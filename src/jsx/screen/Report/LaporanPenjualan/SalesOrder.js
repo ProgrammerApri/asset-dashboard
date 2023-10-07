@@ -10,6 +10,9 @@ import ReactToPrint from "react-to-print";
 import CustomeWrapper from "src/jsx/components/CustomeWrapper/CustomeWrapper";
 import { Dropdown } from "primereact/dropdown";
 import PrimeSingleButton from "src/jsx/components/PrimeSingleButton/PrimeSingleButton";
+// import ExcelExportHelper from "../../../components/ExportExcel/ExcelExportHelper";
+import { MultiSelect } from "primereact/multiselect";
+import { tr } from "../../../../data/tr";
 
 const data = {
   id: 0,
@@ -34,15 +37,15 @@ const ExcelSheet = ReactExport.ExcelFile.ExcelSheet;
 
 const ReportSO = () => {
   const [so, setSo] = useState(null);
+  const [currency, setCurrency] = useState(null);
+  const [customer, setCustomer] = useState(null);
   const [loading, setLoading] = useState(true);
   const printPage = useRef(null);
   const [filtersDate, setFiltersDate] = useState([new Date(), new Date()]);
+  const [selectedSo, setSelectedSo] = useState([]);
+  const [selectedCus, setSelectedCus] = useState([]);
   const [cp, setCp] = useState("");
-  const chunkSize = 7;
-
-  const [satuanDasar, setSatuanDasar] = useState(null);
-  const [satuan, setSatuan] = useState(null);
-  const [lokasi, setLokasi] = useState(null);
+  const chunkSize = 10;
 
   useEffect(() => {
     var d = new Date();
@@ -51,82 +54,7 @@ const ReportSO = () => {
 
     // initFilters1();
     getSo();
-    getLokasi();
-    getSatuan();
   }, []);
-
-  const getSatuan = async (isUpdate = false) => {
-    // setLoading(true);
-    const config = {
-      ...endpoints.getSatuan,
-      data: {},
-    };
-    console.log(config.data);
-    let response = null;
-    try {
-      response = await request(null, config);
-      console.log(response);
-      if (response.status) {
-        const { data } = response;
-        console.log(data);
-        setSatuan(data);
-        let dasar = [];
-        data.forEach((el) => {
-          if (el.type === "d") {
-            dasar.push(el);
-          }
-        });
-        setSatuanDasar(dasar);
-      }
-    } catch (error) {}
-    if (isUpdate) {
-      setLoading(false);
-    } else {
-      setTimeout(() => {
-        setLoading(false);
-      }, 500);
-    }
-  };
-
-  const getLokasi = async () => {
-    const config = {
-      ...endpoints.lokasi,
-      data: {},
-    };
-    console.log(config.data);
-    let response = null;
-    try {
-      response = await request(null, config);
-      console.log(response);
-      if (response.status) {
-        const { data } = response;
-        console.log(data);
-        setLokasi(data);
-      }
-    } catch (error) {}
-  };
-
-
-  let selected = {};
-  const checkLok = (value) => {
-    lokasi?.forEach((element) => {
-      if (value === element.id) {
-        selected = element;
-      }
-    });
-
-    return selected;
-  };
-  const checkUnit = (value) => {
-    let selected = {};
-    satuan.forEach((el) => {
-      if (value === el.id) {
-        selected = el;
-      }
-    });
-
-    return selected;
-  };
 
   const getSo = async (isUpdate = false) => {
     setLoading(true);
@@ -142,6 +70,14 @@ const ReportSO = () => {
       if (response.status) {
         const { data } = response;
         setSo(data);
+        getCur();
+
+        let groupedCus = data?.filter(
+          (el, i) =>
+            i === data.findIndex((ek) => el?.pel_id?.id === ek?.pel_id?.id)
+        );
+
+        setCustomer(groupedCus);
       }
     } catch (error) {}
     if (isUpdate) {
@@ -153,70 +89,253 @@ const ReportSO = () => {
     }
   };
 
+  const getCur = async () => {
+    const config = {
+      ...endpoints.currency,
+      data: {},
+    };
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log(response);
+      if (response.status) {
+        const { data } = response;
+        setCurrency(data);
+      }
+    } catch (error) {}
+  };
+
   const jsonForExcel = (so, excel = false) => {
     let data = [];
+    let cur = 0;
 
-    so?.forEach((el) => {
-      let tgl_gra = new Date(`${el?.so_date}Z`);
-      if (tgl_gra >= filtersDate[0] && tgl_gra <= filtersDate[1]) {
-        let val = [
-          {
-            ref: `No. Req : ${el.so_code}`,
-            type: "header",
-            value: {
-              date: "Tanggal",
-              prod: "Product",
-              cus: "Ref. Customer",
-              lok: "Lokasi",
-              ord: "Quantity",
-              unit: "Unit",
-              // hs: "Harga Satuan",
-              total: "Total",
-            },
-          },
-        ];
-
-        let total = 0;
-        el.sprod?.forEach((ek) => {
-          val.push({
-            type: "item",
-            value: {
-              date: formatDate(el.so_date),
-              prod: `(${ek.prod_id.code}) ${ek.prod_id.name} `,
-              cus:
-                el.pel_id !== null
-                  ? `(${el.pel_id.cus_code}) ${el.pel_id.cus_name}`
-                  : "-",
-              lok: checkLok(ek.location).name,
-              ord: ek.order,
-              unit: ek.prod_id.unit && ek.unit_id.name,
-              total: `Rp. ${formatIdr(ek.total)}`,
-            },
+    if (selectedSo?.length) {
+      selectedSo?.forEach((sel) => {
+        so?.forEach((el) => {
+          currency?.forEach((elem) => {
+            if (el.pel_id.cus_curren === elem.id) {
+              cur = elem.rate;
+            }
           });
+
+          // if (el.status !== 2) {
+          let tgl_gra = new Date(`${el?.so_date}Z`);
+          if (tgl_gra >= filtersDate[0] && tgl_gra <= filtersDate[1]) {
+            if (el?.so_code === sel?.so_code) {
+              let val = [
+                {
+                  ref: `${el.so_code}`,
+                  type: "header",
+                  value: {
+                    date: "Date",
+                    prod: "Product",
+                    cus: "Customer",
+                    ord: "Quantity",
+                    unit: "Unit",
+                    prc: "Price",
+                    total: "Total",
+                  },
+                },
+              ];
+
+              let total_amnt = 0;
+              let total_qty = 0;
+
+              el.sprod?.forEach((ek) => {
+                val.push({
+                  type: "item",
+                  value: {
+                    date: formatDate(el.so_date),
+                    prod: `(${ek.prod_id.code}) ${ek.prod_id.name} `,
+                    cus:
+                      el.pel_id !== null
+                        ? `(${el.pel_id.cus_code}) ${el.pel_id.cus_name}`
+                        : "-",
+                    ord: formatIdr(ek.order),
+                    unit: ek.prod_id.unit && ek.unit_id.name,
+                    prc:
+                      el.pel_id.cus_curren !== null
+                        ? `Rp. ${formatIdr(ek.price * cur)}`
+                        : `Rp. ${formatIdr(ek.price)}`,
+                    total: `Rp. ${formatIdr(ek.total)}`,
+                  },
+                });
+
+                total_qty += ek?.order;
+                total_amnt += ek?.total;
+              });
+
+              val.push({
+                type: "footer",
+                value: {
+                  date: "Total",
+                  prod: ``,
+                  cus: "",
+                  ord: formatIdr(total_qty),
+                  unit: "",
+                  prc: "",
+                  total: `Rp. ${formatIdr(total_amnt)}`,
+                },
+              });
+
+              data.push(val);
+            }
+          }
+          // }
+        });
+      });
+    } else if (selectedCus?.length) {
+      selectedCus?.forEach((cus) => {
+        so?.forEach((el) => {
+          currency?.forEach((elem) => {
+            if (el.pel_id.cus_curren === elem.id) {
+              cur = elem.rate;
+            }
+          });
+
+          // if (el.status !== 2) {
+          let tgl_gra = new Date(`${el?.so_date}Z`);
+          if (tgl_gra >= filtersDate[0] && tgl_gra <= filtersDate[1]) {
+            if (el?.pel_id?.id === cus?.pel_id?.id) {
+              let val = [
+                {
+                  ref: `${el.so_code}`,
+                  type: "header",
+                  value: {
+                    date: "Date",
+                    prod: "Product",
+                    cus: "Customer",
+                    ord: "Quantity",
+                    unit: "Unit",
+                    prc: "Price",
+                    total: "Total",
+                  },
+                },
+              ];
+
+              let total_amnt = 0;
+              let total_qty = 0;
+
+              el.sprod?.forEach((ek) => {
+                val.push({
+                  type: "item",
+                  value: {
+                    date: formatDate(el.so_date),
+                    prod: `(${ek.prod_id.code}) ${ek.prod_id.name} `,
+                    cus:
+                      el.pel_id !== null
+                        ? `(${el.pel_id.cus_code}) ${el.pel_id.cus_name}`
+                        : "-",
+                    ord: formatIdr(ek.order),
+                    unit: ek.prod_id.unit && ek.unit_id.name,
+                    prc:
+                      el.pel_id.cus_curren !== null
+                        ? `Rp. ${formatIdr(ek.price * cur)}`
+                        : `Rp. ${formatIdr(ek.price)}`,
+                    total: `Rp. ${formatIdr(ek.total)}`,
+                  },
+                });
+
+                total_qty += ek?.order;
+                total_amnt += ek?.total;
+              });
+
+              val.push({
+                type: "footer",
+                value: {
+                  date: "Total",
+                  prod: ``,
+                  cus: "",
+                  ord: formatIdr(total_qty),
+                  unit: "",
+                  prc: "",
+                  total: `Rp. ${formatIdr(total_amnt)}`,
+                },
+              });
+
+              data.push(val);
+            }
+          }
+        });
+      });
+    } else {
+      so?.forEach((el) => {
+        currency?.forEach((elem) => {
+          if (el.pel_id.cus_curren === elem.id) {
+            cur = elem.rate;
+          }
         });
 
-        //   val.push({
-        //     // ref: el.kd_gra,
-        //     type: "footer",
-        //     value: {
-        //       date: "Total",
-        //       sup: "",
-        //       prod: "",
-        //       ord: "",
-        //       unit: "",
-        //       prc: "",
-        //       tot: `Rp. ${formatIdr(total)}`,
-        //     },
-        //   });
-        data.push(val);
-      }
-    });
+        // if (el.status !== 2) {
+        let tgl_gra = new Date(`${el?.so_date}Z`);
+        if (tgl_gra >= filtersDate[0] && tgl_gra <= filtersDate[1]) {
+          let val = [
+            {
+              ref: `${el.so_code}`,
+              type: "header",
+              value: {
+                date: "Date",
+                prod: "Product",
+                cus: "Customer",
+                ord: "Quantity",
+                unit: "Unit",
+                prc: "Price",
+                total: "Total",
+              },
+            },
+          ];
+
+          let total_amnt = 0;
+          let total_qty = 0;
+
+          el.sprod?.forEach((ek) => {
+            val.push({
+              type: "item",
+              value: {
+                date: formatDate(el.so_date),
+                prod: `(${ek.prod_id.code}) ${ek.prod_id.name} `,
+                cus:
+                  el.pel_id !== null
+                    ? `(${el.pel_id.cus_code}) ${el.pel_id.cus_name}`
+                    : "-",
+                ord: formatIdr(ek.order),
+                unit: ek.prod_id.unit && ek.unit_id.name,
+                prc:
+                  el.pel_id.cus_curren !== null
+                    ? `Rp. ${formatIdr(ek.price * cur)}`
+                    : `Rp. ${formatIdr(ek.price)}`,
+                total: `Rp. ${formatIdr(ek.total)}`,
+              },
+            });
+
+            total_qty += ek?.order;
+            total_amnt += ek?.total;
+          });
+
+          val.push({
+            type: "footer",
+            value: {
+              date: "Total",
+              prod: ``,
+              cus: "",
+              ord: formatIdr(total_qty),
+              unit: "",
+              prc: "",
+              total: `Rp. ${formatIdr(total_amnt)}`,
+            },
+          });
+
+          data.push(val);
+        }
+        // }
+      });
+    }
 
     let final = [
       {
         columns: [
           {
-            title: "sales order report",
+            title: "Sales Order report",
             width: { wch: 30 },
             style: {
               font: { sz: "16", bold: true },
@@ -256,7 +375,6 @@ const ReportSO = () => {
       let item = [];
       el.forEach((ek) => {
         item.push([
-
           {
             value: `${ek.value.date}`,
             style: {
@@ -265,7 +383,7 @@ const ReportSO = () => {
                 bold:
                   ek.type === "header" || ek.type === "footer" ? true : false,
               },
-              alignment: { horizontal: "right", vertical: "center" },
+              alignment: { horizontal: "center", vertical: "center" },
             },
           },
           {
@@ -284,17 +402,6 @@ const ReportSO = () => {
             style: {
               font: { sz: "14", bold: ek.type === "header" ? true : false },
               alignment: { horizontal: "left", vertical: "center" },
-            },
-          },
-          {
-            value: `${ek.value.lok}`,
-            style: {
-              font: {
-                sz: "14",
-                bold:
-                  ek.type === "header" || ek.type === "footer" ? true : false,
-              },
-              alignment: { horizontal: "right", vertical: "center" },
             },
           },
           {
@@ -319,7 +426,18 @@ const ReportSO = () => {
               alignment: { horizontal: "right", vertical: "center" },
             },
           },
-         
+
+          {
+            value: `${ek.value.prc}`,
+            style: {
+              font: {
+                sz: "14",
+                bold:
+                  ek.type === "header" || ek.type === "footer" ? true : false,
+              },
+              alignment: { horizontal: "right", vertical: "center" },
+            },
+          },
           {
             value: `${ek.value.total}`,
             style: {
@@ -396,7 +514,7 @@ const ReportSO = () => {
           },
           {
             title: "",
-            width: { wch: 15},
+            width: { wch: 15 },
             style: {
               font: { sz: "14", bold: true },
               alignment: { horizontal: "right", vertical: "center" },
@@ -438,7 +556,16 @@ const ReportSO = () => {
     if (excel) {
       return final;
     } else {
-      return data;
+      let page = [];
+
+      data?.forEach((element) => {
+        element?.forEach((el) => {
+          page.push(el);
+        });
+      });
+      console.log("page===");
+      console.log(page);
+      return page;
     }
   };
 
@@ -453,7 +580,7 @@ const ReportSO = () => {
       <div className="flex justify-content-between">
         <div className="col-8 ml-0 mr-0 pl-0">
           <Row className="m-0">
-            <div className="col-3 mr-3 p-0">
+            <div className="col-3 mr-3 p-0 mt-2">
               <div className="p-inputgroup">
                 <span className="p-inputgroup-addon">
                   <i className="pi pi-calendar" />
@@ -464,33 +591,57 @@ const ReportSO = () => {
                     setFiltersDate(e.value);
                   }}
                   selectionMode="range"
-                  placeholder="Pilih Tanggal"
+                  placeholder={tr[localStorage.getItem("language")].pilih_tgl}
                   dateFormat="dd-mm-yy"
                   readOnlyInput
                 />
               </div>
             </div>
-            {/* <div className="">
-              <Dropdown
-                value={selectedSup ?? null}
-                options={supplier}
+            <div className="p-inputgroup col-3">
+              <MultiSelect
+                value={selectedSo ?? null}
+                options={so}
                 onChange={(e) => {
-                  setSelected(e.value);
+                  setSelectedSo(e.value);
                 }}
-                placeholder="Pilih Supplier"
-                optionLabel="sup_id.sup_name"
+                placeholder={tr[localStorage.getItem("language")].pilih_kd_req}
+                optionLabel="so_code"
                 filter
-                filterBy="sup_id.sup_name"
+                filterBy="so_code"
                 showClear
+                display="chip"
+                maxSelectedLabels={3}
               />
-            </div> */}
+            </div>
+            <div className="p-inputgroup col-3">
+              <MultiSelect
+                value={selectedCus ?? null}
+                options={customer}
+                onChange={(e) => {
+                  setSelectedCus(e.value);
+                }}
+                placeholder={tr[localStorage.getItem("language")].pilih_cus}
+                optionLabel="pel_id.cus_name"
+                filter
+                filterBy="pel_id.cus_name"
+                showClear
+                display="chip"
+                maxSelectedLabels={3}
+              />
+            </div>
           </Row>
         </div>
         <div style={{ height: "1rem" }}></div>
         <Row className="mr-1 mt-2" style={{ height: "3rem" }}>
           <div className="mr-3">
+            {/* <ExcelExportHelper
+              json={so ? jsonForExcel(so, true) : null}
+              filename={`sales_order_report_export_${new Date().getTime()}`}
+              sheetname="report"
+            /> */}
+
             <ExcelFile
-              filename={`request_purchase_report_export_${new Date().getTime()}`}
+              filename={`sales_order_report_export_${new Date().getTime()}`}
               element={
                 <PrimeSingleButton
                   label="Excel"
@@ -500,7 +651,7 @@ const ReportSO = () => {
             >
               <ExcelSheet
                 dataSet={so ? jsonForExcel(so, true) : null}
-                name={"Request Purchase"}
+                name={"Report"}
               />
             </ExcelFile>
           </div>
@@ -533,7 +684,7 @@ const ReportSO = () => {
   };
 
   const formatIdr = (value) => {
-    return `${value}`
+    return `${value?.toFixed(2)}`
       .replace(".", ",")
       .replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1.");
   };
@@ -557,14 +708,16 @@ const ReportSO = () => {
         </Col>
       </Row>
 
-      <Row className="m-0 justify-content-center" ref={printPage}>
+      <Row className="m-0 justify-content-center">
         {chunk(jsonForExcel(so) ?? [], chunkSize)?.map((val, idx) => {
           return (
             <Card className="ml-1 mr-1 mt-0">
               <Card.Body className="p-0 m-0">
                 <CustomeWrapper
-                  tittle={"sales order report"}
-                  subTittle={`sales order report From ${formatDate(
+                  viewOnly
+                  horizontal
+                  tittle={"Sales Order report"}
+                  subTittle={`Sales Order report From ${formatDate(
                     filtersDate[0]
                   )} To ${formatDate(filtersDate[1])}`}
                   onComplete={(cp) => setCp(cp)}
@@ -572,120 +725,70 @@ const ReportSO = () => {
                   body={
                     <>
                       {val.map((v) => {
-                        return (
-                          <DataTable
-                            responsiveLayout="none"
-                            value={v}
-                            showGridlines
-                            dataKey="id"
-                            rowHover
-                            emptyMessage="Tidak Ada Transaksi"
-                            className="mt-0"
-                          >
-                            <Column
-                              className="header-center"
-                              header={(e) =>
-                                e.props.value ? e.props?.value[0]?.ref : null
-                              }
-                              style={{ minWidth: "10rem" }}
-                              body={(e) => (
-                                <div
-                                  className={
-                                    e.type === "header" || e.type === "footer"
-                                      ? "font-weight-bold"
-                                      : ""
-                                  }
-                                >
-                                  {e.value.date}
+                        if (v.type === "header") {
+                          return (
+                            <>
+                              <div className="header-report single">
+                                {v.ref}
+                              </div>
+                              <div className="header-report row m-0">
+                                <div className="col-2">{v.value?.date}</div>
+                                <div className="col-2">{v.value?.cus}</div>
+                                <div className="col-2">{v.value?.prod}</div>
+                                <div className="col-1 text-right ">
+                                  {v.value?.ord}
                                 </div>
-                              )}
-                            />
-                            <Column
-                              className="header-center"
-                              header=""
-                              style={{ minWidth: "15rem" }}
-                              body={(e) => (
-                                <div
-                                  className={
-                                    e.type === "header" && "font-weight-bold"
-                                  }
-                                >
-                                  {e.value.prod}
+                                <div className="col-1">{v.value?.unit}</div>
+                                <div className="col-2 text-right ">
+                                  {v.value?.prc}
                                 </div>
-                              )}
-                            />
-                            <Column
-                              className="header-center"
-                              header=""
-                              style={{ minWidth: "15rem" }}
-                              body={(e) => (
-                                <div
-                                  className={
-                                    e.type === "header" && "font-weight-bold"
-                                  }
-                                >
-                                  {e.value.cus}
+                                <div className="col-2 text-right ">
+                                  {v.value?.total}
                                 </div>
-                              )}
-                            />
-                            <Column
-                              className="header-center"
-                              header=""
-                              style={{ minWidth: "5rem" }}
-                              body={(e) => (
-                                <div
-                                  className={
-                                    e.type === "header" && "font-weight-bold"
-                                  }
-                                >
-                                  {e.value.lok}
+                              </div>
+                            </>
+                          );
+                        } else if (v.type === "item") {
+                          return (
+                            <>
+                              <div className="item-report row m-0">
+                                <div className="col-2">{v.value?.date}</div>
+                                <div className="col-2">{v.value?.cus}</div>
+                                <div className="col-2">{v.value?.prod}</div>
+                                <div className="col-1 text-right ">
+                                  {v.value?.ord}
                                 </div>
-                              )}
-                            />
-                            <Column
-                              className="header-center"
-                              header=""
-                              style={{ minWidth: "5rem" }}
-                              body={(e) => (
-                                <div
-                                  className={
-                                    e.type === "header" && "font-weight-bold"
-                                  }
-                                >
-                                  {e.value.ord}
+                                <div className="col-1">{v.value?.unit}</div>
+                                <div className="col-2 text-right ">
+                                  {v.value?.prc}
                                 </div>
-                              )}
-                            />
-                            <Column
-                              className="header-center"
-                              header=""
-                              style={{ minWidth: "5rem" }}
-                              body={(e) => (
-                                <div
-                                  className={
-                                    e.type === "header" && "font-weight-bold"
-                                  }
-                                >
-                                  {e.value.unit}
+                                <div className="col-2 text-right ">
+                                  {v.value?.total}
                                 </div>
-                              )}
-                            />
-                            <Column
-                              className="header-center"
-                              header=""
-                              style={{ minWidth: "8rem" }}
-                              body={(e) => (
-                                <div
-                                  className={
-                                    e.type === "header" && "font-weight-bold"
-                                  }
-                                >
-                                  {e.value.total}
+                              </div>
+                            </>
+                          );
+                        } else if (v.type === "footer") {
+                          return (
+                            <>
+                              <div className="footer-report row m-0 mb-5">
+                                <div className="col-2">{v.value?.date}</div>
+                                <div className="col-2">{v.value?.cus}</div>
+                                <div className="col-2">{v.value?.prod}</div>
+                                <div className="col-1 text-right ">
+                                  {v.value?.ord}
                                 </div>
-                              )}
-                            />
-                          </DataTable>
-                        );
+                                <div className="col-1">{v.value?.unit}</div>
+                                <div className="col-2 text-right ">
+                                  {v.value?.prc}
+                                </div>
+                                <div className="col-2 text-right ">
+                                  {v.value?.total}
+                                </div>
+                              </div>
+                            </>
+                          );
+                        }
                       })}
                     </>
                   }
@@ -694,6 +797,100 @@ const ReportSO = () => {
             </Card>
           );
         })}
+      </Row>
+
+      <Row className="m-0 justify-content-center d-none">
+        <Card>
+          <Card.Body className="p-0" ref={printPage}>
+            {chunk(jsonForExcel(so) ?? [], chunkSize)?.map((val, idx) => {
+              return (
+                <Card className="ml-1 mr-1 mt-0">
+                  <Card.Body className="p-0 m-0">
+                    <CustomeWrapper
+                      horizontal
+                      tittle={"Sales Order report"}
+                      subTittle={`Sales Order report From ${formatDate(
+                        filtersDate[0]
+                      )} To ${formatDate(filtersDate[1])}`}
+                      onComplete={(cp) => setCp(cp)}
+                      page={idx + 1}
+                      body={
+                        <>
+                          {val.map((v) => {
+                            if (v.type === "header") {
+                              return (
+                                <>
+                                  <div className="header-report single">
+                                    {v.ref}
+                                  </div>
+                                  <div className="header-report row m-0">
+                                    <div className="col-2">{v.value?.date}</div>
+                                    <div className="col-2">{v.value?.cus}</div>
+                                    <div className="col-2">{v.value?.prod}</div>
+                                    <div className="col-1 text-right ">
+                                      {v.value?.ord}
+                                    </div>
+                                    <div className="col-1">{v.value?.unit}</div>
+                                    <div className="col-2 text-right ">
+                                      {v.value?.prc}
+                                    </div>
+                                    <div className="col-2 text-right ">
+                                      {v.value?.total}
+                                    </div>
+                                  </div>
+                                </>
+                              );
+                            } else if (v.type === "item") {
+                              return (
+                                <>
+                                  <div className="item-report row m-0">
+                                    <div className="col-2">{v.value?.date}</div>
+                                    <div className="col-2">{v.value?.cus}</div>
+                                    <div className="col-2">{v.value?.prod}</div>
+                                    <div className="col-1 text-right ">
+                                      {v.value?.ord}
+                                    </div>
+                                    <div className="col-1">{v.value?.unit}</div>
+                                    <div className="col-2 text-right ">
+                                      {v.value?.prc}
+                                    </div>
+                                    <div className="col-2 text-right ">
+                                      {v.value?.total}
+                                    </div>
+                                  </div>
+                                </>
+                              );
+                            } else if (v.type === "footer") {
+                              return (
+                                <>
+                                  <div className="footer-report row m-0 mb-5">
+                                    <div className="col-2">{v.value?.date}</div>
+                                    <div className="col-2">{v.value?.cus}</div>
+                                    <div className="col-2">{v.value?.prod}</div>
+                                    <div className="col-1 text-right ">
+                                      {v.value?.ord}
+                                    </div>
+                                    <div className="col-1">{v.value?.unit}</div>
+                                    <div className="col-2 text-right ">
+                                      {v.value?.prc}
+                                    </div>
+                                    <div className="col-2 text-right ">
+                                      {v.value?.total}
+                                    </div>
+                                  </div>
+                                </>
+                              );
+                            }
+                          })}
+                        </>
+                      }
+                    />
+                  </Card.Body>
+                </Card>
+              );
+            })}
+          </Card.Body>
+        </Card>
       </Row>
     </>
   );

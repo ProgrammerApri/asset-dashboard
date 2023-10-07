@@ -399,6 +399,22 @@ const DataBatch = ({ onAdd, onEdit, onDetail }) => {
               type: SET_CURRENT_BTC,
               payload: {
                 ...data,
+                seqq: [
+                  {
+                    id: 0,
+                    seq: null,
+                    wc_id: null,
+                    loc_id: null,
+                    mch_id: null,
+                    work_id: null,
+                    sup_id: null,
+                    datetime_plan: null,
+                    datetime_actual: null,
+                    datetime_end: null,
+                    durasi: null,
+                    proses: null,
+                  },
+                ],
                 sequence: [
                   {
                     id: 0,

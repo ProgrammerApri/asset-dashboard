@@ -12,9 +12,16 @@ import ReactExport from "react-data-export";
 import ReactToPrint from "react-to-print";
 import CustomeWrapper from "src/jsx/components/CustomeWrapper/CustomeWrapper";
 import CustomDropdown from "src/jsx/components/CustomDropdown/CustomDropdown";
-import { el } from "date-fns/locale";
+
 import PrimeSingleButton from "src/jsx/components/PrimeSingleButton/PrimeSingleButton";
 import { Dropdown } from "primereact/dropdown";
+// import { Link } from "@material-ui/core";
+import { Link } from "react-router-dom";
+// import ExcelExportHelper from "../../../components/ExportExcel/ExcelExportHelper";
+import { MultiSelect } from "primereact/multiselect";
+import formatIdr from "../../../../utils/formatIdr";
+import { tr } from "../../../../data/tr";
+// import formatIdr from "../../../../utils/formatIdr";
 
 const ExcelFile = ReactExport.ExcelFile;
 const ExcelSheet = ReactExport.ExcelFile.ExcelSheet;
@@ -23,14 +30,16 @@ const UmurHutangRingkasan = () => {
   const [report, setReport] = useState(null);
   const [loading, setLoading] = useState(true);
   const printPage = useRef(null);
-  const [date, setDate] = useState(new Date());
+  const [filtDate, setFiltDate] = useState(new Date());
+  const [date, setDate] = useState(null);
   const [rawAP, setRawAP] = useState(null);
   const [supplier, setSupplier] = useState(null);
   const [selectSup, setSelectSup] = useState(null);
   const [ap, setAp] = useState(null);
+  const [apAll, setApAll] = useState(null);
   const [total, setTotal] = useState(null);
   const [cp, setCp] = useState("");
-  const chunkSize = 2;
+  const chunkSize = 15;
 
   useEffect(() => {
     getSupplier();
@@ -47,37 +56,20 @@ const UmurHutangRingkasan = () => {
       console.log(response);
       if (response.status) {
         const { data } = response;
-        let sup = [];
-        let total = 0;
-        spl.forEach((element) => {
-          element.ap = [];
-          data.forEach((el) => {
-            if (el.trx_type === "LP" && el.pay_type === "P1") {
-              if (element.supplier.id === el.sup_id.id) {
-                element.ap.push({ ...el, trx_amnh: 0, acq_amnh: 0 });
-              }
-            }
-          });
-          element.ap.forEach((el) => {
-            data.forEach((ek) => {
-              if (el.ord_id?.id === ek.ord_id?.id) {
-                el.trx_amnh = ek?.trx_amnh ?? 0;
-                el.acq_amnh += ek?.acq_amnh ?? 0;
-              }
-            });
-            total += el?.trx_amnh ?? 0 - el?.acq_amnh ?? 0;
-          });
-          if (element.ap.length > 0) {
-            sup.push(element);
+        let filt = [];
+        data.forEach((el) => {
+          // if (!el.lunas) {
+          if (el.trx_dbcr === "k" && el?.pay_type === "P1") {
+            filt.push(el);
+            // }
           }
         });
-        setAp(sup);
-        setRawAP(data);
-        setTotal(total);
+        setAp(filt);
+        setApAll(data);
 
-        let grouped = data?.filter(
+        let grouped = filt?.filter(
           (el, i) =>
-            i === data.findIndex((ek) => el?.sup_id?.id === ek?.sup_id?.id)
+            i === filt.findIndex((ek) => el?.sup_id?.id === ek?.sup_id?.id)
         );
         setSupplier(grouped);
       }
@@ -120,166 +112,206 @@ const UmurHutangRingkasan = () => {
   const jsonForExcel = (ap, excel = false) => {
     let data = [];
 
-    if (selectSup) {
-      ap?.forEach((el) => {
-        if (selectSup?.sup_id?.id === el.supplier?.id) {
-          let val = [
-            {
-              sup: `${el.supplier.sup_name} (${el.supplier.sup_code})`,
-              type: "header",
-              value: {
-                supp: "Supplier",
-                jt: "Before Due ",
-                day1: "7 Day",
-                day2: "14 Day",
-                day3: "30 Day",
-                day4: "60 Day",
-                older: "Older ",
-                total: "Total ",
-              },
-            },
-          ];
-          let amn = 0;
-          let t_jt = 0;
-          let t_day1 = 0;
-          let t_day2 = 0;
-          let t_day3 = 0;
-          let t_day4 = 0;
-          let t_older = 0;
-          el.ap.forEach((ek) => {
-            let due = new Date(`${ek?.ord_due}Z`);
-            let diff = (date - due) / (1000 * 60 * 60 * 24);
-
-            val.push({
-              sup: `${el.supplier.sup_name} (${el.supplier.sup_code})`,
-              type: "item",
-              value: {
-                supp: `${el.supplier.sup_name} (${el.supplier.sup_code})`,
-                jt: diff <= 0 ? `Rp. ${formatIdr(ek.trx_amnh)}` : "-",
-                day1:
-                  diff <= 7 && diff > 0 ? `Rp. ${formatIdr(ek.trx_amnh)}` : "-",
-                day2:
-                  diff <= 14 && diff > 7
-                    ? `Rp. ${formatIdr(ek.trx_amnh)}`
-                    : "-",
-                day3:
-                  diff <= 30 && diff > 14
-                    ? `Rp. ${formatIdr(ek.trx_amnh)}`
-                    : "-",
-                day4:
-                  diff <= 60 && diff > 30
-                    ? `Rp. ${formatIdr(ek.trx_amnh)}`
-                    : "-",
-
-                older: diff > 60 ? `Rp. ${formatIdr(ek.trx_amnh)}` : "-",
-
-                total: `Rp. ${formatIdr(ek.trx_amnh)}`,
-              },
-            });
-            amn += ek.trx_amnh;
-            t_jt += diff <= 0 ? ek.trx_amnh : 0;
-            t_day1 += diff <= 7 && diff > 0 ? ek.trx_amnh : 0;
-            t_day2 += diff <= 14 && diff > 7 ? ek.trx_amnh : 0;
-            t_day3 += diff <= 30 && diff > 14 ? ek.trx_amnh : 0;
-            t_day4 += diff <= 60 && diff > 30 ? ek.trx_amnh : 0;
-            t_older += diff > 60 ? ek.trx_amnh : 0;
-          });
-          val.push({
-            sup: `${el.supplier.sup_name} (${el.supplier.sup_code})`,
-            type: "footer",
-            value: {
-              supp: `${el.supplier.sup_name} (${el.supplier.sup_code})`,
-              jt: `Rp. ${formatIdr(t_jt)}`,
-              day1: `Rp. ${formatIdr(t_day1)}`,
-              day2: `Rp. ${formatIdr(t_day2)}`,
-              day3: `Rp. ${formatIdr(t_day3)}`,
-              day4: `Rp. ${formatIdr(t_day4)}`,
-              older: `Rp. ${formatIdr(t_older)}`,
-
-              total: `Rp. ${formatIdr(amn)}`,
-            },
-          });
-          data.push(val);
-        }
-      });
-    } else {
-      ap?.forEach((el) => {
-        let val = [
-          {
-            sup: `${el.supplier.sup_name} (${el.supplier.sup_code})`,
-            type: "header",
-            value: {
-              supp: "Supplier",
-              jt: "Before Due ",
-              day1: "7 Day",
-              day2: "14 Day",
-              day3: "30 Day",
-              day4: "60 Day",
-              older: "Older",
-
-              total: "Total ",
-            },
-          },
-        ];
+    if (selectSup?.length) {
+      selectSup.forEach((p) => {
         let amn = 0;
+        let hut = 0;
         let t_jt = 0;
         let t_day1 = 0;
         let t_day2 = 0;
         let t_day3 = 0;
         let t_day4 = 0;
         let t_older = 0;
-        el.ap.forEach((ek) => {
-          let due = new Date(`${ek?.ord_due}Z`);
-          let diff = (date - due) / (1000 * 60 * 60 * 24);
+        let t_pay = 0;
+        let sup = null;
+        let sup_id = null;
 
-          val.push({
-            sup: `${el.supplier.sup_name} (${el.supplier.sup_code})`,
-            type: "item",
+        let val = [
+          {
+            sup: `${p.sup_id?.sup_name} (${p.sup_id?.sup_code})`,
+            type: "header",
             value: {
-              // fk: el.supplier.sup_code,
-              supp: `${el.supplier.sup_name} (${el.supplier.sup_code})`,
-              jt: diff <= 0 ? `Rp. ${formatIdr(ek.trx_amnh)}` : "-",
-              day1:
-                diff <= 7 && diff > 0 ? `Rp. ${formatIdr(ek.trx_amnh)}` : "-",
-              day2:
-                diff <= 14 && diff > 7 ? `Rp. ${formatIdr(ek.trx_amnh)}` : "-",
-              day3:
-                diff <= 30 && diff > 14 ? `Rp. ${formatIdr(ek.trx_amnh)}` : "-",
-              day4:
-                diff <= 60 && diff > 30 ? `Rp. ${formatIdr(ek.trx_amnh)}` : "-",
-
-              older: diff > 60 ? `Rp. ${formatIdr(ek.trx_amnh)}` : "-",
-              // nota: `Rp. ${formatIdr(0)}`,
-              // rtr: `Rp. ${formatIdr(0)}`,
-              total: `Rp. ${formatIdr(ek.trx_amnh)}`,
-              // giro: `Rp. ${formatIdr(0)}`,
+              supp: tr[localStorage.getItem("language")].pemasok,
+              hut: "Payable",
+              jt: "Before Due ",
+              day1: "7 Day",
+              day2: "14 Day",
+              day3: "30 Day",
+              day4: "60 Day",
+              older: "Older ",
+              total: "Payment ",
             },
-          });
-          amn += ek.trx_amnh;
-          t_jt += diff <= 0 ? ek.trx_amnh : 0;
-          t_day1 += diff <= 7 && diff > 0 ? ek.trx_amnh : 0;
-          t_day2 += diff <= 14 && diff > 7 ? ek.trx_amnh : 0;
-          t_day3 += diff <= 30 && diff > 14 ? ek.trx_amnh : 0;
-          t_day4 += diff <= 60 && diff > 30 ? ek.trx_amnh : 0;
-          t_older += diff > 60 ? ek.trx_amnh : 0;
-        });
-        val.push({
-          sup: `${el.supplier.sup_name} - ${el.supplier.sup_code}`,
-          type: "footer",
-          value: {
-            supp: `${el.supplier.sup_name} (${el.supplier.sup_code})`,
-            jt: `Rp. ${formatIdr(t_jt)}`,
-            day1: `Rp. ${formatIdr(t_day1)}`,
-            day2: `Rp. ${formatIdr(t_day2)}`,
-            day3: `Rp. ${formatIdr(t_day3)}`,
-            day4: `Rp. ${formatIdr(t_day4)}`,
-            older: `Rp. ${formatIdr(t_older)}`,
+          },
+        ];
 
-            total: `Rp. ${formatIdr(amn)}`,
+        ap?.forEach((ek) => {
+          console.log("ap", ap);
+          if (p?.sup_id?.id === ek.sup_id?.id) {
+            let acq_amnh = 0;
+            let due = new Date(`${ek?.ord_due}Z`);
+            let diff = (date - due) / (1000 * 60 * 60 * 24);
+            apAll?.forEach((all) => {
+              if (
+                (all?.ord_id && ek?.ord_id?.id === all.ord_id?.id) ||
+                (all?.sa_id && ek?.sa_id?.id === all.sa_id?.id) ||
+                (all?.kor_id && ek?.kor_id?.id === all.kor_id?.id)
+              ) {
+                if (all?.trx_dbcr === "d" && all?.pay_type === "H4") {
+                  acq_amnh += all?.acq_amnh;
+                }
+                if (all?.trx_dbcr === "d" && all?.pay_type === "P1") {
+                  acq_amnh += all?.trx_amnh != null && all?.acq_amnh !== null
+                    ? all?.acq_amnh
+                    : all?.trx_amnh;
+                }
+              }
+            });
+
+            hut += ek?.trx_amnh;
+            t_pay += acq_amnh;
+
+            if (due <= filtDate) {
+              // sup = `${ek.sup_id?.sup_name} (${ek.sup_id?.sup_code})`;
+              sup_id = ek.sup_id?.id;
+              amn += ek.trx_dbcr === "k" ? ek.trx_amnh : ek.trx_amnh;
+
+              t_jt += diff <= 0 ? ek.trx_amnh - acq_amnh : 0;
+              t_day1 += diff <= 7 && diff > 0 ? ek.trx_amnh - acq_amnh : 0;
+              t_day2 += diff <= 14 && diff > 7 ? ek.trx_amnh - acq_amnh : 0;
+              t_day3 += diff <= 30 && diff > 14 ? ek.trx_amnh - acq_amnh : 0;
+              t_day4 += diff <= 60 && diff > 30 ? ek.trx_amnh - acq_amnh : 0;
+              t_older += diff > 60 ? ek.trx_amnh - acq_amnh : 0;
+            }
+          }
+        });
+
+        val.push({
+          sup: ``,
+          type: "item",
+          value: {
+            supp: `${p.sup_id?.sup_name} (${p.sup_id?.sup_code})`,
+            sup_id: sup_id,
+            hut: `${formatIdr(hut)}`,
+            jt: `${formatIdr(t_jt)}`,
+            day1: `${formatIdr(t_day1)}`,
+            day2: `${formatIdr(t_day2)}`,
+            day3: `${formatIdr(t_day3)}`,
+            day4: `${formatIdr(t_day4)}`,
+
+            older: `${formatIdr(t_older)}`,
+
+            total: `${formatIdr(t_pay)}`,
           },
         });
+
         data.push(val);
       });
+    } else {
+      let grouped = ap?.filter(
+        (el, i) => i === ap.findIndex((ek) => el?.sup_id?.id === ek?.sup_id?.id)
+      );
+
+      if (date) {
+        let total_hut = 0;
+        let total_bd = 0;
+        let total_d1 = 0;
+        let total_d2 = 0;
+        let total_d3 = 0;
+        let total_d4 = 0;
+        let total_old = 0;
+        let total_pay = 0;
+
+        grouped?.forEach((ek) => {
+          let val = [
+            {
+              sup: ``,
+              type: "header",
+              value: {
+                supp: tr[localStorage.getItem("language")].pemasok,
+                hut: "Payable",
+                jt: "Before Due ",
+                day1: "7 Day",
+                day2: "14 Day",
+                day3: "30 Day",
+                day4: "60 Day",
+                older: "Older ",
+                total: "Payment ",
+              },
+            },
+          ];
+
+          let amn = 0;
+          let t_hut = 0;
+          let t_jt = 0;
+          let t_day1 = 0;
+          let t_day2 = 0;
+          let t_day3 = 0;
+          let t_day4 = 0;
+          let t_older = 0;
+          let t_pay = 0;
+          let sup = null;
+          let sup_id = null;
+
+          ap?.forEach((el) => {
+            if (ek.sup_id?.id === el.sup_id?.id) {
+              // if (p?.sup_id?.id === ek.sup_id?.id) {
+              let acq_amnh = 0;
+              let due = new Date(`${el?.ord_due}Z`);
+              let diff = (date - due) / (1000 * 60 * 60 * 24);
+              apAll?.forEach((all) => {
+                if (
+                  (all?.ord_id && el?.ord_id?.id === all.ord_id?.id) ||
+                  (all?.sa_id && el?.sa_id?.id === all.sa_id?.id) ||
+                  (all?.kor_id && el?.kor_id?.id === all.kor_id?.id)
+                ) {
+                  if (all?.trx_dbcr === "d" && all?.pay_type === "H4") {
+                    acq_amnh += all?.acq_amnh;
+                  }
+                  if (all?.trx_dbcr === "d" && all?.pay_type === "P1") {
+                    acq_amnh += all?.trx_amnh != null && all?.acq_amnh !== null
+                      ? all?.acq_amnh
+                      : all?.trx_amnh;
+                  }
+                }
+              });
+
+              t_hut += el?.trx_amnh;
+              t_pay += acq_amnh;
+
+              // if (due <= filtDate) {
+              // sup = `${el.sup_id?.sup_name} (${el.sup_id?.sup_code})`;
+              sup_id = el.sup_id?.id;
+              amn += el.trx_dbcr === "k" ? el.trx_amnh : el.trx_amnh;
+
+              t_jt += diff <= 0 ? el.trx_amnh : 0;
+              t_day1 += diff <= 7 && diff > 0 ? el.trx_amnh - acq_amnh : 0;
+              t_day2 += diff <= 14 && diff > 7 ? el.trx_amnh - acq_amnh : 0;
+              t_day3 += diff <= 30 && diff > 14 ? el.trx_amnh - acq_amnh : 0;
+              t_day4 += diff <= 60 && diff > 30 ? el.trx_amnh - acq_amnh : 0;
+              t_older += diff > 60 ? el.trx_amnh - acq_amnh : 0;
+              // }
+            }
+          });
+
+          val.push({
+            sup: ``,
+            type: "item",
+            value: {
+              supp: `${ek.sup_id?.sup_name} (${ek.sup_id?.sup_code})`,
+              sup_id: ek?.sup_id?.id,
+              hut: `${formatIdr(t_hut)}`,
+              jt: `${formatIdr(t_jt)}`,
+              day1: `${formatIdr(t_day1)}`,
+              day2: `${formatIdr(t_day2)}`,
+              day3: `${formatIdr(t_day3)}`,
+              day4: `${formatIdr(t_day4)}`,
+              older: `${formatIdr(t_older)}`,
+              total: `${formatIdr(t_pay)}`,
+            },
+          });
+          data.push(val);
+        });
+      }
     }
 
     let final = [
@@ -499,7 +531,7 @@ const UmurHutangRingkasan = () => {
     final.push({
       columns: [
         {
-          title: "Supplier",
+          title: tr[localStorage.getItem("language")].pemasok,
           width: { wch: 30 },
           style: {
             font: { sz: "14", bold: true },
@@ -524,7 +556,7 @@ const UmurHutangRingkasan = () => {
         },
         {
           title: "7 Day",
-          width: { wch: 20 },
+          width: { wch: 30 },
           style: {
             font: { sz: "14", bold: true },
             alignment: { horizontal: "right", vertical: "center" },
@@ -548,7 +580,7 @@ const UmurHutangRingkasan = () => {
         },
         {
           title: "30 Day",
-          width: { wch: 20 },
+          width: { wch: 30 },
           style: {
             font: { sz: "14", bold: true },
             alignment: { horizontal: "right", vertical: "center" },
@@ -584,7 +616,7 @@ const UmurHutangRingkasan = () => {
         },
         {
           title: "Total",
-          width: { wch: 20 },
+          width: { wch: 30 },
           style: {
             font: { sz: "14", bold: true },
             alignment: { horizontal: "right", vertical: "center" },
@@ -607,18 +639,12 @@ const UmurHutangRingkasan = () => {
     }
   };
 
-  const formatIdr = (value) => {
-    return `${value?.toFixed(2)}`
-      .replace(".", ",")
-      .replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1.");
-  };
-
   const renderHeader = () => {
     return (
       <div className="flex justify-content-between">
-        <div className="col-9 ml-0 mr-0 pl-0 pt-0">
+        <div className="col-6 ml-0 mr-0 pl-0 pt-0">
           <Row className="mt-0">
-            <div className="p-inputgroup col-3">
+            <div className="p-inputgroup col-4">
               <span className="p-inputgroup-addon">
                 <i className="pi pi-calendar" />
               </span>
@@ -628,33 +654,40 @@ const UmurHutangRingkasan = () => {
                   console.log(e.value);
                   setDate(e.value);
                 }}
-                placeholder="Pilih Tanggal"
+                placeholder={tr[localStorage.getItem("language")].pilih_tgl}
                 readOnlyInput
                 dateFormat="dd-mm-yy"
               />
             </div>
-            <div className="col-3">
-              <Dropdown
+            <div className="col-4">
+              <MultiSelect
                 value={selectSup ?? null}
                 options={supplier}
                 onChange={(e) => {
                   setSelectSup(e.value);
                 }}
-                placeholder="Pilih Supplier"
+                placeholder={tr[localStorage.getItem("language")].pilih_sup}
                 optionLabel="sup_id.sup_name"
                 filter
                 filterBy="sup_id.sup_name"
                 showClear
+                display="chip"
+                className="w-full md:w-20rem"
+                maxSelectedLabels={3}
               />
             </div>
           </Row>
         </div>
         <Row className="mr-1 mt-2" style={{ height: "3rem" }}>
           <div className="mr-3">
+            {/* <ExcelExportHelper
+              json={ap ? jsonForExcel(ap, true) : null}
+              filename={`Summary Debt Age_export_${new Date().getTime()}`}
+              sheetname="report"
+            /> */}
+
             <ExcelFile
-              filename={`summary_debt_age${formatDate(new Date())
-                .replace("-", "")
-                .replace("-", "")}`}
+              filename={`Summary Debt Age_export_${new Date().getTime()}`}
               element={
                 <PrimeSingleButton
                   label="Excel"
@@ -664,7 +697,7 @@ const UmurHutangRingkasan = () => {
             >
               <ExcelSheet
                 dataSet={ap ? jsonForExcel(ap, true) : null}
-                name="Report"
+                name={"Report"}
               />
             </ExcelFile>
           </div>
@@ -682,6 +715,12 @@ const UmurHutangRingkasan = () => {
         </Row>
       </div>
     );
+  };
+
+  const formatIdr = (value) => {
+    return `Rp. ${value?.toFixed(2)}`
+      .replace(".", ",")
+      .replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1.");
   };
 
   const chunk = (arr, size) =>
@@ -703,12 +742,13 @@ const UmurHutangRingkasan = () => {
         </Col>
       </Row>
 
-      <Row className="ml-0 pt-0 justify-content-center" ref={printPage}>
+      <Row className="ml-0 pt-0 justify-content-center">
         {chunk(jsonForExcel(ap, false) ?? [], chunkSize)?.map((val, idx) => {
           return (
             <Card>
               <Card.Body className="p-0 m-0">
                 <CustomeWrapper
+                  viewOnly
                   horizontal
                   tittle={"Summary Debt Age"}
                   subTittle={`Summary Debt Age as of ${formatDate(date)}`}
@@ -722,13 +762,38 @@ const UmurHutangRingkasan = () => {
                         showGridlines
                         dataKey="id"
                         rowHover
-                        emptyMessage="Data Tidak Ditemukan"
+                        emptyMessage={
+                          tr[localStorage.getItem("language")].data_kosong
+                        }
                       >
                         <Column
                           className="border-right border-left"
-                          header={"Supplier"}
+                          header={tr[localStorage.getItem("language")].pemasok}
                           style={{ width: "20rem" }}
-                          body={(e) => e[e.length - 1].sup}
+                          field={(e) => e[e.length - 1]?.value?.supp}
+                          body={(e) => (
+                            <Link
+                              to={`/laporan/ap/umur-hutang-rincian/${btoa(
+                                `m'${filtDate?.getMonth() + 1}`
+                              )}/${btoa(`y'${filtDate?.getFullYear()}`)}/${btoa(
+                                btoa(
+                                  JSON.stringify({
+                                    id: e.value?.sup_id,
+                                  })
+                                )
+                              )}`}
+                            >
+                              <td className="header-center">
+                                {e[e.length - 1]?.value?.supp}
+                              </td>
+                            </Link>
+                          )}
+                        />
+                        <Column
+                          className="header-right text-right border-right"
+                          header="Payable"
+                          style={{ width: "10rem" }}
+                          body={(e) => e[e.length - 1].value.hut}
                         />
                         <Column
                           className="header-right text-right border-right"
@@ -769,7 +834,7 @@ const UmurHutangRingkasan = () => {
 
                         <Column
                           className="header-right text-right border-right"
-                          header="Total"
+                          header="Payment"
                           style={{ width: "10rem" }}
                           body={(e) => e[e.length - 1].value.total}
                         />
@@ -781,6 +846,96 @@ const UmurHutangRingkasan = () => {
             </Card>
           );
         })}
+      </Row>
+
+      <Row className="ml-0 pt-0 justify-content-center d-none">
+        <Card>
+          <Card.Body className="p-0 m-0" ref={printPage}>
+            {chunk(jsonForExcel(ap, false) ?? [], chunkSize)?.map(
+              (val, idx) => {
+                return (
+                  <Card>
+                    <Card.Body className="p-0 m-0">
+                      <CustomeWrapper
+                        horizontal
+                        tittle={"Summary Debt Age"}
+                        subTittle={`Summary Debt Age as of ${formatDate(date)}`}
+                        onComplete={(cp) => setCp(cp)}
+                        page={idx + 1}
+                        body={
+                          <>
+                            <DataTable
+                              responsiveLayout="scroll"
+                              value={val}
+                              showGridlines
+                              dataKey="id"
+                              rowHover
+                              emptyMessage={
+                                tr[localStorage.getItem("language")].data_kosong
+                              }
+                            >
+                              <Column
+                                className="border-right border-left"
+                                header={
+                                  tr[localStorage.getItem("language")].pemasok
+                                }
+                                style={{ width: "20rem" }}
+                                body={(e) => e[e.length - 1]?.value?.supp}
+                              />
+                              <Column
+                                className="header-right text-right border-right"
+                                header="Before Due"
+                                style={{ width: "10rem" }}
+                                body={(e) => e[e.length - 1].value.jt}
+                              />
+                              <Column
+                                className="header-right text-right border-right"
+                                header="7 Day"
+                                style={{ width: "10rem" }}
+                                body={(e) => e[e.length - 1].value.day1}
+                              />
+                              <Column
+                                className="header-right text-right border-right"
+                                header="14 Day"
+                                style={{ width: "10rem" }}
+                                body={(e) => e[e.length - 1].value.day2}
+                              />
+                              <Column
+                                className="header-right text-right border-right"
+                                header="30 Day"
+                                style={{ width: "10rem" }}
+                                body={(e) => e[e.length - 1].value.day3}
+                              />
+                              <Column
+                                className="header-right text-right border-right"
+                                header="60 Day"
+                                style={{ width: "10rem" }}
+                                body={(e) => e[e.length - 1].value.day4}
+                              />
+                              <Column
+                                className="header-right text-right border-right"
+                                header="Older"
+                                style={{ width: "10rem" }}
+                                body={(e) => e[e.length - 1].value.older}
+                              />
+
+                              <Column
+                                className="header-right text-right border-right"
+                                header="Total"
+                                style={{ width: "10rem" }}
+                                body={(e) => e[e.length - 1].value.total}
+                              />
+                            </DataTable>
+                          </>
+                        }
+                      />
+                    </Card.Body>
+                  </Card>
+                );
+              }
+            )}
+          </Card.Body>
+        </Card>
       </Row>
     </>
   );

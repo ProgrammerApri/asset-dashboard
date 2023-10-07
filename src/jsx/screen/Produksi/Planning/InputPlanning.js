@@ -689,6 +689,7 @@ const InputPlanning = ({ onCancel, onSuccess }) => {
                           unit_id: v?.unit_id?.id,
                           qty_form: v.qty ?? 0,
                           qty_making: null,
+                          wc_mutation: null,
                         };
                       })
                     : null,
@@ -1321,6 +1322,7 @@ const InputPlanning = ({ onCancel, onSuccess }) => {
                                   qty_form: null,
                                   qty_making: null,
                                   aloc: null,
+                                  wc_mutation: null,
                                 },
                               ],
                             });

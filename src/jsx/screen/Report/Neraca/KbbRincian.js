@@ -12,6 +12,8 @@ import { el } from "date-fns/locale";
 import CustomeWrapper from "src/jsx/components/CustomeWrapper/CustomeWrapper";
 import PrimeSingleButton from "src/jsx/components/PrimeSingleButton/PrimeSingleButton";
 import { Link } from "react-router-dom";
+import { tr } from "src/data/tr";
+import { MultiSelect } from "primereact/multiselect";
 
 const ExcelFile = ReactExport.ExcelFile;
 const ExcelSheet = ReactExport.ExcelFile.ExcelSheet;
@@ -31,7 +33,7 @@ const KBBRincian = ({ month, year, accId }) => {
   const [trans, setTrans] = useState(null);
   const [saldo, setSaldo] = useState(null);
   const [cp, setCp] = useState("");
-  const chunkSize = 27;
+  const chunkSize = 12;
 
   useEffect(() => {
     if (month && year) {
@@ -71,7 +73,7 @@ const KBBRincian = ({ month, year, accId }) => {
 
   const getAccDdb = async () => {
     const config = {
-      ...endpoints.acc_ddb,
+      ...endpoints.posting,
     };
     let response = null;
     try {
@@ -123,10 +125,11 @@ const KBBRincian = ({ month, year, accId }) => {
           }
         });
         setAcc(filt);
+
         if (id) {
           filt.forEach((el) => {
             if (el.account.id === Number(id)) {
-              setSelected(el);
+              setSelected([el]);
             }
           });
         }
@@ -141,7 +144,7 @@ const KBBRincian = ({ month, year, accId }) => {
 
   const getSaldo = async (acc) => {
     const config = {
-      ...endpoints.saldo,
+      ...endpoints.saldo_sa_gl,
       data: {},
     };
     let response = null;
@@ -179,17 +182,6 @@ const KBBRincian = ({ month, year, accId }) => {
   const jsonForExcel = (accDdb, excel = false) => {
     let data = [];
 
-    let dt = [];
-    let db = 0;
-    let kr = 0;
-    let sa = 0;
-    let bl = 0;
-    let deb = 0;
-    let kre = 0;
-    let cd = [];
-    let des = [];
-    let sld = 0;
-
     let temp = [];
 
     let month = [];
@@ -197,91 +189,112 @@ const KBBRincian = ({ month, year, accId }) => {
     accDdb?.forEach((ej) => {
       if (
         filtDate[0]?.getFullYear() >= ej.acc_year &&
-        filtDate[0]?.getMonth()+1 >= ej.acc_month &&
+        filtDate[0]?.getMonth() + 1 >= ej.acc_month &&
         filtDate[1]?.getFullYear() >= ej.acc_year &&
-        filtDate[1]?.getMonth()+1 >= ej.acc_month
+        filtDate[1]?.getMonth() + 1 >= ej.acc_month
       ) {
         month.push(ej.acc_month);
       }
     });
 
-    accDdb?.forEach((el) => {
-      let trn = [
-        {
-          type: "header",
-          value: {
-            ref: "Kode Transaksi",
-            date: "Tanggal",
-            debe: "Mutasi Debet",
-            kred: "Mutasi Kredit",
-            blce: "Balance",
-            desc: "Deskripsi",
-          },
-        },
-      ];
+    if (selectedAcc?.length) {
+      selectedAcc?.forEach((slc) => {
+        let dt = [];
+        let db = 0;
+        let kr = 0;
+        let sa = 0;
+        let bl = 0;
+        let deb = 0;
+        let kre = 0;
+        let cd = [];
+        let des = [];
+        let sld = 0;
 
-      if (selectedAcc?.account?.id === el.acc_code?.id) {
-        if (el?.acc_code?.id === selectedAcc?.account?.id) {
-          if (
-            el.acc_year >= filtDate[0]?.getFullYear() &&
-            el.acc_year <= filtDate[1]?.getFullYear()
-          ) {
-            if (Math.max(...month) == el.acc_month) {
-              sa += el.acc_awal;
-              db += el.acc_debit;
-              kr += el.acc_kredit;
-              bl += el.acc_akhir;
-              trans?.forEach((element) => {
-                dt = new Date(`${element?.trx_date}Z`);
-                if (element?.acc_id?.id === el.acc_code?.id) {
-                  if (dt.getMonth() === filtDate[0].getMonth()) {
-                    if (
-                      dt >=
-                        new Date(
-                          filtDate[0].getFullYear(),
-                          filtDate[0].getMonth(),
-                          1
-                        ) &&
-                      dt <=
-                        new Date(
-                          filtDate[0].getFullYear(),
-                          filtDate[0].getMonth(),
-                          filtDate[0].getDate() - 1
-                        )
-                    ) {
-                      if (element.acc_id.sld_type === "D") {
-                        if (element.trx_dbcr === "D") {
-                          sld += element.trx_amnt;
-                        } else {
-                          sld -= element.trx_amnt;
-                        }
-                      } else {
-                        if (element.trx_dbcr === "K") {
-                          sld += element.trx_amnt;
-                        } else {
-                          sld -= element.trx_amnt;
-                        }
-                      }
-                    }
-                  }
-                }
-              });
+        let trn = [
+          {
+            type: "header",
+            value: {
+              ref: tr[localStorage.getItem("language")]?.kd_tran,
+              date: tr[localStorage.getItem("language")]?.tgl,
+              debe: tr[localStorage.getItem("language")]?.mut_deb,
+              kred: tr[localStorage.getItem("language")]?.mut_kred,
+              blce: tr[localStorage.getItem("language")]?.sldo,
+              desc: tr[localStorage.getItem("language")]?.ket,
+            },
+          },
+        ];
+
+        accDdb?.forEach((el) => {
+          if (slc?.account?.id === el?.acc_code?.id) {
+            if (
+              el.acc_year >= filtDate[0]?.getFullYear() &&
+              el.acc_year <= filtDate[1]?.getFullYear()
+            ) {
+              if (Math.max(...month) == el.acc_month) {
+                sa += el.acc_awal;
+                db += el.acc_debit;
+                kr += el.acc_kredit;
+                bl += el.acc_akhir;
+              }
             }
           }
-        }
+        });
+
+        trans?.forEach((element) => {
+          dt = new Date(`${element?.trx_date}Z`);
+          if (slc?.account?.id == element?.acc_id?.id) {
+            // if (element?.acc_id?.id === el.acc_code?.id) {
+            if (dt.getMonth() === filtDate[0].getMonth()) {
+              if (
+                dt >=
+                  new Date(
+                    filtDate[0].getFullYear(),
+                    filtDate[0].getMonth(),
+                    1
+                  ) &&
+                dt <=
+                  new Date(
+                    filtDate[0].getFullYear(),
+                    filtDate[0].getMonth(),
+                    filtDate[0].getDate() - 1
+                  )
+              ) {
+                if (element?.acc_id.sld_type === "D") {
+                  if (element?.trx_dbcr === "D") {
+                    sld += element?.trx_amnt;
+                  } else {
+                    sld -= element?.trx_amnt;
+                  }
+                } else {
+                  if (element?.trx_dbcr === "K") {
+                    sld += element?.trx_amnt;
+                  } else {
+                    sld -= element?.trx_amnt;
+                  }
+                }
+              }
+            }
+            // }
+          }
+        });
+
         let blc = sa + sld;
         let total_db = 0;
         let total_kr = 0;
         trans?.forEach((element) => {
-          if (element?.acc_id?.id === el.acc_code?.id) {
+          if (slc?.account?.id == element?.acc_id?.id) {
+            // if (element?.acc_id?.id === el.acc_code?.id) {
             dt = new Date(`${element?.trx_date}Z`);
+            dt?.setHours(0, 0, 0, 0);
+            filtDate[0]?.setHours(0, 0, 0, 0);
+            filtDate[1]?.setHours(0, 0, 0, 0);
             if (dt >= filtDate[0] && dt <= filtDate[1]) {
               deb = element.trx_dbcr === "D" ? element.trx_amnt : 0;
               kre = element.trx_dbcr === "K" ? element.trx_amnt : 0;
               cd = element.trx_code;
               des = element.trx_desc;
-    
-              if (el.acc_code.sld_type === "D") {
+
+              if (element?.acc_id?.sld_type === "D") {
                 blc += deb - kre;
               } else {
                 blc += kre - deb;
@@ -295,16 +308,17 @@ const KBBRincian = ({ month, year, accId }) => {
                   ref: cd,
                   date: formatDate(dt),
                   // acco: ac,
-                  debe: `Rp. ${formatIdr(deb)}`,
-                  kred: `Rp. ${formatIdr(kre)}`,
+                  debe: `${formatIdr(deb)}`,
+                  kred: `${formatIdr(kre)}`,
                   desc: des,
-                  blce: `Rp. ${formatIdr(blc)}`,
+                  blce: `${formatIdr(blc)}`,
                 },
               });
               // total_bl = blc;
               total_db += deb;
               total_kr += kre;
             }
+            // }
           }
         });
 
@@ -314,49 +328,50 @@ const KBBRincian = ({ month, year, accId }) => {
             ref: "Total",
             date: "",
             // acco: "",
-            debe: `Rp. ${formatIdr(total_db)}`,
-            kred: `Rp. ${formatIdr(total_kr)}`,
+            debe: `${formatIdr(total_db)}`,
+            kred: `${formatIdr(total_kr)}`,
             blce: "",
             desc: "",
           },
         });
 
-        data = {
+        data.push({
           header: [
             {
               acco:
-                selectedAcc === null
+                slc === null
                   ? "-"
-                  : `${selectedAcc?.account?.acc_name} (${selectedAcc?.account?.acc_code})`,
-              slda: selectedAcc === null ? "-" : `Rp. ${formatIdr(sa)}`,
+                  : `${slc?.account?.acc_name} (${slc?.account?.acc_code})`,
+              slda: slc === null ? "-" : `${formatIdr(sa)}`,
             },
           ],
 
           trn: trn,
-        };
-        if (sld !== 0) {
-          data.header = [
-            ...data.header,
-            {
-              acco: `Transaksi Dari ${formatDate(
-                new Date(filtDate[0].getFullYear(), filtDate[0].getMonth(), 1)
-              )} - ${formatDate(
-                new Date(
-                  filtDate[0].getFullYear(),
-                  filtDate[0].getMonth(),
-                  filtDate[0].getDate() - 1
-                )
-              )}`,
-              slda: `Rp. ${formatIdr(sld)}`,
-            },
-            {
-              acco: "Total",
-              slda: `Rp. ${formatIdr(sa + sld)}`,
-            },
-          ];
-        }
-      }
-    });
+        });
+        // if (sld !== 0) {
+        //   data.header = [
+        //     ...data.header,
+        //     {
+        //       acco: `Transaksi Dari ${formatDate(
+        //         new Date(filtDate[0]?.getFullYear(), filtDate[0]?.getMonth(), 1)
+        //       )} - ${formatDate(
+        //         new Date(
+        //           filtDate[0]?.getFullYear(),
+        //           filtDate[0]?.getMonth(),
+        //           filtDate[0]?.getDate() - 1
+        //         )
+        //       )}`,
+        //       slda: `Rp. ${formatIdr(sld)}`,
+        //     },
+        //     {
+        //       acco: "Total",
+        //       slda: `Rp. ${formatIdr(sa + sld)}`,
+        //     },
+        //   ];
+        // }
+      });
+    }
+
     let final = [
       {
         columns: [
@@ -399,147 +414,14 @@ const KBBRincian = ({ month, year, accId }) => {
     ];
 
     let item = [];
-    data?.header?.forEach((el) => {
-      item.push([
-        {
-          value: `${el.acco}`,
-          style: {
-            font: {
-              sz: "14",
-              bold: false,
-            },
-            alignment: { horizontal: "left", vertical: "center" },
-          },
-        },
-        {
-          value: "",
-          style: {
-            font: {
-              sz: "14",
-              bold: false,
-            },
-            alignment: { horizontal: "left", vertical: "center" },
-          },
-        },
-        {
-          value: "",
-          style: {
-            font: {
-              sz: "14",
-              bold: false,
-            },
-            alignment: { horizontal: "left", vertical: "center" },
-          },
-        },
-        {
-          value: "",
-          style: {
-            font: {
-              sz: "14",
-              bold: false,
-            },
-            alignment: { horizontal: "left", vertical: "center" },
-          },
-        },
-        {
-          value: "",
-          style: {
-            font: {
-              sz: "14",
-              bold: false,
-            },
-            alignment: { horizontal: "left", vertical: "center" },
-          },
-        },
-        {
-          value: `${el.slda}`,
-          style: {
-            font: {
-              sz: "14",
-              bold: false,
-            },
-            alignment: { horizontal: "right", vertical: "center" },
-          },
-        },
-      ]);
-    });
-
     item.push([
       {
-        value: "",
+        value: ``,
         style: {
-          font: { sz: "14", bold: true },
-          alignment: { horizontal: "left", vertical: "center" },
-        },
-      },
-    ]);
-
-    item.push([
-      {
-        value: "Detail Transaksi",
-        style: {
-          height: { wch: 18 },
-          font: { sz: "14", bold: true },
-          alignment: { horizontal: "left", vertical: "center" },
-          fill: {
-            paternType: "solid",
-            fgColor: { rgb: "F3F3F3" },
+          font: {
+            sz: "14",
+            bold: true,
           },
-        },
-      },
-      {
-        value: "",
-        style: {
-          height: { wch: 18 },
-          font: { sz: "14", bold: true },
-          alignment: { horizontal: "left", vertical: "center" },
-          fill: {
-            paternType: "solid",
-            fgColor: { rgb: "F3F3F3" },
-          },
-        },
-      },
-      {
-        value: "",
-        style: {
-          height: { wch: 18 },
-          font: { sz: "14", bold: true },
-          alignment: { horizontal: "left", vertical: "center" },
-          fill: {
-            paternType: "solid",
-            fgColor: { rgb: "F3F3F3" },
-          },
-        },
-      },
-      {
-        value: "",
-        style: {
-          height: { wch: 18 },
-          font: { sz: "14", bold: true },
-          alignment: { horizontal: "left", vertical: "center" },
-          fill: {
-            paternType: "solid",
-            fgColor: { rgb: "F3F3F3" },
-          },
-        },
-      },
-      {
-        value: "",
-        style: {
-          height: { wch: 18 },
-          font: { sz: "14", bold: true },
-          alignment: { horizontal: "left", vertical: "center" },
-          fill: {
-            paternType: "solid",
-            fgColor: { rgb: "F3F3F3" },
-          },
-        },
-      },
-      {
-        value: "",
-        style: {
-          height: { wch: 18 },
-          font: { sz: "14", bold: true },
           alignment: { horizontal: "left", vertical: "center" },
           fill: {
             paternType: "solid",
@@ -549,147 +431,303 @@ const KBBRincian = ({ month, year, accId }) => {
       },
     ]);
 
-    data?.trn?.forEach((ek) => {
+    data?.forEach((element) => {
       item.push([
         {
-          value: `${ek.value.ref}`,
+          value: `Account`,
           style: {
             font: {
               sz: "14",
-              bold: ek.type === "header" || ek.type === "footer",
+              bold: true,
             },
-
             alignment: { horizontal: "left", vertical: "center" },
-          },
-        },
-        {
-          value: `${ek.value.date}`,
-          style: {
-            font: {
-              sz: "14",
-              bold: ek.type === "header" || ek.type === "footer",
+            fill: {
+              paternType: "solid",
+              fgColor: { rgb: "F3F3F3" },
             },
-            alignment: { horizontal: "center", vertical: "center" },
           },
         },
         {
-          value: `${ek.value.debe}`,
+          value: "",
           style: {
             font: {
               sz: "14",
-              bold: ek.type === "header" || ek.type === "footer",
+              bold: false,
+            },
+            alignment: { horizontal: "left", vertical: "center" },
+            fill: {
+              paternType: "solid",
+              fgColor: { rgb: "F3F3F3" },
+            },
+          },
+        },
+        {
+          value: "",
+          style: {
+            font: {
+              sz: "14",
+              bold: false,
+            },
+            alignment: { horizontal: "left", vertical: "center" },
+            fill: {
+              paternType: "solid",
+              fgColor: { rgb: "F3F3F3" },
+            },
+          },
+        },
+        {
+          value: "",
+          style: {
+            font: {
+              sz: "14",
+              bold: false,
+            },
+            alignment: { horizontal: "left", vertical: "center" },
+            fill: {
+              paternType: "solid",
+              fgColor: { rgb: "F3F3F3" },
+            },
+          },
+        },
+        {
+          value: "",
+          style: {
+            font: {
+              sz: "14",
+              bold: false,
+            },
+            alignment: { horizontal: "left", vertical: "center" },
+            fill: {
+              paternType: "solid",
+              fgColor: { rgb: "F3F3F3" },
+            },
+          },
+        },
+        {
+          value: `Begining Balance`,
+          style: {
+            font: {
+              sz: "14",
+              bold: true,
             },
             alignment: { horizontal: "right", vertical: "center" },
-          },
-        },
-        {
-          value: `${ek.value.kred}`,
-          style: {
-            font: {
-              sz: "14",
-              bold: ek.type === "header" || ek.type === "footer",
+            fill: {
+              paternType: "solid",
+              fgColor: { rgb: "F3F3F3" },
             },
-            alignment: { horizontal: "right", vertical: "center" },
-          },
-        },
-        {
-          value: `${ek.value.blce}`,
-          style: {
-            font: {
-              sz: "14",
-              bold: ek.type === "header" || ek.type === "footer",
-            },
-            alignment: { horizontal: "right", vertical: "center" },
-          },
-        },
-        {
-          value: `${ek.value.desc}`,
-          style: {
-            font: {
-              sz: "14",
-              bold: ek.type === "header" || ek.type === "footer",
-            },
-            alignment: { horizontal: "right", vertical: "center" },
           },
         },
       ]);
+
+      element?.header?.forEach((el) => {
+        item.push([
+          {
+            value: el.acco,
+            style: {
+              font: {
+                sz: "14",
+                bold: true,
+              },
+              alignment: { horizontal: "left", vertical: "center" },
+            },
+          },
+          {
+            value: "",
+            style: {
+              font: {
+                sz: "14",
+                bold: false,
+              },
+              alignment: { horizontal: "left", vertical: "center" },
+            },
+          },
+          {
+            value: "",
+            style: {
+              font: {
+                sz: "14",
+                bold: false,
+              },
+              alignment: { horizontal: "right", vertical: "center" },
+            },
+          },
+          {
+            value: "",
+            style: {
+              font: {
+                sz: "14",
+                bold: false,
+              },
+              alignment: { horizontal: "right", vertical: "center" },
+            },
+          },
+          {
+            value: "",
+            style: {
+              font: {
+                sz: "14",
+                bold: false,
+              },
+              alignment: { horizontal: "right", vertical: "center" },
+            },
+          },
+          {
+            value: el?.slda,
+            style: {
+              font: {
+                sz: "14",
+                bold: true,
+              },
+              alignment: { horizontal: "right", vertical: "center" },
+            },
+          },
+        ]);
+      });
+
+      item.push([
+        {
+          value: "Transaction Details",
+          style: {
+            height: { wch: 18 },
+            font: { sz: "14", bold: true },
+            alignment: { horizontal: "left", vertical: "center" },
+            fill: {
+              paternType: "solid",
+              fgColor: { rgb: "F3F3F3" },
+            },
+          },
+        },
+        {
+          value: "",
+          style: {
+            height: { wch: 19 },
+            font: { sz: "14", bold: true },
+            alignment: { horizontal: "left", vertical: "center" },
+            fill: {
+              paternType: "solid",
+              fgColor: { rgb: "F3F3F3" },
+            },
+          },
+        },
+        {
+          value: "",
+          style: {
+            height: { wch: 25 },
+            font: { sz: "14", bold: true },
+            alignment: { horizontal: "left", vertical: "center" },
+            fill: {
+              paternType: "solid",
+              fgColor: { rgb: "F3F3F3" },
+            },
+          },
+        },
+        {
+          value: "",
+          style: {
+            height: { wch: 25 },
+            font: { sz: "14", bold: true },
+            alignment: { horizontal: "left", vertical: "center" },
+            fill: {
+              paternType: "solid",
+              fgColor: { rgb: "F3F3F3" },
+            },
+          },
+        },
+        {
+          value: "",
+          style: {
+            height: { wch: 25 },
+            font: { sz: "14", bold: true },
+            alignment: { horizontal: "left", vertical: "center" },
+            fill: {
+              paternType: "solid",
+              fgColor: { rgb: "F3F3F3" },
+            },
+          },
+        },
+        {
+          value: "",
+          style: {
+            height: { wch: 30 },
+            font: { sz: "14", bold: true },
+            alignment: { horizontal: "left", vertical: "center" },
+            fill: {
+              paternType: "solid",
+              fgColor: { rgb: "F3F3F3" },
+            },
+          },
+        },
+      ]);
+
+      element?.trn?.forEach((ek) => {
+        item.push([
+          {
+            value: ek.value.ref,
+            style: {
+              font: {
+                sz: "14",
+                bold: ek.type === "header" || ek.type === "footer",
+              },
+
+              alignment: { horizontal: "left", vertical: "center" },
+            },
+          },
+          {
+            value: ek.value.date,
+            style: {
+              font: {
+                sz: "14",
+                bold: ek.type === "header" || ek.type === "footer",
+              },
+              alignment: { horizontal: "center", vertical: "center" },
+            },
+          },
+          {
+            value: ek.value.debe,
+            style: {
+              font: {
+                sz: "14",
+                bold: ek.type === "header" || ek.type === "footer",
+              },
+              alignment: { horizontal: "right", vertical: "center" },
+            },
+          },
+          {
+            value: ek.value.kred,
+            style: {
+              font: {
+                sz: "14",
+                bold: ek.type === "header" || ek.type === "footer",
+              },
+              alignment: { horizontal: "right", vertical: "center" },
+            },
+          },
+          {
+            value: ek.value.blce,
+            style: {
+              font: {
+                sz: "14",
+                bold: ek.type === "header" || ek.type === "footer",
+              },
+              alignment: { horizontal: "right", vertical: "center" },
+            },
+          },
+          {
+            value: ek.value.desc,
+            style: {
+              font: {
+                sz: "14",
+                bold: ek.type === "header" || ek.type === "footer",
+              },
+              alignment: { horizontal: "right", vertical: "center" },
+            },
+          },
+        ]);
+      });
     });
 
     final.push({
-      columns: [
-        {
-          title: "Account",
-          width: { wch: 40 },
-          style: {
-            font: { sz: "14", bold: true },
-            alignment: { horizontal: "left", vertical: "center" },
-            fill: {
-              paternType: "solid",
-              fgColor: { rgb: "F3F3F3" },
-            },
-          },
-        },
-        {
-          title: "",
-          width: { wch: 15 },
-          style: {
-            font: { sz: "14", bold: true },
-            alignment: { horizontal: "center", vertical: "center" },
-            fill: {
-              paternType: "solid",
-              fgColor: { rgb: "F3F3F3" },
-            },
-          },
-        },
-        {
-          title: "",
-          width: { wch: 20 },
-          style: {
-            font: { sz: "14", bold: true },
-            alignment: { horizontal: "right", vertical: "center" },
-            fill: {
-              paternType: "solid",
-              fgColor: { rgb: "F3F3F3" },
-            },
-          },
-        },
-        {
-          title: "",
-          width: { wch: 20 },
-          style: {
-            font: { sz: "14", bold: true },
-            alignment: { horizontal: "right", vertical: "center" },
-            fill: {
-              paternType: "solid",
-              fgColor: { rgb: "F3F3F3" },
-            },
-          },
-        },
-        {
-          title: "",
-          width: { wch: 20 },
-          style: {
-            font: { sz: "14", bold: true },
-            alignment: { horizontal: "right", vertical: "center" },
-            fill: {
-              paternType: "solid",
-              fgColor: { rgb: "F3F3F3" },
-            },
-          },
-        },
-        {
-          title: "Start Balance",
-          width: { wch: 45 },
-          style: {
-            font: { sz: "14", bold: true },
-            alignment: { horizontal: "right", vertical: "center" },
-            fill: {
-              paternType: "solid",
-              fgColor: { rgb: "F3F3F3" },
-            },
-          },
-        },
-      ],
+      columns: [],
       data: item,
     });
     console.log(data);
@@ -697,12 +735,23 @@ const KBBRincian = ({ month, year, accId }) => {
     if (excel) {
       return final;
     } else {
-      return data;
+      let page = [];
+
+      data?.forEach((el) => {
+        el?.header?.forEach((elem) => {
+          el?.trn?.forEach((element) => {
+            page?.push({ ...element, head: elem });
+          });
+        });
+      });
+
+      console.log("page", page);
+      return page;
     }
   };
 
   const formatIdr = (value) => {
-    return `${value}`
+    return `${value?.toFixed(2)}`
       .replace(".", ",")
       .replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1.");
   };
@@ -736,7 +785,7 @@ const KBBRincian = ({ month, year, accId }) => {
       <div className="flex justify-content-between">
         <div className="col-6 ml-0 mr-0 pl-0">
           <Row className="m-0">
-            <div className="col-4 mr-3 p-0">
+            <div className="col-5 mr-3 p-0 mt-2">
               <div className="p-inputgroup">
                 <span className="p-inputgroup-addon">
                   <i className="pi pi-calendar" />
@@ -745,30 +794,33 @@ const KBBRincian = ({ month, year, accId }) => {
                   value={filtDate}
                   id="range"
                   onChange={(e) => {
-                    console.log(e.value);
+                    console.log(filtDate[0].setHours(0, 0, 0, 0));
                     setFiltDate(e.value);
                   }}
                   selectionMode="range"
-                  placeholder="Pilih Tanggal"
+                  placeholder={tr[localStorage.getItem("language")]?.pilih_tgl}
                   readOnlyInput
                   dateFormat="dd/mm/yy"
                 />
               </div>
             </div>
-            <div className="">
-              <Dropdown
+            <div className="p-inputgroup col-4">
+              <MultiSelect
                 value={selectedAcc ?? null}
                 options={account}
                 onChange={(e) => {
                   setSelected(e.value);
                 }}
-                placeholder="Pilih Akun"
+                placeholder={tr[localStorage.getItem("language")]?.pilih_acc}
                 optionLabel="account.acc_name"
                 itemTemplate={glTemplate}
                 valueTemplate={valTemp}
                 filter
                 filterBy="account.acc_name"
                 showClear
+                display="chip"
+                // className="w-full md:w-15rem"
+                maxSelectedLabels={3}
               />
             </div>
           </Row>
@@ -824,9 +876,129 @@ const KBBRincian = ({ month, year, accId }) => {
         </Col>
       </Row>
 
-      <Row className="m-0 justify-content-center">
-        {/* {chunk(jsonForExcel(accDdb) ?? [], chunkSize)?.map((v, idx) => {
-          return ( */}
+      <Row className="m-0 justify-content-center" ref={printPage}>
+        {chunk(jsonForExcel(accDdb) ?? [], chunkSize)?.map((val, idx) => {
+          return (
+            <div key={idx} className={"shadow p-0 mb-4 col-12"}>
+              <CustomeWrapper
+                horizontal
+                viewOnly
+                tittle={tr[localStorage.getItem("language")]?.kbb_rincian}
+                subTittle={`${
+                  tr[localStorage.getItem("language")]?.kbb_rincian
+                } Periode ${formatDate(filtDate[0])} to ${formatDate(
+                  filtDate[1]
+                )}`}
+                onComplete={(cp) => setCp(cp)}
+                page={idx + 1}
+                body={
+                  <>
+                    {val?.map((v) => {
+                      if (v?.type == "header") {
+                        return (
+                          <>
+                            <div className="header-report single row p-0 m-0 mt-5">
+                              <div className="col-3">{"Account"}</div>
+                              <div className="col-2">{""}</div>
+                              <div className="col-2">{""}</div>
+                              <div className="col-1">{""}</div>
+                              <div className="col-1">{""}</div>
+                              <div className="col-3 text-right">
+                                {"Beginning Balance"}
+                              </div>
+                            </div>
+
+                            <div className="item-report row m-0">
+                              <div className="col-3">{v?.head.acco}</div>
+                              <div className="col-2">{""}</div>
+                              <div className="col-2">{""}</div>
+                              <div className="col-1">{""}</div>
+                              <div className="col-1">{""}</div>
+                              <div className="col-3 text-right">
+                                {v?.head.slda}
+                              </div>
+                            </div>
+
+                            <div className="header-report single p-0 row m-0">
+                              <div className="col-2">{v.value.ref}</div>
+                              <div className="col-1">{v.value.date}</div>
+                              <div className="col-2 text-right">
+                                {v.value.debe}
+                              </div>
+                              <div className="col-2 text-right">
+                                {v.value.kred}
+                              </div>
+                              <div className="col-2 text-right">
+                                {v.value.blce}
+                              </div>
+                              <div className="col-3 text-right">
+                                {v.value.desc}
+                              </div>
+                            </div>
+                          </>
+                        );
+                      } else if (v.type === "item") {
+                        return (
+                          <>
+                            <div className="item-report row m-0">
+                              <div className="col-2">
+                                <Link
+                                  to={`/laporan/jurnal/${btoa(
+                                    btoa(JSON.stringify({ trx: v.value.ref }))
+                                  )}`}
+                                >
+                                  {v.value.ref}
+                                </Link>
+                              </div>
+
+                              <div className="col-1">{v.value.date}</div>
+                              <div className="col-2 text-right">
+                                {v.value.debe}
+                              </div>
+                              <div className="col-2 text-right">
+                                {v.value.kred}
+                              </div>
+                              <div className="col-2 text-right">
+                                {v.value.blce}
+                              </div>
+                              <div className="col-3 text-right">
+                                {v.value.desc}
+                              </div>
+                            </div>
+                          </>
+                        );
+                      } else if (v?.type === "footer") {
+                        return (
+                          <>
+                            <div className="footer-report row m-0">
+                              <div className="col-2">{v.value.ref}</div>
+                              <div className="col-1">{v.value.date}</div>
+                              <div className="col-2 text-right">
+                                {v.value.debe}
+                              </div>
+                              <div className="col-2 text-right">
+                                {v.value.kred}
+                              </div>
+                              <div className="col-2 text-right">
+                                {v.value.blce}
+                              </div>
+                              <div className="col-3 text-right">
+                                {v.value.desc}
+                              </div>
+                            </div>
+                          </>
+                        );
+                      }
+                    })}
+                  </>
+                }
+              />
+            </div>
+          );
+        })}
+      </Row>
+
+      <Row className="m-0 justify-content-center d-none">
         <Card className="ml-1 mr-1 mt-2">
           <Card.Body className="p-0">
             <CustomeWrapper
@@ -835,7 +1007,6 @@ const KBBRincian = ({ month, year, accId }) => {
                 filtDate[0]
               )} to ${formatDate(filtDate[1])}`}
               onComplete={(cp) => setCp(cp)}
-              // page={idx + 1}
               body={
                 <>
                   <DataTable
@@ -844,219 +1015,9 @@ const KBBRincian = ({ month, year, accId }) => {
                     showGridlines
                     dataKey="id"
                     rowHover
-                    emptyMessage="Data Tidak Ditemukan"
-                  >
-                    <Column
-                      className="header-center"
-                      header="Akun"
-                      style={{ minWidth: "20rem" }}
-                      field={(e) => (
-                        <div className="font-weight-bold text-left">
-                          {e.acco}
-                        </div>
-                      )}
-                    />
-                    <Column
-                      className="header-right text-right"
-                      header={(e) => (
-                        <div className="ml-4 text-right">Saldo Awal</div>
-                      )}
-                      style={{ width: "15rem" }}
-                      field={(e) => (
-                        <div className="font-weight-bold text-right">
-                          {e.slda}
-                        </div>
-                      )}
-                    />
-                  </DataTable>
-
-                  <DataTable
-                    responsiveLayout="none"
-                    value={
-                      jsonForExcel(accDdb)?.trn?.length > 2
-                        ? jsonForExcel(accDdb).trn
-                        : []
+                    emptyMessage={
+                      tr[localStorage.getItem("language")]?.dt_tidak_ada
                     }
-                    showGridlines
-                    dataKey="id"
-                    rowHover
-                    emptyMessage="Tidak ada transaksi"
-                  >
-                    <Column
-                      header={(e) => (
-                        <div className="text-left">Detail Transaksi</div>
-                      )}
-                      style={{ width: "9rem" }}
-                      body={(e) =>
-                        e.type === "header" || e.type === "footer" ? (
-                          <div
-                            className={
-                              e.type === "header"
-                                ? "font-weight-bold text-left"
-                                : e.type === "footer"
-                                ? "font-weight-bold text-left"
-                                : "text-left"
-                            }
-                          >
-                            {e.value.ref}
-                          </div>
-                        ) : (
-                          <Link
-                            to={`/laporan/jurnal/${btoa(
-                              btoa(JSON.stringify({ trx: e.value.ref }))
-                            )}`}
-                          >
-                            <div
-                              className={
-                                e.type == "header"
-                                  ? "font-weight-bold text-left"
-                                  : e.type == "footer"
-                                  ? "font-weight-bold text-left"
-                                  : "text-left"
-                              }
-                            >
-                              {e.value.ref}
-                            </div>
-                          </Link>
-                        )
-                      }
-                    />
-                    <Column
-                      // className="header-center"
-                      // header=""
-                      style={{ minWidth: "7rem" }}
-                      body={(e) => (
-                        <div
-                          className={
-                            e.type == "header"
-                              ? "font-weight-bold text-left"
-                              : e.type == "footer"
-                              ? "font-weight-bold text-left"
-                              : "text-left"
-                          }
-                        >
-                          {e.value.date}
-                        </div>
-                      )}
-                    />
-                    {/* <Column
-                      // className="header-center"
-                      // header=""
-                      style={{ minWidth: "6rem" }}
-                      body={(e) => (
-                        <div
-                          className={
-                            e.type == "header"
-                              ? "font-weight-bold text-left"
-                              : e.type == "footer"
-                              ? "font-weight-bold text-left"
-                              : "text-left"
-                          }
-                        >
-                          {e.value.acco}
-                        </div>
-                      )}
-                    /> */}
-                    <Column
-                      // className="header-center"
-                      // header=""
-                      style={{ minWidth: "8rem" }}
-                      body={(e) => (
-                        <div
-                          className={
-                            e.type == "header"
-                              ? "font-weight-bold text-right"
-                              : e.type == "footer"
-                              ? "font-weight-bold text-right"
-                              : "text-right"
-                          }
-                        >
-                          {e.value.debe}
-                        </div>
-                      )}
-                    />
-                    <Column
-                      // className="header-center"
-                      // header=""
-                      style={{ minWidth: "8rem" }}
-                      body={(e) => (
-                        <div
-                          className={
-                            e.type == "header"
-                              ? "font-weight-bold text-right"
-                              : e.type == "footer"
-                              ? "font-weight-bold text-right"
-                              : "text-right"
-                          }
-                        >
-                          {e.value.kred}
-                        </div>
-                      )}
-                    />
-                    <Column
-                      // className="header-center"
-                      // header=""
-                      style={{ minWidth: "8rem" }}
-                      body={(e) => (
-                        <div
-                          className={
-                            e.type == "header"
-                              ? "font-weight-bold text-right"
-                              : e.type == "footer"
-                              ? "font-weight-bold text-right"
-                              : "text-right"
-                          }
-                        >
-                          {e.value.blce}
-                        </div>
-                      )}
-                    />
-                    <Column
-                      // className="header-center"
-                      // header=""
-                      style={{ minWidth: "15rem" }}
-                      body={(e) => (
-                        <div
-                          className={
-                            e.type == "header"
-                              ? "font-weight-bold text-right"
-                              : e.type == "footer"
-                              ? "font-weight-bold text-right"
-                              : "text-right"
-                          }
-                        >
-                          {e.value.desc}
-                        </div>
-                      )}
-                    />
-                  </DataTable>
-                </>
-              }
-            />
-          </Card.Body>
-        </Card>
-        {/* );
-        })} */}
-      </Row>
-
-      <Row className="m-0 justify-content-center d-none" >
-        <Card className="ml-1 mr-1 mt-2" ref={printPage}>
-          <Card.Body className="p-0">
-            <CustomeWrapper
-              tittle={"Rincian Kartu Buku Besar"}
-              subTittle={`Rincian Kartu Buku Besar Periode ${formatDate(
-                filtDate[0]
-              )} to ${formatDate(filtDate[1])}`}
-              onComplete={(cp) => setCp(cp)}
-              body={
-                <>
-                  <DataTable
-                    responsiveLayout="none"
-                    value={jsonForExcel(accDdb).header}
-                    showGridlines
-                    dataKey="id"
-                    rowHover
-                    emptyMessage="Data Tidak Ditemukan"
                   >
                     <Column
                       className="header-center"

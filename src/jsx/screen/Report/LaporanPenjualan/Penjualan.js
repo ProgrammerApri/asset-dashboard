@@ -14,6 +14,9 @@ import ReactToPrint from "react-to-print";
 import CustomeWrapper from "src/jsx/components/CustomeWrapper/CustomeWrapper";
 import { Dropdown } from "primereact/dropdown";
 import PrimeSingleButton from "src/jsx/components/PrimeSingleButton/PrimeSingleButton";
+// import ExcelExportHelper from "../../../components/ExportExcel/ExcelExportHelper";
+import { MultiSelect } from "primereact/multiselect";
+import { tr } from "../../../../data/tr";
 
 const data = {
   id: 0,
@@ -38,14 +41,14 @@ const ExcelSheet = ReactExport.ExcelFile.ExcelSheet;
 
 const SalesReport = () => {
   const [sales, setSales] = useState(null);
-  const [currency, setCurr] = useState(null);
+  const [currency, setCurrency] = useState(null);
   const [customer, setCustomer] = useState(null);
   const [report, setReport] = useState(null);
   const [loading, setLoading] = useState(true);
   const printPage = useRef(null);
   const [filtersDate, setFiltersDate] = useState([new Date(), new Date()]);
   const [globalFilterValue1, setGlobalFilterValue1] = useState("");
-  const chunkSize = 5;
+  const chunkSize = 11;
   const [cp, setCp] = useState("");
   const [selectedCus, setSelected] = useState(null);
 
@@ -56,7 +59,6 @@ const SalesReport = () => {
     d.setDate(d.getDate() - 30);
     setFiltersDate([d, new Date()]);
     getSale();
-    getCur();
   }, []);
 
   const getSale = async (isUpdate = false) => {
@@ -78,6 +80,7 @@ const SalesReport = () => {
             i === data.findIndex((ek) => el?.pel_id?.id === ek?.pel_id?.id)
         );
         setCustomer(grouped);
+        getCur();
       }
     } catch (error) {}
     if (isUpdate) {
@@ -100,7 +103,7 @@ const SalesReport = () => {
       console.log(response);
       if (response.status) {
         const { data } = response;
-        setCurr(data);
+        setCurrency(data);
       }
     } catch (error) {}
   };
@@ -153,83 +156,92 @@ const SalesReport = () => {
 
   const jsonForExcel = (sales, excel = false) => {
     let data = [];
-    let cur_rate = 0;
-    let cur_name = null;
+    let cur = 0;
 
-    sales?.forEach((sls) => {
-      currency?.forEach((cur) => {
-        if (sls?.pel_id?.cus_curren === cur?.id) {
-          cur_rate = cur?.rate;
-          cur_name = cur?.code;
-        }
-      });
-    });
-    // console.log(currency);
+    if (selectedCus?.length) {
+      selectedCus.forEach((p) => {
+        sales?.forEach((el) => {
+          currency?.forEach((elem) => {
+            if (el.pel_id.cus_curren === elem.id) {
+              cur = elem?.rate;
+            }
+          });
 
-    if (selectedCus) {
-      sales?.forEach((el) => {
-        let dt = new Date(`${el?.ord_date}Z`);
-        if (dt >= filtersDate[0] && dt <= filtersDate[1]) {
-          if (selectedCus?.pel_id?.id === el.pel_id?.id) {
-            let val = [
-              {
-                ref: `No. Trans : ${el.ord_code}`,
-                type: "header",
-                value: {
-                  date: "Date",
-                  po: "SO Code",
-                  sup: "Customer",
-                  prod: "Product Name",
-                  ord: "Quantity",
-                  unit: "Unit",
-                  prc: "Price",
-                  tot: "Total",
+          // if (el.status !== 1) {
+          let dt = new Date(`${el?.ord_date}Z`);
+          if (dt >= filtersDate[0] && dt <= filtersDate[1]) {
+            if (p?.pel_id?.id === el.pel_id?.id) {
+              let val = [
+                {
+                  ref: `No. Trans : ${el.ord_code}`,
+                  type: "header",
+                  value: {
+                    date: "Date",
+                    po: "SO Code",
+                    sup: "Customer",
+                    prod: "Product Name",
+                    ord: "Quantity",
+                    unit: "Unit",
+                    prc: "Price",
+                    tot: "Total",
+                  },
                 },
-              },
-            ];
+              ];
 
-            let total = 0;
-            el.jprod.forEach((ek) => {
-              total += ek.total;
+              let total = 0;
+              let total_qty = 0;
+              el.jprod.forEach((ek) => {
+                total += ek.total;
+                total_qty += ek.order;
+                val.push({
+                  ref: el.ord_code,
+                  type: "item",
+                  value: {
+                    date: formatDate(el.ord_date),
+                    po: el?.so_id?.so_code,
+                    sup: `${el.pel_id.cus_name} (${el.pel_id.cus_code})`,
+                    prod: `${ek.prod_id.name} (${ek.prod_id.code})`,
+                    ord: formatIdr(ek.order),
+                    unit: ek.unit_id?.name,
+                    prc:
+                      el.pel_id.cus_curren !== null
+                        ? `Rp. ${formatIdr(ek.price * cur)}`
+                        : `Rp. ${formatIdr(ek.price)}`,
+                    tot: `Rp. ${formatIdr(ek.total)}`,
+                  },
+                });
+              });
+
               val.push({
                 ref: el.ord_code,
-                type: "item",
+                type: "footer",
                 value: {
-                  date: formatDate(el.ord_date),
-                  po: el.so_id?.so_code ?? "-",
-                  sup: `${el.pel_id.cus_name} (${el.pel_id.cus_code})`,
-                  prod: `${ek.prod_id.name} (${ek.prod_id.code})`,
-                  ord: formatIdr(ek.order),
-                  unit: ek.unit_id?.code ?? "-",
-                  prc: el?.pel_id?.cus_curren
-                    ? `Rp. ${formatIdr(ek.price * cur_rate)}`
-                    : `Rp. ${formatIdr(ek.price)}`,
-                  tot: `Rp. ${formatIdr(ek.total)}`,
+                  date: "Total",
+                  po: "",
+                  sup: "",
+                  prod: "",
+                  ord: formatIdr(total_qty),
+                  unit: "",
+                  prc: "",
+                  tot: `Rp. ${formatIdr(total)}`,
                 },
               });
-            });
 
-            val.push({
-              ref: el.ord_code,
-              type: "footer",
-              value: {
-                date: "Total",
-                po: "",
-                sup: "",
-                prod: "",
-                ord: "",
-                unit: "",
-                prc: "",
-                tot: `Rp. ${formatIdr(total)}`,
-              },
-            });
-
-            data.push(val);
+              data.push(val);
+            }
           }
-        }
+          // }
+        });
       });
     } else {
       sales?.forEach((el) => {
+        currency?.forEach((elem) => {
+          if (el.pel_id.cus_curren === elem.id) {
+            cur = elem?.rate;
+          }
+        });
+
+        // if (el.status !== 1) {
         let dt = new Date(`${el?.ord_date}Z`);
         if (dt >= filtersDate[0] && dt <= filtersDate[1]) {
           let val = [
@@ -250,21 +262,24 @@ const SalesReport = () => {
           ];
 
           let total = 0;
+          let total_qty = 0;
           el.jprod.forEach((ek) => {
             total += ek.total;
+            total_qty += ek?.order;
             val.push({
               ref: el.ord_code,
               type: "item",
               value: {
                 date: formatDate(el.ord_date),
-                po: el.so_id?.so_code ?? "-",
+                po: el?.so_id?.so_code,
                 sup: `${el.pel_id.cus_name} (${el.pel_id.cus_code})`,
                 prod: `${ek.prod_id.name} (${ek.prod_id.code})`,
                 ord: formatIdr(ek.order),
-                unit: ek.unit_id?.code ?? "-",
-                prc: el?.pel_id?.cus_curren !== null
-                  ? `Rp. ${formatIdr(ek.price * cur_rate)}`
-                  : `Rp. ${formatIdr(ek.price)}`,
+                unit: ek.unit_id?.name,
+                prc:
+                  el.pel_id.cus_curren !== null
+                    ? `Rp. ${formatIdr(ek.price * cur)}`
+                    : `Rp. ${formatIdr(ek.price)}`,
                 tot: `Rp. ${formatIdr(ek.total)}`,
               },
             });
@@ -278,7 +293,7 @@ const SalesReport = () => {
               po: "",
               sup: "",
               prod: "",
-              ord: "",
+              ord: formatIdr(total_qty),
               unit: "",
               prc: "",
               tot: `Rp. ${formatIdr(total)}`,
@@ -287,6 +302,7 @@ const SalesReport = () => {
 
           data.push(val);
         }
+        // }
       });
     }
 
@@ -345,13 +361,13 @@ const SalesReport = () => {
               alignment: { horizontal: "left", vertical: "center" },
             },
           },
-          {
-            value: `${ek.value.po}`,
-            style: {
-              font: { sz: "14", bold: ek.type === "header" ? true : false },
-              alignment: { horizontal: "left", vertical: "center" },
-            },
-          },
+          // {
+          //   value: `${ek.value.po}`,
+          //   style: {
+          //     font: { sz: "14", bold: ek.type === "header" ? true : false },
+          //     alignment: { horizontal: "left", vertical: "center" },
+          //   },
+          // },
           {
             value: `${ek.value.sup}`,
             style: {
@@ -437,13 +453,6 @@ const SalesReport = () => {
           style: {
             font: { sz: "14", bold: false },
             alignment: { horizontal: "left", vertical: "center" },
-          },
-        },
-        {
-          value: "",
-          style: {
-            font: { sz: "14", bold: false },
-            alignment: { horizontal: "right", vertical: "center" },
           },
         },
         {
@@ -562,18 +571,6 @@ const SalesReport = () => {
               },
             },
           },
-          {
-            title: "",
-            width: { wch: 20 },
-            style: {
-              font: { sz: "14", bold: true },
-              alignment: { horizontal: "right", vertical: "center" },
-              fill: {
-                paternType: "solid",
-                fgColor: { rgb: "F3F3F3" },
-              },
-            },
-          },
         ],
         data: item,
       });
@@ -582,7 +579,16 @@ const SalesReport = () => {
     if (excel) {
       return final;
     } else {
-      return data;
+      let page = [];
+
+      data?.forEach((element) => {
+        element?.forEach((el) => {
+          page.push(el);
+        });
+      });
+      console.log("page=====");
+      console.log(page);
+      return page;
     }
   };
 
@@ -609,24 +615,27 @@ const SalesReport = () => {
                     setFiltersDate(e.value);
                   }}
                   selectionMode="range"
-                  placeholder="Pilih Tanggal"
+                  placeholder={tr[localStorage.getItem("language")].pilih_tgl}
                   dateFormat="dd-mm-yy"
                 />
               </div>
             </div>
 
             <div className="">
-              <Dropdown
+              <MultiSelect
                 value={selectedCus ?? null}
                 options={customer}
                 onChange={(e) => {
                   setSelected(e.value);
                 }}
-                placeholder="Pilih Customer"
+                placeholder={tr[localStorage.getItem("language")].pilih_cus}
                 optionLabel="pel_id.cus_name"
                 filter
                 filterBy="pel_id.cus_name"
                 showClear
+                display="chip"
+                className="w-full md:w-20rem"
+                maxSelectedLabels={3}
               />
             </div>
           </Row>
@@ -635,8 +644,14 @@ const SalesReport = () => {
         <div style={{ height: "1rem" }}></div>
         <Row className="mr-1 mt-2" style={{ height: "3rem" }}>
           <div className="mr-3">
+            {/* <ExcelExportHelper
+              json={sales ? jsonForExcel(sales, true) : null}
+              filename={`receivable_report_export_${new Date().getTime()}`}
+              sheetname="report"
+            /> */}
+
             <ExcelFile
-              filename={`sales_report_export_${new Date().getTime()}`}
+              filename={`receivable_report_export_${new Date().getTime()}`}
               element={
                 <PrimeSingleButton
                   label="Excel"
@@ -646,7 +661,7 @@ const SalesReport = () => {
             >
               <ExcelSheet
                 dataSet={sales ? jsonForExcel(sales, true) : null}
-                name="Report Sales"
+                name={"Report"}
               />
             </ExcelFile>
           </div>
@@ -703,12 +718,14 @@ const SalesReport = () => {
         </Col>
       </Row>
 
-      <Row className="m-0 justify-content-center" ref={printPage}>
+      <Row className="m-0 justify-content-center">
         {chunk(jsonForExcel(sales) ?? [], chunkSize)?.map((val, idx) => {
           return (
             <Card className="ml-1 mr-1 mt-2">
               <Card.Body className="p-0">
                 <CustomeWrapper
+                  viewOnly
+                  horizontal
                   tittle={"Sales Report"}
                   subTittle={`Sales Report for Period ${formatDate(
                     filtersDate[0]
@@ -718,142 +735,79 @@ const SalesReport = () => {
                   body={
                     <>
                       {val.map((v) => {
-                        return (
-                          <DataTable
-                            responsiveLayout="scroll"
-                            value={v}
-                            showGridlines
-                            dataKey="id"
-                            rowHover
-                            emptyMessage="Data Tidak Ditemukan"
-                            className="mt-0"
-                          >
-                            <Column
-                              className="header-center"
-                              header={(e) =>
-                                e.props.value ? e.props?.value[0]?.ref : null
-                              }
-                              style={{ width: "11rem" }}
-                              body={(e) => (
-                                <div
-                                  className={
-                                    e.type === "header" || e.type === "footer"
-                                      ? "font-weight-bold"
-                                      : ""
-                                  }
-                                >
-                                  {e.value.date}
+                        if (v.type === "header") {
+                          return (
+                            <>
+                              <div className="header-report single">
+                                {v.ref}
+                              </div>
+                              <div className="header-report row m-0">
+                                <div className="col-1">{v.value?.date}</div>
+                                <div className="col-1">
+                                  {v.value?.po ?? "-"}
                                 </div>
-                              )}
-                            />
-                            <Column
-                              className="header-center"
-                              header=""
-                              style={{ width: "7rem" }}
-                              body={(e) => (
-                                <div
-                                  className={
-                                    e.type === "header" && "font-weight-bold"
-                                  }
-                                >
-                                  {e.value.po}
+                                <div className="col-2">{v.value?.sup}</div>
+                                <div className="col-2">{v.value?.prod}</div>
+                                <div className="col-1 text-right ">
+                                  {v.value?.ord}
                                 </div>
-                              )}
-                            />
-                            <Column
-                              className="header-center"
-                              header=""
-                              style={{ width: "12rem" }}
-                              body={(e) => (
-                                <div
-                                  className={
-                                    e.type === "header" && "font-weight-bold"
-                                  }
-                                >
-                                  {e.value.sup}
+                                <div className="col-1">{v.value?.unit}</div>
+                                <div className="col-2 text-right ">
+                                  {v.value?.prc}
                                 </div>
-                              )}
-                            />
-                            <Column
-                              className="header-center"
-                              header=""
-                              style={{ width: "16rem" }}
-                              body={(e) => (
-                                <div
-                                  className={
-                                    e.type === "header" && "font-weight-bold"
-                                  }
-                                >
-                                  {e.value.prod}
+                                <div className="col-2 text-right ">
+                                  {v.value?.tot}
                                 </div>
-                              )}
-                            />
-                            <Column
-                              className="header-center"
-                              header=""
-                              style={{ width: "6rem" }}
-                              body={(e) => (
-                                <div
-                                  className={
-                                    e.type === "header" && "font-weight-bold"
-                                  }
-                                >
-                                  {e.value.ord}
+                              </div>
+                            </>
+                          );
+                        } else if (v.type === "item") {
+                          return (
+                            <>
+                              <div className="item-report row m-0">
+                                <div className="col-1">{v.value?.date}</div>
+                                <div className="col-1">
+                                  {v.value?.po ?? "-"}
                                 </div>
-                              )}
-                            />
-                            <Column
-                              className="header-center"
-                              header=""
-                              style={{ width: "6rem" }}
-                              body={(e) => (
-                                <div
-                                  className={
-                                    e.type === "header" && "font-weight-bold"
-                                  }
-                                >
-                                  {e.value.unit}
+                                <div className="col-2">{v.value?.sup}</div>
+                                <div className="col-2">{v.value?.prod}</div>
+                                <div className="col-1 text-right ">
+                                  {v.value?.ord}
                                 </div>
-                              )}
-                            />
-                            <Column
-                              className="header-center"
-                              header=""
-                              style={{ width: "9rem" }}
-                              body={(e) => (
-                                <div
-                                  className={
-                                    e.type === "header"
-                                      ? "font-weight-bold text-right"
-                                      : e.type === "footer"
-                                      ? "font-weight-bold text-right"
-                                      : "text-right"
-                                  }
-                                >
-                                  {e.value.prc}
+                                <div className="col-1">{v.value?.unit}</div>
+                                <div className="col-2 text-right ">
+                                  {v.value?.prc}
                                 </div>
-                              )}
-                            />
-                            <Column
-                              className="header-center"
-                              header=""
-                              style={{ width: "10rem" }}
-                              body={(e) => (
-                                <div
-                                  className={
-                                    e.type === "header"
-                                      ? "font-weight-bold text-right"
-                                      : e.type === "footer"
-                                      ? "font-weight-bold text-right"
-                                      : "text-right"
-                                  }
-                                >
-                                  {e.value.tot}
+                                <div className="col-2 text-right ">
+                                  {v.value?.tot}
                                 </div>
-                              )}
-                            />
-                          </DataTable>
-                        );
+                              </div>
+                            </>
+                          );
+                        } else if (v.type === "footer") {
+                          return (
+                            <>
+                              <div className="footer-report row m-0 mb-5">
+                                <div className="col-1">{v.value?.date}</div>
+                                <div className="col-1">
+                                  {v.value?.po ?? "-"}
+                                </div>
+                                <div className="col-2">{v.value?.sup}</div>
+                                <div className="col-2">{v.value?.prod}</div>
+                                <div className="col-1 text-right ">
+                                  {v.value?.ord}
+                                </div>
+                                <div className="col-1">{v.value?.unit}</div>
+                                <div className="col-2 text-right ">
+                                  {v.value?.prc}
+                                </div>
+                                <div className="col-2 text-right ">
+                                  {v.value?.tot}
+                                </div>
+                              </div>
+                            </>
+                          );
+                        }
                       })}
                     </>
                   }
@@ -862,6 +816,109 @@ const SalesReport = () => {
             </Card>
           );
         })}
+      </Row>
+
+      <Row className="m-0 justify-content-center d-none">
+        <Card>
+          <Card.Body className="p-0" ref={printPage}>
+            {chunk(jsonForExcel(sales) ?? [], chunkSize)?.map((val, idx) => {
+              return (
+                <Card className="ml-1 mr-1 mt-2">
+                  <Card.Body className="p-0">
+                    <CustomeWrapper
+                      horizontal
+                      tittle={"Sales Report"}
+                      subTittle={`Sales Report for Period ${formatDate(
+                        filtersDate[0]
+                      )} to ${formatDate(filtersDate[1])}`}
+                      onComplete={(cp) => setCp(cp)}
+                      page={idx + 1}
+                      body={
+                        <>
+                          {val.map((v) => {
+                            if (v.type === "header") {
+                              return (
+                                <>
+                                  <div className="header-report single">
+                                    {v.ref}
+                                  </div>
+                                  <div className="header-report row m-0">
+                                    <div className="col-1">{v.value?.date}</div>
+                                    <div className="col-1">
+                                      {v.value?.po ?? "-"}
+                                    </div>
+                                    <div className="col-2">{v.value?.sup}</div>
+                                    <div className="col-2">{v.value?.prod}</div>
+                                    <div className="col-1 text-right ">
+                                      {v.value?.ord}
+                                    </div>
+                                    <div className="col-1">{v.value?.unit}</div>
+                                    <div className="col-2 text-right ">
+                                      {v.value?.prc}
+                                    </div>
+                                    <div className="col-2 text-right ">
+                                      {v.value?.tot}
+                                    </div>
+                                  </div>
+                                </>
+                              );
+                            } else if (v.type === "item") {
+                              return (
+                                <>
+                                  <div className="item-report row m-0">
+                                    <div className="col-1">{v.value?.date}</div>
+                                    <div className="col-1">
+                                      {v.value?.po ?? "-"}
+                                    </div>
+                                    <div className="col-2">{v.value?.sup}</div>
+                                    <div className="col-2">{v.value?.prod}</div>
+                                    <div className="col-1 text-right ">
+                                      {v.value?.ord}
+                                    </div>
+                                    <div className="col-1">{v.value?.unit}</div>
+                                    <div className="col-2 text-right ">
+                                      {v.value?.prc}
+                                    </div>
+                                    <div className="col-2 text-right ">
+                                      {v.value?.tot}
+                                    </div>
+                                  </div>
+                                </>
+                              );
+                            } else if (v.type === "footer") {
+                              return (
+                                <>
+                                  <div className="footer-report row m-0 mb-5">
+                                    <div className="col-1">{v.value?.date}</div>
+                                    <div className="col-1">
+                                      {v.value?.po ?? "-"}
+                                    </div>
+                                    <div className="col-2">{v.value?.sup}</div>
+                                    <div className="col-2">{v.value?.prod}</div>
+                                    <div className="col-1 text-right ">
+                                      {v.value?.ord}
+                                    </div>
+                                    <div className="col-1">{v.value?.unit}</div>
+                                    <div className="col-2 text-right ">
+                                      {v.value?.prc}
+                                    </div>
+                                    <div className="col-2 text-right ">
+                                      {v.value?.tot}
+                                    </div>
+                                  </div>
+                                </>
+                              );
+                            }
+                          })}
+                        </>
+                      }
+                    />
+                  </Card.Body>
+                </Card>
+              );
+            })}
+          </Card.Body>
+        </Card>
       </Row>
     </>
   );

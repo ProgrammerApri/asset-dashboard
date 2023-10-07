@@ -524,6 +524,26 @@ const endpoints = {
     data: {},
   },
 
+  // setup neraca exceptions
+
+  getNeracaException: {
+    endpoint: "/v1/api/setup/neraca/exception",
+    method: "GET",
+    data: {},
+  },
+
+  addNeracaException: {
+    endpoint: "/v1/api/setup/neraca/exception",
+    method: "POST",
+    data: {},
+  },
+
+  editNeracaException: {
+    endpoint: "/v1/api/setup/neraca/exception/",
+    method: "PUT",
+    data: {},
+  },
+
   // Setup P/L
 
   getPnl: {

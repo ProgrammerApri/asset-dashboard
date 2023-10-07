@@ -529,6 +529,7 @@ const InputBatch = ({ onCancel, onSuccess }) => {
     let step = null;
     let status = null;
     let maklon = null;
+    let disabled = false;
 
     btc?.plan_id?.sequence?.forEach((el) => {
       date_act = el?.datetime_actual;
@@ -609,21 +610,22 @@ const InputBatch = ({ onCancel, onSuccess }) => {
                 updateBTC({
                   ...btc,
                   plan_id: e?.value?.id ?? null,
-                  seq: e?.value
+                  sequence: e?.value
                     ? e?.value?.sequence?.map((v) => {
                         return {
                           ...v,
-                          seq: v.seq,
+                          seq: v?.seq,
                           wc_id: v.wc_id?.id ?? null,
                           loc_id: v.loc_id?.id ?? null,
                           mch_id: v?.mch_id?.id ?? null,
                           work_id: v?.work_id?.id ?? null,
                           sup_id: v?.sup_id ?? null,
                           datetime_plan: v?.date ?? null,
-                          datetime_actual: v?.datetime_actual,
-                          datetime_end: v?.datetime_end,
-                          durasi: v?.durasi,
-                          proses: v?.proses,
+                          datetime_actual: v?.datetime_actual ?? null,
+                          datetime_end: v?.datetime_end ?? null,
+                          durasi: v?.durasi ?? null,
+                          proses: v?.proses ?? null,
+                          batch: v?.batch ?? null,
                         };
                       })
                     : null,
@@ -635,7 +637,10 @@ const InputBatch = ({ onCancel, onSuccess }) => {
                           unit_id: v?.unit_id?.id ?? null,
                           qty_making: v.qty_making ?? 0,
                           aloc: v?.aloc ?? null,
-                          qty_receive: null,
+                          qty_receive:
+                            v?.wc_mutation == null
+                              ? v?.qty_making
+                              : v?.wc_mutation,
                           qty_reject: null,
                           loc_reject: null,
                           wc_mutation: null,
@@ -784,7 +789,22 @@ const InputBatch = ({ onCancel, onSuccess }) => {
               body={
                 <DataTable
                   responsiveLayout="scroll"
-                  value={!isEdit ? btc.seq : btc.sequence}
+                  value={
+                    // !isEdit
+                    //   ? btc?.seqq.map((v, i) => {
+                    //       return {
+                    //         ...v,
+                    //         index: i,
+                    //       };
+                    //     })
+                    //   :
+                    btc?.sequence.map((v, i) => {
+                      return {
+                        ...v,
+                        index: i,
+                      };
+                    })
+                  }
                   className="display w-150 datatable-wrapper header-white no-border"
                   showGridlines={false}
                   emptyMessage={() => <div></div>}
@@ -954,11 +974,11 @@ const InputBatch = ({ onCancel, onSuccess }) => {
                           }
                           options={supplier}
                           onChange={(u) => {
-                            let temp = [...btc.seq];
+                            let temp = [...btc.sequence];
                             temp[e.index].sup_id = u?.value?.map(
                               (a) => a?.supplier?.id ?? null
                             );
-                            updateBTC({ ...btc, seq: temp });
+                            updateBTC({ ...btc, sequence: temp });
                           }}
                           placeholder="Pilih Supplier"
                           optionLabel="supplier.sup_name"
@@ -990,11 +1010,6 @@ const InputBatch = ({ onCancel, onSuccess }) => {
                               ? new Date(`${e.datetime_plan}Z`)
                               : e.datetime_plan
                           }
-                          onChange={(t) => {
-                            let temp = [...btc.seq];
-                            temp[e.index].datetime_plan = t?.value ?? null;
-                            updateBTC({ ...btc, seq: temp });
-                          }}
                           placeholder="Pilih Tanggal"
                           dateFormat="dd-mm-yy"
                           showTime
@@ -1017,21 +1032,23 @@ const InputBatch = ({ onCancel, onSuccess }) => {
                       <div className="p-inputgroup">
                         <Calendar
                           value={
-                            isEdit || date_act !== null
-                              ? new Date(`${e.datetime_actual}Z`)
-                              : e.datetime_actual
+                            !isEdit
+                              ? e.batch
+                                ? new Date(`${e.datetime_actual}Z`)
+                                : e.datetime_actual
+                              : new Date(`${e.datetime_actual}Z`)
                           }
-                          onChange={(t) => {
-                            let temp = [...btc.seq];
-                            temp[e.index].datetime_actual = t?.value ?? null;
-                            updateBTC({ ...btc, seq: temp });
+                          onChange={(a) => {
+                            let temp = btc.sequence;
+                            temp[e.index].datetime_actual = a?.value ?? null;
+                            updateBTC({ ...btc, sequence: temp });
                           }}
                           placeholder="Pilih Tanggal"
                           dateFormat="dd-mm-yy"
                           showTime
                           hourFormat="12"
                           showIcon
-                          disabled={e.proses === 0}
+                          // disabled={e.batch !== null}
                         />
                       </div>
                     )}
@@ -1047,21 +1064,23 @@ const InputBatch = ({ onCancel, onSuccess }) => {
                       <div className="p-inputgroup">
                         <Calendar
                           value={
-                            isEdit || date_end !== null
-                              ? new Date(`${e.datetime_end}Z`)
-                              : e.datetime_end
+                            !isEdit
+                              ? e?.batch
+                                ? new Date(`${e.datetime_end}Z`)
+                                : e.datetime_end
+                              : new Date(`${e.datetime_end}Z`)
                           }
-                          onChange={(t) => {
-                            let temp = [...btc.seq];
-                            temp[e.index].datetime_end = t?.value ?? null;
-                            updateBTC({ ...btc, seq: temp });
+                          onChange={(u) => {
+                            let temp = [...btc.sequence];
+                            temp[e.index].datetime_end = u?.value ?? null;
+                            updateBTC({ ...btc, sequence: temp });
                           }}
                           placeholder="Pilih Tanggal"
                           dateFormat="dd-mm-yy"
                           showTime
                           hourFormat="12"
                           showIcon
-                          disabled={e.proses === 0}
+                          // disabled={e.proses === 0}
                         />
                       </div>
                     )}
@@ -1078,13 +1097,13 @@ const InputBatch = ({ onCancel, onSuccess }) => {
                       <PrimeNumber
                         price
                         value={e.durasi && e.durasi}
-                        onChange={(t) => {
-                          let temp = [...btc.seq];
-                          temp[e.index].durasi = t?.value ?? null;
-                          updateBTC({ ...btc, seq: temp });
+                        onChange={(a) => {
+                          let temp = [...btc.sequence];
+                          temp[e.index].durasi = a?.value ?? null;
+                          updateBTC({ ...btc, sequence: temp });
                         }}
                         placeholder="0"
-                        disabled={e.proses === 0}
+                        // disabled={e.proses === 0}
                       />
                     )}
                   />
@@ -1098,47 +1117,47 @@ const InputBatch = ({ onCancel, onSuccess }) => {
                     }}
                     body={(e) => (
                       // <div className="p-inputgroup">
-                        <SelectButton
-                          value={
-                            e.proses !== null && e.proses !== ""
-                              ? e.proses === 0
-                                ? { name: "Done", code: 0 }
-                                : { name: "Panding", code: 1 }
-                              : null
-                          }
-                          options={proses}
-                          onChange={(t) => {
-                            let temp = [...btc.seq];
-                            temp[e.index].proses = t?.value?.code ?? null;
+                      <SelectButton
+                        value={
+                          e.proses !== null && e.proses !== ""
+                            ? e.proses === 0
+                              ? { name: "Done", code: 0 }
+                              : { name: "Panding", code: 1 }
+                            : null
+                        }
+                        options={proses}
+                        onChange={(t) => {
+                          let temp = [...btc.sequence];
+                          temp[e.index].proses = t?.value?.code ?? null;
 
-                            let val = [];
-                            btc?.seq?.forEach((el) => {
-                              if (el?.proses != null) {
-                                val?.push(el);
-                              }
-                            });
-                            updateBTC({
-                              ...btc,
-                              seq: temp,
-                              sequence: val?.map((v) => ({
-                                ...v,
-                                seq: v.seq,
-                                wc_id: v.wc_id ?? null,
-                                loc_id: v.loc_id ?? null,
-                                mch_id: v?.mch_id ?? null,
-                                work_id: v?.work_id ?? null,
-                                sup_id: v?.sup_id ?? null,
-                                datetime_plan: v?.datetime_plan,
-                                datetime_actual: temp[e.index].datetime_actual,
-                                datetime_end: temp[e.index].datetime_end,
-                                durasi: temp[e.index].durasi,
-                                proses: t?.value?.code ?? null,
-                              })),
-                            });
-                          }}
-                          optionLabel="name"
-                          // disabled={e.proses === 0}
-                        />
+                          let val = [];
+                          btc?.seqq?.forEach((el) => {
+                            if (el?.proses != null) {
+                              val?.push(el);
+                            }
+                          });
+                          updateBTC({
+                            ...btc,
+                            sequence: temp,
+                            // sequence: val?.map((v) => ({
+                            //   ...v,
+                            //   seq: v.seq,
+                            //   wc_id: v.wc_id ?? null,
+                            //   loc_id: v.loc_id ?? null,
+                            //   mch_id: v?.mch_id ?? null,
+                            //   work_id: v?.work_id ?? null,
+                            //   sup_id: v?.sup_id ?? null,
+                            //   datetime_plan: v?.datetime_plan,
+                            //   datetime_actual: temp[e.index].datetime_actual,
+                            //   datetime_end: temp[e.index].datetime_end,
+                            //   durasi: temp[e.index].durasi,
+                            //   proses: t?.value?.code ?? null,
+                            // })),
+                          });
+                        }}
+                        optionLabel="name"
+                        // disabled={e.proses === 0}
+                      />
                       // </div>
                     )}
                   />
@@ -1354,6 +1373,8 @@ const InputBatch = ({ onCancel, onSuccess }) => {
                         onChange={(t) => {
                           let temp = [...btc.product];
                           temp[e.index].qty_receive = t?.value ?? null;
+                          temp[e.index].remain =
+                            t?.value - temp[e.index].wc_mutation ?? null;
                           updateBTC({ ...btc, product: temp });
                         }}
                         placeholder="0"

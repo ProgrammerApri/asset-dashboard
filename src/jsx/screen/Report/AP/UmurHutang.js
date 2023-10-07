@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { request, endpoints } from "src/utils";
 import { FilterMatchMode, FilterOperator } from "primereact/api";
 import { DataTable } from "primereact/datatable";
+// import formatIdr from "../../../../utils/formatIdr";
 import { Column } from "primereact/column";
 import { Calendar } from "primereact/calendar";
 import { Button, Card, Col, Row } from "react-bootstrap";
@@ -12,30 +13,38 @@ import ReactExport from "react-data-export";
 import ReactToPrint from "react-to-print";
 import CustomeWrapper from "src/jsx/components/CustomeWrapper/CustomeWrapper";
 import CustomDropdown from "src/jsx/components/CustomDropdown/CustomDropdown";
-import { el } from "date-fns/locale";
+
 import PrimeSingleButton from "src/jsx/components/PrimeSingleButton/PrimeSingleButton";
+import { Dropdown } from "primereact/dropdown";
+// import ExcelExportHelper from "../../../components/ExportExcel/ExcelExportHelper";
+import { MultiSelect } from "primereact/multiselect";
+import formatIdr from "../../../../utils/formatIdr";
+import { tr } from "../../../../data/tr";
 
 const ExcelFile = ReactExport.ExcelFile;
 const ExcelSheet = ReactExport.ExcelFile.ExcelSheet;
 
-const UmurHutang = () => {
+const UmurHutang = ({ month, year, id }) => {
   const [report, setReport] = useState(null);
   const [loading, setLoading] = useState(true);
   const printPage = useRef(null);
-  const [date, setDate] = useState(new Date());
+  const [date, setDate] = useState(
+    year && month ? new Date(year, month - 1, 1) : null
+  );
   const [rawAP, setRawAP] = useState(null);
   const [supplier, setSupplier] = useState(null);
   const [selectSup, setSelectSup] = useState(null);
   const [ap, setAp] = useState(null);
+  const [apAll, setApAll] = useState(null);
   const [total, setTotal] = useState(null);
   const [cp, setCp] = useState("");
-  const chunkSize = 4;
+  const chunkSize = 10;
 
   useEffect(() => {
-    getSupplier();
+    getAPCard(id);
   }, []);
 
-  const getAPCard = async (spl) => {
+  const getAPCard = async (sup_id) => {
     const config = {
       ...endpoints.apcard,
       data: {},
@@ -46,52 +55,31 @@ const UmurHutang = () => {
       console.log(response);
       if (response.status) {
         const { data } = response;
-        let sup = [];
-        let total = 0;
-        spl.forEach((element) => {
-          element.ap = [];
-          data.forEach((el) => {
-            if (el.trx_type === "LP" && el.pay_type === "P1") {
-              if (element.supplier.id === el.sup_id.id) {
-                element.ap.push({ ...el, trx_amnh: 0, acq_amnh: 0 });
-              }
-            }
-          });
-          element.ap.forEach((el) => {
-            data.forEach((ek) => {
-              if (el.ord_id?.id === ek.ord_id?.id) {
-                el.trx_amnh = ek?.trx_amnh ?? 0;
-                el.acq_amnh += ek?.acq_amnh ?? 0;
-              }
-            });
-            total += el?.trx_amnh ?? 0 - el?.acq_amnh ?? 0;
-          });
-          if (element.ap.length > 0) {
-            sup.push(element);
+        let filt = [];
+        data.forEach((el) => {
+          if (el.trx_dbcr === "k" && el?.pay_type === "P1") {
+            // if (!el.lunas) {
+            filt.push(el);
+            // }
           }
         });
-        setAp(sup);
-        setRawAP(data);
-        setTotal(total);
-      }
-    } catch (error) {
-      console.log(error);
-    }
-  };
 
-  const getSupplier = async () => {
-    const config = {
-      ...endpoints.supplier,
-      data: {},
-    };
-    let response = null;
-    try {
-      response = await request(null, config);
-      console.log(response);
-      if (response.status) {
-        const { data } = response;
-        setSupplier(data);
-        getAPCard(data);
+        setAp(filt);
+        setApAll(data);
+
+        let grouped = filt?.filter(
+          (el, i) =>
+            i === filt.findIndex((ek) => el?.sup_id?.id === ek?.sup_id?.id)
+        );
+        setSupplier(grouped);
+
+        if (sup_id) {
+          grouped?.forEach((el) => {
+            if (el.sup_id?.id === Number(sup_id)) {
+              setSelectSup([el]);
+            }
+          });
+        }
       }
     } catch (error) {
       console.log(error);
@@ -113,92 +101,278 @@ const UmurHutang = () => {
   const jsonForExcel = (ap, excel = false) => {
     let data = [];
 
-    ap?.forEach((el) => {
-      let val = [
-        {
-          sup: `${el.supplier.sup_name} (${el.supplier.sup_code})`,
-          type: "header",
-          value: {
-            fk: "Invoice",
-            tgl: "Date",
-            jt: "Before Due",
-            day1: "7 Day",
-            day2: "14 Day",
-            day3: "30 Day",
-            day4: "60 Day",
-            older: "Older",
-            // nota: "Debit",
-            // rtr: "Retur",
-            total: "Total",
-            // giro: "Giro",
+    if (selectSup?.length) {
+      selectSup.forEach((p) => {
+        let val = [
+          {
+            sup: `${p.sup_id?.sup_name} \n (${p.sup_id?.sup_code})`,
+            type: "header",
+            value: {
+              fk: "Trans Code",
+              tgl: "Date",
+              due: "Due Date",
+              nota: "Payable",
+              jt: "Before Due",
+              day1: "7 Day",
+              day2: "14 Day",
+              day3: "30 Day",
+              day4: "60 Day",
+              older: "Older",
+              rtr: "Payment",
+              total: "Total",
+              giro: "Giro",
+            },
           },
-        },
-      ];
-      let amn = 0;
-      let t_jt = 0;
-      let t_day1 = 0;
-      let t_day2 = 0;
-      let t_day3 = 0;
-      let t_day4 = 0;
-      let t_older = 0;
-      el.ap.forEach((ek) => {
-        let due = new Date(`${ek?.ord_due}Z`);
-        let diff = (date - due) / (1000 * 60 * 60 * 24);
+        ];
+
+        let t_hut = 0;
+        let t_jt = 0;
+        let t_day1 = 0;
+        let t_day2 = 0;
+        let t_day3 = 0;
+        let t_day4 = 0;
+        let t_older = 0;
+        let t_pay = 0;
+
+        ap?.forEach((ek) => {
+          if (p?.sup_id?.id === ek.sup_id?.id) {
+            let acq_amnh = 0;
+            let dt = new Date(`${ek?.ord_date}Z`);
+            let due = new Date(`${ek?.ord_due}Z`);
+            let diff = (date - due) / (1000 * 60 * 60 * 24);
+
+            if (dt <= date) {
+              apAll.forEach((all) => {
+                if (
+                  (all?.ord_id && ek?.ord_id?.id === all.ord_id?.id) ||
+                  (all?.sa_id && ek?.sa_id?.id === all.sa_id?.id) ||
+                  (all?.kor_id && ek?.kor_id?.id === all.kor_id?.id)
+                ) {
+                  if (all?.trx_dbcr === "d" && all?.pay_type === "H4") {
+                    acq_amnh += all?.acq_amnh;
+                  }
+                  if (all?.trx_dbcr === "d" && all?.pay_type === "P1") {
+                    acq_amnh += all?.trx_amnh;
+                  }
+                }
+              });
+
+              val.push({
+                sup: `${ek.sup_id?.sup_name} \n (${ek.sup_id?.sup_code})`,
+                type: "item",
+                value: {
+                  fk: ek.trx_code,
+                  tgl: formatDate(ek?.ord_date),
+                  due: formatDate(ek?.ord_due),
+                  nota: ` ${formatIdr(ek?.trx_amnh)}`,
+                  jt:
+                    diff <= 0
+                      ? `${formatIdr(ek.trx_amnh - acq_amnh)}`
+                      : formatIdr(0),
+                  day1:
+                    diff <= 7 && diff > 0
+                      ? `${formatIdr(ek.trx_amnh - acq_amnh)}`
+                      : formatIdr(0),
+                  day2:
+                    diff <= 14 && diff > 7
+                      ? `${formatIdr(ek.trx_amnh - acq_amnh)}`
+                      : formatIdr(0),
+                  day3:
+                    diff <= 30 && diff > 14
+                      ? `${formatIdr(ek.trx_amnh - acq_amnh)}`
+                      : formatIdr(0),
+                  day4:
+                    diff <= 60 && diff > 30
+                      ? `${formatIdr(ek.trx_amnh - acq_amnh)}`
+                      : formatIdr(0),
+                  older:
+                    diff > 60
+                      ? `${formatIdr(ek.trx_amnh - acq_amnh)}`
+                      : formatIdr(0),
+                  rtr: `${formatIdr(acq_amnh)}`,
+                  total: `${formatIdr(
+                    ek.trx_dbcr === "k" ? ek.trx_amnh : ek.trx_amnh
+                  )}`,
+                  giro: `${formatIdr(0)}`,
+                },
+              });
+
+              t_hut += ek.trx_amnh;
+              t_jt += diff <= 0 ? ek.trx_amnh : 0;
+              t_day1 += diff <= 7 && diff > 0 ? ek.trx_amnh - acq_amnh : 0;
+              t_day2 += diff <= 14 && diff > 7 ? ek.trx_amnh - acq_amnh : 0;
+              t_day3 += diff <= 30 && diff > 14 ? ek.trx_amnh - acq_amnh : 0;
+              t_day4 += diff <= 60 && diff > 30 ? ek.trx_amnh - acq_amnh : 0;
+              t_older += diff > 60 ? ek.trx_amnh - acq_amnh : 0;
+              t_pay += acq_amnh;
+            }
+          }
+        });
 
         val.push({
-          sup: `${el.supplier.sup_name} (${el.supplier.sup_code})`,
-          type: "item",
+          // sup: `${ek.sup_id?.sup_name} (${ek.sup_id?.sup_code})`,
+          type: "footer",
           value: {
-            fk: ek.trx_code,
-            tgl: formatDate(ek.ord_date),
-            jt: diff <= 0 ? `Rp. ${formatIdr(ek.trx_amnh)}` : "-",
-            day1: diff <= 7 && diff > 0 ? `Rp. ${formatIdr(ek.trx_amnh)}` : "-",
-            day2:
-              diff <= 14 && diff > 7 ? `Rp. ${formatIdr(ek.trx_amnh)}` : "-",
-            day3:
-              diff <= 30 && diff > 14 ? `Rp. ${formatIdr(ek.trx_amnh)}` : "-",
-            day4:
-              diff <= 60 && diff > 30 ? `Rp. ${formatIdr(ek.trx_amnh)}` : "-",
-            older: diff > 60 ? `Rp. ${formatIdr(ek.trx_amnh)}` : "-",
-            // nota: `Rp. ${formatIdr(0)}`,
-            // rtr: `Rp. ${formatIdr(0)}`,
-            total: `Rp. ${formatIdr(ek.trx_amnh)}`,
-            // giro: `Rp. ${formatIdr(0)}`,
+            fk: "Total",
+            tgl: "",
+            due: "",
+            nota: formatIdr(t_hut),
+            jt: formatIdr(t_jt),
+            day1: formatIdr(t_day1),
+            day2: formatIdr(t_day2),
+            day3: formatIdr(t_day3),
+            day4: formatIdr(t_day4),
+            older: formatIdr(t_older),
+            rtr: formatIdr(t_pay),
+            total: ``,
+            giro: ``,
           },
         });
-        amn += ek.trx_amnh;
-        t_jt += diff <= 0 ? ek.trx_amnh : 0;
-        t_day1 += diff <= 7 && diff > 0 ? ek.trx_amnh : 0;
-        t_day2 += diff <= 14 && diff > 7 ? ek.trx_amnh : 0;
-        t_day3 += diff <= 30 && diff > 14 ? ek.trx_amnh : 0;
-        t_day4 += diff <= 30 && diff > 14 ? ek.trx_amnh : 0;
-        t_older += diff > 60 ? ek.trx_amnh : 0;
+
+        data.push(val);
       });
-      val.push({
-        sup: `${el.supplier.sup_name} (${el.supplier.sup_code})`,
-        type: "footer",
-        value: {
-          fk: "Total",
-          tgl: "",
-          jt: `Rp. ${formatIdr(t_jt)}`,
-          day1: `Rp. ${formatIdr(t_day1)}`,
-          day2: `Rp. ${formatIdr(t_day2)}`,
-          day3: `Rp. ${formatIdr(t_day3)}`,
-          day4: `Rp. ${formatIdr(t_day4)}`,
-          older: `Rp. ${formatIdr(t_older)}`,
-          // nota: "",
-          // rtr: "",
-          total: `Rp. ${formatIdr(amn)}`,
-        },
-      });
-      data.push(val);
-    });
+    } else {
+      if (date) {
+        let grouped = supplier?.filter(
+          (el, i) =>
+            i === supplier.findIndex((ek) => el?.sup_id?.id === ek?.sup_id?.id)
+        );
+
+        grouped?.forEach((p) => {
+          let t_jt = 0;
+          let t_day1 = 0;
+          let t_day2 = 0;
+          let t_day3 = 0;
+          let t_day4 = 0;
+          let t_older = 0;
+          let t_hut = 0;
+          let t_pay = 0;
+
+          let val = [
+            {
+              sup: `${p?.sup_id?.sup_name} \n (${p?.sup_id?.sup_code})`,
+              type: "header",
+              value: {
+                fk: "Trans Code",
+                tgl: "Date",
+                due: "Due Date",
+                nota: "Payable",
+                jt: "Before Due",
+                day1: "7 Day",
+                day2: "14 Day",
+                day3: "30 Day",
+                day4: "60 Day",
+                older: "Older",
+                rtr: "Payment",
+                total: "Total",
+                giro: "Giro",
+              },
+            },
+          ];
+
+          ap?.forEach((ek) => {
+            if (p?.sup_id?.id === ek?.sup_id?.id) {
+              let acq_amnh = 0;
+
+              let dt = new Date(`${ek?.ord_date}Z`);
+              let due = new Date(`${ek?.ord_due}Z`);
+              let diff = (date - due) / (1000 * 60 * 60 * 24);
+
+              if (dt <= date) {
+                apAll.forEach((all) => {
+                  if (
+                    (all?.ord_id && ek?.ord_id?.id === all.ord_id?.id) ||
+                    (all?.sa_id && ek?.sa_id?.id === all.sa_id?.id) ||
+                    (all?.kor_id && ek?.kor_id?.id === all.kor_id?.id)
+                  ) {
+                    if (all?.trx_dbcr === "d" && all?.pay_type === "H4") {
+                      acq_amnh += all?.acq_amnh;
+                    }
+                    if (all?.trx_dbcr === "d" && all?.pay_type === "P1") {
+                      acq_amnh += all?.trx_amnh;
+                    }
+                  }
+                });
+
+                val.push({
+                  sup: `${ek.sup_id?.sup_name} \n (${ek.sup_id?.sup_code})`,
+                  type: "item",
+                  value: {
+                    fk: ek.trx_code,
+                    tgl: formatDate(ek?.ord_date),
+                    due: formatDate(ek?.ord_due),
+                    nota: ` ${formatIdr(ek?.trx_amnh)}`,
+                    jt: diff <= 0 ? `${formatIdr(ek.trx_amnh)}` : formatIdr(0),
+                    day1:
+                      diff <= 7 && diff > 0
+                        ? `${formatIdr(ek.trx_amnh - acq_amnh)}`
+                        : formatIdr(0),
+                    day2:
+                      diff <= 14 && diff > 7
+                        ? `${formatIdr(ek.trx_amnh - acq_amnh)}`
+                        : formatIdr(0),
+                    day3:
+                      diff <= 30 && diff > 14
+                        ? `${formatIdr(ek.trx_amnh - acq_amnh)}`
+                        : formatIdr(0),
+                    day4:
+                      diff <= 60 && diff > 30
+                        ? `${formatIdr(ek.trx_amnh - acq_amnh)}`
+                        : formatIdr(0),
+                    older:
+                      diff > 60
+                        ? `${formatIdr(ek.trx_amnh - acq_amnh)}`
+                        : formatIdr(0),
+                    rtr: `${formatIdr(acq_amnh)}`,
+                    total: `${formatIdr(
+                      ek.trx_dbcr === "k" ? ek.trx_amnh : ek.trx_amnh
+                    )}`,
+                    giro: `${formatIdr(0)}`,
+                  },
+                });
+
+                t_hut += ek.trx_amnh;
+                t_jt += diff <= 0 ? ek.trx_amnh - acq_amnh : 0;
+                t_day1 += diff <= 7 && diff > 0 ? ek.trx_amnh - acq_amnh : 0;
+                t_day2 += diff <= 14 && diff > 7 ? ek.trx_amnh - acq_amnh : 0;
+                t_day3 += diff <= 30 && diff > 14 ? ek.trx_amnh - acq_amnh : 0;
+                t_day4 += diff <= 60 && diff > 30 ? ek.trx_amnh - acq_amnh : 0;
+                t_older += diff > 60 ? ek.trx_amnh - acq_amnh : 0;
+                t_pay += acq_amnh;
+              }
+            }
+          });
+
+          val.push({
+            // sup: `${ek.sup_id?.sup_name} (${ek.sup_id?.sup_code})`,
+            type: "footer",
+            value: {
+              fk: "Total",
+              tgl: "",
+              due: "",
+              nota: formatIdr(t_hut),
+              jt: formatIdr(t_jt),
+              day1: formatIdr(t_day1),
+              day2: formatIdr(t_day2),
+              day3: formatIdr(t_day3),
+              day4: formatIdr(t_day4),
+              older: formatIdr(t_older),
+              rtr: formatIdr(t_pay),
+              total: ``,
+              giro: ``,
+            },
+          });
+
+          data.push(val);
+        });
+      }
+    }
 
     let final = [
       {
         columns: [
           {
-            title: "Debt Age Details",
+            title: "Age of Debt Details",
             width: { wch: 20 },
             style: {
               font: { sz: "14", bold: true },
@@ -314,28 +488,28 @@ const UmurHutang = () => {
               alignment: { horizontal: "right", vertical: "center" },
             },
           },
-          // {
-          //   value: `${ek.value.nota}`,
-          //   style: {
-          //     font: {
-          //       sz: "14",
-          //       bold:
-          //         ek.type === "header" || ek.type === "footer" ? true : false,
-          //     },
-          //     alignment: { horizontal: "right", vertical: "center" },
-          //   },
-          // },
-          // {
-          //   value: `${ek.value.rtr}`,
-          //   style: {
-          //     font: {
-          //       sz: "14",
-          //       bold:
-          //         ek.type === "header" || ek.type === "footer" ? true : false,
-          //     },
-          //     alignment: { horizontal: "right", vertical: "center" },
-          //   },
-          // },
+          {
+            value: `${ek.value.nota}`,
+            style: {
+              font: {
+                sz: "14",
+                bold:
+                  ek.type === "header" || ek.type === "footer" ? true : false,
+              },
+              alignment: { horizontal: "right", vertical: "center" },
+            },
+          },
+          {
+            value: `${ek.value.rtr}`,
+            style: {
+              font: {
+                sz: "14",
+                bold:
+                  ek.type === "header" || ek.type === "footer" ? true : false,
+              },
+              alignment: { horizontal: "right", vertical: "center" },
+            },
+          },
           {
             value: `${ek.value.total}`,
             style: {
@@ -358,13 +532,75 @@ const UmurHutang = () => {
             alignment: { horizontal: "left", vertical: "center" },
           },
         },
-       
+        {
+          value: "",
+          style: {
+            font: { sz: "14", bold: false },
+            alignment: { horizontal: "left", vertical: "center" },
+          },
+        },
+        {
+          value: "",
+          style: {
+            font: { sz: "14", bold: false },
+            alignment: { horizontal: "left", vertical: "center" },
+          },
+        },
+        {
+          value: "",
+          style: {
+            font: { sz: "14", bold: false },
+            alignment: { horizontal: "left", vertical: "center" },
+          },
+        },
+        {
+          value: "",
+          style: {
+            font: { sz: "14", bold: false },
+            alignment: { horizontal: "right", vertical: "center" },
+          },
+        },
+        {
+          value: "",
+          style: {
+            font: { sz: "14", bold: false },
+            alignment: { horizontal: "right", vertical: "center" },
+          },
+        },
+        {
+          value: "",
+          style: {
+            font: { sz: "14", bold: false },
+            alignment: { horizontal: "right", vertical: "center" },
+          },
+        },
+        {
+          value: "",
+          style: {
+            font: { sz: "14", bold: false },
+            alignment: { horizontal: "right", vertical: "center" },
+          },
+        },
+        {
+          value: "",
+          style: {
+            font: { sz: "14", bold: false },
+            alignment: { horizontal: "right", vertical: "center" },
+          },
+        },
+        {
+          value: "",
+          style: {
+            font: { sz: "14", bold: false },
+            alignment: { horizontal: "right", vertical: "center" },
+          },
+        },
       ]);
 
       final.push({
         columns: [
           {
-            title: `${el[0].sup}`,
+            title: `${el[0]?.sup}`,
             width: { wch: 20 },
             style: {
               font: { sz: "14", bold: false },
@@ -389,7 +625,7 @@ const UmurHutang = () => {
           },
           {
             title: "",
-            width: { wch: 15 },
+            width: { wch: 30 },
             style: {
               font: { sz: "14", bold: true },
               alignment: { horizontal: "left", vertical: "center" },
@@ -413,7 +649,7 @@ const UmurHutang = () => {
           },
           {
             title: "",
-            width: { wch: 15 },
+            width: { wch: 30 },
             style: {
               font: { sz: "14", bold: true },
               alignment: { horizontal: "right", vertical: "center" },
@@ -462,6 +698,18 @@ const UmurHutang = () => {
           {
             title: "",
             width: { wch: 15 },
+            style: {
+              font: { sz: "14", bold: true },
+              alignment: { horizontal: "right", vertical: "center" },
+              fill: {
+                paternType: "solid",
+                fgColor: { rgb: "F3F3F3" },
+              },
+            },
+          },
+          {
+            title: "",
+            width: { wch: 30 },
             style: {
               font: { sz: "14", bold: true },
               alignment: { horizontal: "right", vertical: "center" },
@@ -479,15 +727,28 @@ const UmurHutang = () => {
     if (excel) {
       return final;
     } else {
-      return data;
+      let page = [];
+
+      data?.forEach((element) => {
+        element?.forEach((el) => {
+          page.push(el);
+        });
+      });
+      return page;
     }
   };
 
   const formatIdr = (value) => {
-    return `${value?.toFixed(2)}`
+    return `Rp. ${value?.toFixed(2)}`
       .replace(".", ",")
       .replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1.");
   };
+
+  // const formatIdr = (value) => {
+  //   return `${value}`
+  //     .replace(".", ",")
+  //     .replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1.");
+  // };
 
   const renderHeader = () => {
     return (
@@ -504,30 +765,40 @@ const UmurHutang = () => {
                   console.log(e.value);
                   setDate(e.value);
                 }}
-                placeholder="Pilih Tanggal"
+                placeholder={tr[localStorage.getItem("language")].pilih_tgl}
                 readOnlyInput
                 dateFormat="dd-mm-yy"
               />
             </div>
-            {/* <div className="col-4">
-              <CustomDropdown
-                value={supplier && selectSup}
-                option={supplier}
+            <div className="col-4">
+              <MultiSelect
+                value={selectSup ?? null}
+                options={supplier}
                 onChange={(e) => {
-                  setSelectSup(e);
+                  setSelectSup(e.value);
                 }}
-                label={"[supplier.sup_name] ([supplier.sup_code])"}
-                placeholder="Pilih Pemasok"
+                placeholder={tr[localStorage.getItem("language")].pilih_sup}
+                optionLabel="sup_id.sup_name"
+                filter
+                filterBy="sup_id.sup_name"
+                showClear
+                display="chip"
+                className="w-full md:w-20rem"
+                maxSelectedLabels={3}
               />
-            </div> */}
+            </div>
           </Row>
         </div>
         <Row className="mr-1 mt-2" style={{ height: "3rem" }}>
           <div className="mr-3">
+            {/* <ExcelExportHelper
+              json={ap ? jsonForExcel(ap, true) : null}
+              filename={`Age of Debt Details_export_${new Date().getTime()}`}
+              sheetname="report"
+            /> */}
+
             <ExcelFile
-              filename={`due_date_payable_${formatDate(new Date())
-                .replace("-", "")
-                .replace("-", "")}`}
+              filename={`Age of Debt Details_export_${new Date().getTime()}`}
               element={
                 <PrimeSingleButton
                   label="Excel"
@@ -537,7 +808,7 @@ const UmurHutang = () => {
             >
               <ExcelSheet
                 dataSet={ap ? jsonForExcel(ap, true) : null}
-                name="Report"
+                name={"Report"}
               />
             </ExcelFile>
           </div>
@@ -576,243 +847,211 @@ const UmurHutang = () => {
         </Col>
       </Row>
 
-      <Row className="ml-0 pt-0 justify-content-center" ref={printPage}>
+      <Row className="ml-0 pt-0 justify-content-center">
         {chunk(jsonForExcel(ap, false) ?? [], chunkSize)?.map((val, idx) => {
           return (
             <Card>
               <Card.Body className="p-0 m-0">
                 <CustomeWrapper
-                  tittle={"Debt Age Details"}
-                  subTittle={`Debt Age Details as of ${formatDate(date)}`}
+                  viewOnly
+                  horizontal
+                  tittle={"Age of Debt Details"}
+                  subTittle={`Age of Debt Details as of ${formatDate(date)}`}
                   onComplete={(cp) => setCp(cp)}
+                  page={idx + 1}
                   body={
                     <>
                       {val.map((v) => {
-                        return (
-                          <DataTable
-                            responsiveLayout="scroll"
-                            value={v}
-                            showGridlines
-                            dataKey="id"
-                            rowHover
-                            emptyMessage="Data Tidak Ditemukan"
-                          >
-                            <Column
-                              className="header-center border-right border-left"
-                              header={(e) =>
-                                e.props.value ? e.props?.value[0]?.sup : null
-                              }
-                              style={{ width: "11rem" }}
-                              body={(e) => (
-                                <div
-                                  className={
-                                    e.type === "header" || e.type === "footer"
-                                      ? "font-weight-bold"
-                                      : ""
-                                  }
-                                >
-                                  {e.value.fk}
+                        if (v.type === "header") {
+                          return (
+                            <>
+                              <div className="header-report single">
+                                {v.sup}
+                              </div>
+                              <div className="header-report row m-0">
+                                <div style={{ width: "7vw" }}>{v.value.fk}</div>
+                                <div style={{ width: "5vw" }}>
+                                  {v.value.tgl}
                                 </div>
-                              )}
-                            />
-                            <Column
-                              className="header-center border-right"
-                              header=""
-                              style={{ width: "13rem" }}
-                              body={(e) => (
-                                <div
-                                  className={
-                                    e.type === "header"
-                                      ? "font-weight-bold"
-                                      : ""
-                                  }
-                                >
-                                  {e.value.tgl}
+                                <div style={{ width: "5vw" }}>
+                                  {v.value.due}
                                 </div>
-                              )}
-                            />
-                            <Column
-                              className="header-center border-right"
-                              header=""
-                              style={{ width: "13rem" }}
-                              body={(e) => (
                                 <div
-                                  className={
-                                    e.type === "header"
-                                      ? "font-weight-bold text-right"
-                                      : e.type === "footer"
-                                      ? "font-weight-bold text-right"
-                                      : "text-right"
-                                  }
+                                  className="col text-right"
+                                  // style={{ width: "10vw" }}
                                 >
-                                  {e.value.jt}
+                                  {v.value.nota}
                                 </div>
-                              )}
-                            />
-                            <Column
-                              className="header-center border-right"
-                              header=""
-                              style={{ width: "13rem" }}
-                              body={(e) => (
                                 <div
-                                  className={
-                                    e.type === "header"
-                                      ? "font-weight-bold text-right"
-                                      : e.type === "footer"
-                                      ? "font-weight-bold text-right"
-                                      : "text-right"
-                                  }
+                                  className="col text-right"
+                                  // style={{ width: "10vw" }}
                                 >
-                                  {e.value.day1}
+                                  {v.value.jt}
                                 </div>
-                              )}
-                            />
-                            <Column
-                              className="header-center border-right"
-                              header=""
-                              style={{ width: "11rem" }}
-                              body={(e) => (
                                 <div
-                                  className={
-                                    e.type === "header"
-                                      ? "font-weight-bold text-right"
-                                      : e.type === "footer"
-                                      ? "font-weight-bold text-right"
-                                      : "text-right"
-                                  }
+                                  className="col text-right"
+                                  // style={{ width: "10vw" }}
                                 >
-                                  {e.value.day2}
+                                  {v.value.day1}
                                 </div>
-                              )}
-                            />
-                            <Column
-                              className="header-center border-right"
-                              header=""
-                              style={{ width: "13rem" }}
-                              body={(e) => (
                                 <div
-                                  className={
-                                    e.type === "header"
-                                      ? "font-weight-bold text-right"
-                                      : e.type === "footer"
-                                      ? "font-weight-bold text-right"
-                                      : "text-right"
-                                  }
+                                  className="col text-right"
+                                  // style={{ width: "10vw" }}
                                 >
-                                  {e.value.day3}
+                                  {v.value.day2}
                                 </div>
-                              )}
-                            />
-                            <Column
-                              className="header-center border-right"
-                              header=""
-                              style={{ width: "13rem" }}
-                              body={(e) => (
                                 <div
-                                  className={
-                                    e.type === "header"
-                                      ? "font-weight-bold text-right"
-                                      : e.type === "footer"
-                                      ? "font-weight-bold text-right"
-                                      : "text-right"
-                                  }
+                                  className="col text-right"
+                                  // style={{ width: "10vw" }}
                                 >
-                                  {e.value.day4}
+                                  {v.value.day3}
                                 </div>
-                              )}
-                            />
-                            <Column
-                              className="header-center border-right"
-                              header=""
-                              style={{ width: "13rem" }}
-                              body={(e) => (
                                 <div
-                                  className={
-                                    e.type === "header"
-                                      ? "font-weight-bold text-right"
-                                      : e.type === "footer"
-                                      ? "font-weight-bold text-right"
-                                      : "text-right"
-                                  }
+                                  className="col text-right"
+                                  // style={{ width: "10vw" }}
                                 >
-                                  {e.value.older}
+                                  {v.value.day4}
                                 </div>
-                              )}
-                            />
-                            {/* <Column
-                              className="header-center border-right"
-                              header=""
-                              style={{ minWidht: "13rem" }}
-                              body={(e) => (
                                 <div
-                                  className={
-                                    e.type === "header"
-                                      ? "font-weight-bold text-right"
-                                      : e.type === "footer"
-                                      ? "font-weight-bold text-right"
-                                      : "text-right"
-                                  }
+                                  className="col text-right"
+                                  // style={{ width: "10vw" }}
                                 >
-                                  {e.value.nota}
+                                  {v.value.older}
                                 </div>
-                              )}
-                            />
-                            <Column
-                              className="header-center border-right"
-                              header=""
-                              style={{ minWidht: "13rem" }}
-                              body={(e) => (
                                 <div
-                                  className={
-                                    e.type === "header"
-                                      ? "font-weight-bold text-right"
-                                      : e.type === "footer"
-                                      ? "font-weight-bold text-right"
-                                      : "text-right"
-                                  }
+                                  className="col text-right"
+                                  // style={{ width: "10vw" }}
                                 >
-                                  {e.value.rtr}
+                                  {v.value.rtr}
                                 </div>
-                              )}
-                            /> */}
-                            <Column
-                              className="header-center border-right"
-                              header=""
-                              style={{ width: "13rem" }}
-                              body={(e) => (
+                              </div>
+                            </>
+                          );
+                        } else if (v.type === "item") {
+                          return (
+                            <>
+                              <div className="item-report row m-0">
+                                <div style={{ width: "7vw" }}>{v.value.fk}</div>
+                                <div style={{ width: "5vw" }}>
+                                  {v.value.tgl}
+                                </div>
+                                <div style={{ width: "5vw" }}>
+                                  {v.value.due}
+                                </div>
                                 <div
-                                  className={
-                                    e.type === "header"
-                                      ? "font-weight-bold text-right"
-                                      : e.type === "footer"
-                                      ? "font-weight-bold text-right"
-                                      : "text-right"
-                                  }
+                                  className="col text-right"
+                                  // style={{ width: "10vw" }}
                                 >
-                                  {e.value.total}
+                                  {v.value.nota}
                                 </div>
-                              )}
-                            />
-                            {/* <Column
-                              className="header-center border-right"
-                              header=""
-                              style={{ minWidht: "13rem" }}
-                              body={(e) => (
                                 <div
-                                  className={
-                                    e.type === "header"
-                                      ? "font-weight-bold text-right"
-                                      : e.type === "footer"
-                                      ? "font-weight-bold text-right"
-                                      : "text-right"
-                                  }
+                                  className="col text-right"
+                                  // style={{ width: "10vw" }}
                                 >
-                                  {e.value.giro}
+                                  {v.value.jt}
                                 </div>
-                              )}
-                            /> */}
-                          </DataTable>
-                        );
+                                <div
+                                  className="col text-right"
+                                  // style={{ width: "10vw" }}
+                                >
+                                  {v.value.day1}
+                                </div>
+                                <div
+                                  className="col text-right"
+                                  // style={{ width: "10vw" }}
+                                >
+                                  {v.value.day2}
+                                </div>
+                                <div
+                                  className="col text-right"
+                                  // style={{ width: "10vw" }}
+                                >
+                                  {v.value.day3}
+                                </div>
+                                <div
+                                  className="col text-right"
+                                  // style={{ width: "10vw" }}
+                                >
+                                  {v.value.day4}
+                                </div>
+                                <div
+                                  className="col text-right"
+                                  // style={{ width: "10vw" }}
+                                >
+                                  {v.value.older}
+                                </div>
+                                <div
+                                  className="col text-right"
+                                  // style={{ width: "10vw" }}
+                                >
+                                  {v.value.rtr}
+                                </div>
+                              </div>
+                            </>
+                          );
+                        } else if (v.type === "footer") {
+                          return (
+                            <>
+                              <div className="footer-report row m-0 mb-4">
+                                <div style={{ width: "7vw" }}>{v.value.fk}</div>
+                                <div style={{ width: "5vw" }}>
+                                  {v.value.tgl}
+                                </div>
+                                <div style={{ width: "5vw" }}>
+                                  {v.value.due}
+                                </div>
+                                <div
+                                  className="col text-right"
+                                  // style={{ width: "10vw" }}
+                                >
+                                  {v.value.nota}
+                                </div>
+                                <div
+                                  className="col text-right"
+                                  // style={{ width: "10vw" }}
+                                >
+                                  {v.value.jt}
+                                </div>
+                                <div
+                                  className="col text-right"
+                                  // style={{ width: "10vw" }}
+                                >
+                                  {v.value.day1}
+                                </div>
+                                <div
+                                  className="col text-right"
+                                  // style={{ width: "10vw" }}
+                                >
+                                  {v.value.day2}
+                                </div>
+                                <div
+                                  className="col text-right"
+                                  // style={{ width: "10vw" }}
+                                >
+                                  {v.value.day3}
+                                </div>
+                                <div
+                                  className="col text-right"
+                                  // style={{ width: "10vw" }}
+                                >
+                                  {v.value.day4}
+                                </div>
+                                <div
+                                  className="col text-right"
+                                  // style={{ width: "10vw" }}
+                                >
+                                  {v.value.older}
+                                </div>
+                                <div
+                                  className="col text-right"
+                                  // style={{ width: "10vw" }}
+                                >
+                                  {v.value.rtr}
+                                </div>
+                              </div>
+                            </>
+                          );
+                        }
                       })}
                     </>
                   }
@@ -823,236 +1062,230 @@ const UmurHutang = () => {
         })}
       </Row>
 
-      <Row className="m-0 d-none">
-        <Card ref={printPage}>
-          <Card.Body className="p-0">
-            <CustomeWrapper
-              tittle={"Debt Age Details"}
-              subTittle={`Debt Age Details as of ${formatDate(date)}`}
-              body={
-                <>
-                  {jsonForExcel(ap, false)?.map((v) => {
-                    return (
-                      <DataTable
-                        responsiveLayout="scroll"
-                        value={v}
-                        showGridlines
-                        dataKey="id"
-                        rowHover
-                        emptyMessage="Data Tidak Ditemukan"
-                      >
-                        <Column
-                          className="header-center border-right border-left"
-                          header={(e) =>
-                            e.props.value ? e.props?.value[0]?.sup : null
-                          }
-                          style={{ width: "11rem" }}
-                          body={(e) => (
-                            <div
-                              className={
-                                e.type === "header" || e.type === "footer"
-                                  ? "font-weight-bold"
-                                  : ""
+      <Row className="ml-0 pt-0 justify-content-center d-none">
+        <Card>
+          <Card.Body className="p-0 m-0" ref={printPage}>
+            {chunk(jsonForExcel(ap, false) ?? [], chunkSize)?.map(
+              (val, idx) => {
+                return (
+                  <Card>
+                    <Card.Body className="p-0 m-0">
+                      <CustomeWrapper
+                        horizontal
+                        tittle={"Age of Debt Details"}
+                        subTittle={`Age of Debt Details as of ${formatDate(
+                          date
+                        )}`}
+                        onComplete={(cp) => setCp(cp)}
+                        page={idx + 1}
+                        body={
+                          <>
+                            {val.map((v) => {
+                              if (v.type === "header") {
+                                return (
+                                  <>
+                                    <div className="header-report single">
+                                      {v.sup}
+                                    </div>
+                                    <div className="header-report row m-0">
+                                      <div style={{ width: "7vw" }}>
+                                        {v.value.fk}
+                                      </div>
+                                      <div style={{ width: "5vw" }}>
+                                        {v.value.tgl}
+                                      </div>
+                                      <div style={{ width: "5vw" }}>
+                                        {v.value.due}
+                                      </div>
+                                      <div
+                                        className="col text-right"
+                                        // style={{ width: "10vw" }}
+                                      >
+                                        {v.value.nota}
+                                      </div>
+                                      <div
+                                        className="col text-right"
+                                        // style={{ width: "10vw" }}
+                                      >
+                                        {v.value.jt}
+                                      </div>
+                                      <div
+                                        className="col text-right"
+                                        // style={{ width: "10vw" }}
+                                      >
+                                        {v.value.day1}
+                                      </div>
+                                      <div
+                                        className="col text-right"
+                                        // style={{ width: "10vw" }}
+                                      >
+                                        {v.value.day2}
+                                      </div>
+                                      <div
+                                        className="col text-right"
+                                        // style={{ width: "10vw" }}
+                                      >
+                                        {v.value.day3}
+                                      </div>
+                                      <div
+                                        className="col text-right"
+                                        // style={{ width: "10vw" }}
+                                      >
+                                        {v.value.day4}
+                                      </div>
+                                      <div
+                                        className="col text-right"
+                                        // style={{ width: "10vw" }}
+                                      >
+                                        {v.value.older}
+                                      </div>
+                                      <div
+                                        className="col text-right"
+                                        // style={{ width: "10vw" }}
+                                      >
+                                        {v.value.rtr}
+                                      </div>
+                                    </div>
+                                  </>
+                                );
+                              } else if (v.type === "item") {
+                                return (
+                                  <>
+                                    <div className="item-report row m-0">
+                                      <div style={{ width: "7vw" }}>
+                                        {v.value.fk}
+                                      </div>
+                                      <div style={{ width: "5vw" }}>
+                                        {v.value.tgl}
+                                      </div>
+                                      <div style={{ width: "5vw" }}>
+                                        {v.value.due}
+                                      </div>
+                                      <div
+                                        className="col text-right"
+                                        // style={{ width: "10vw" }}
+                                      >
+                                        {v.value.nota}
+                                      </div>
+                                      <div
+                                        className="col text-right"
+                                        // style={{ width: "10vw" }}
+                                      >
+                                        {v.value.jt}
+                                      </div>
+                                      <div
+                                        className="col text-right"
+                                        // style={{ width: "10vw" }}
+                                      >
+                                        {v.value.day1}
+                                      </div>
+                                      <div
+                                        className="col text-right"
+                                        // style={{ width: "10vw" }}
+                                      >
+                                        {v.value.day2}
+                                      </div>
+                                      <div
+                                        className="col text-right"
+                                        // style={{ width: "10vw" }}
+                                      >
+                                        {v.value.day3}
+                                      </div>
+                                      <div
+                                        className="col text-right"
+                                        // style={{ width: "10vw" }}
+                                      >
+                                        {v.value.day4}
+                                      </div>
+                                      <div
+                                        className="col text-right"
+                                        // style={{ width: "10vw" }}
+                                      >
+                                        {v.value.older}
+                                      </div>
+                                      <div
+                                        className="col text-right"
+                                        // style={{ width: "10vw" }}
+                                      >
+                                        {v.value.rtr}
+                                      </div>
+                                    </div>
+                                  </>
+                                );
+                              } else if (v.type === "footer") {
+                                return (
+                                  <>
+                                    <div className="footer-report row m-0 mb-4">
+                                      <div style={{ width: "7vw" }}>
+                                        {v.value.fk}
+                                      </div>
+                                      <div style={{ width: "5vw" }}>
+                                        {v.value.tgl}
+                                      </div>
+                                      <div style={{ width: "5vw" }}>
+                                        {v.value.due}
+                                      </div>
+                                      <div
+                                        className="col text-right"
+                                        // style={{ width: "10vw" }}
+                                      >
+                                        {v.value.nota}
+                                      </div>
+                                      <div
+                                        className="col text-right"
+                                        // style={{ width: "10vw" }}
+                                      >
+                                        {v.value.jt}
+                                      </div>
+                                      <div
+                                        className="col text-right"
+                                        // style={{ width: "10vw" }}
+                                      >
+                                        {v.value.day1}
+                                      </div>
+                                      <div
+                                        className="col text-right"
+                                        // style={{ width: "10vw" }}
+                                      >
+                                        {v.value.day2}
+                                      </div>
+                                      <div
+                                        className="col text-right"
+                                        // style={{ width: "10vw" }}
+                                      >
+                                        {v.value.day3}
+                                      </div>
+                                      <div
+                                        className="col text-right"
+                                        // style={{ width: "10vw" }}
+                                      >
+                                        {v.value.day4}
+                                      </div>
+                                      <div
+                                        className="col text-right"
+                                        // style={{ width: "10vw" }}
+                                      >
+                                        {v.value.older}
+                                      </div>
+                                      <div
+                                        className="col text-right"
+                                        // style={{ width: "10vw" }}
+                                      >
+                                        {v.value.rtr}
+                                      </div>
+                                    </div>
+                                  </>
+                                );
                               }
-                            >
-                              {e.value.fk}
-                            </div>
-                          )}
-                        />
-                        <Column
-                          className="header-center border-right"
-                          header=""
-                          style={{ minWidht: "13rem" }}
-                          body={(e) => (
-                            <div
-                              className={
-                                e.type === "header"
-                                  ? "font-weight-bold text-right"
-                                  : e.type === "footer"
-                                  ? "font-weight-bold text-right"
-                                  : "text-right"
-                              }
-                            >
-                              {e.value.jt}
-                            </div>
-                          )}
-                        />
-                        <Column
-                          className="header-center border-right"
-                          header=""
-                          style={{ minWidht: "13rem" }}
-                          body={(e) => (
-                            <div
-                              className={
-                                e.type === "header"
-                                  ? "font-weight-bold text-right"
-                                  : e.type === "footer"
-                                  ? "font-weight-bold text-right"
-                                  : "text-right"
-                              }
-                            >
-                              {e.value.day1}
-                            </div>
-                          )}
-                        />
-                        <Column
-                          className="header-center border-right"
-                          header=""
-                          style={{ minWidht: "11rem" }}
-                          body={(e) => (
-                            <div
-                              className={
-                                e.type === "header border-right"
-                                  ? "font-weight-bold text-right"
-                                  : e.type === "footer"
-                                  ? "font-weight-bold text-right"
-                                  : "text-right"
-                              }
-                            >
-                              {e.value.day2}
-                            </div>
-                          )}
-                        />
-                        <Column
-                          className="header-center border-right"
-                          header=""
-                          style={{ minWidht: "13rem" }}
-                          body={(e) => (
-                            <div
-                              className={
-                                e.type === "header"
-                                  ? "font-weight-bold text-right"
-                                  : e.type === "footer"
-                                  ? "font-weight-bold text-right"
-                                  : "text-right"
-                              }
-                            >
-                              {e.value.day3}
-                            </div>
-                          )}
-                        />
-                        <Column
-                          className="header-center border-right"
-                          header=""
-                          style={{ minWidht: "13rem" }}
-                          body={(e) => (
-                            <div
-                              className={
-                                e.type === "header"
-                                  ? "font-weight-bold text-right"
-                                  : e.type === "footer"
-                                  ? "font-weight-bold text-right"
-                                  : "text-right"
-                              }
-                            >
-                              {e.value.day4}
-                            </div>
-                          )}
-                        />
-                        <Column
-                          className="header-center border-right"
-                          header=""
-                          style={{ minWidht: "13rem" }}
-                          body={(e) => (
-                            <div
-                              className={
-                                e.type === "header"
-                                  ? "font-weight-bold text-right"
-                                  : e.type === "footer"
-                                  ? "font-weight-bold text-right"
-                                  : "text-right"
-                              }
-                            >
-                              {e.value.older}
-                            </div>
-                          )}
-                        />
-                        <Column
-                          className="header-center border-right"
-                          header=""
-                          style={{ minWidht: "13rem" }}
-                          body={(e) => (
-                            <div
-                              className={
-                                e.type === "header"
-                                  ? "font-weight-bold text-right"
-                                  : e.type === "footer"
-                                  ? "font-weight-bold text-right"
-                                  : "text-right"
-                              }
-                            >
-                              {e.value.nota}
-                            </div>
-                          )}
-                        />
-                        <Column
-                          className="header-center border-right"
-                          header=""
-                          style={{ minWidht: "13rem" }}
-                          body={(e) => (
-                            <div
-                              className={
-                                e.type === "header"
-                                  ? "font-weight-bold text-right"
-                                  : e.type === "footer"
-                                  ? "font-weight-bold text-right"
-                                  : "text-right"
-                              }
-                            >
-                              {e.value.rtr}
-                            </div>
-                          )}
-                        />
-                        <Column
-                          className="header-center border-right"
-                          header=""
-                          style={{ minWidht: "13rem" }}
-                          body={(e) => (
-                            <div
-                              className={
-                                e.type === "header"
-                                  ? "font-weight-bold text-right"
-                                  : e.type === "footer"
-                                  ? "font-weight-bold text-right"
-                                  : "text-right"
-                              }
-                            >
-                              {e.value.total}
-                            </div>
-                          )}
-                        />
-                        <Column
-                          className="header-center border-right"
-                          header=""
-                          style={{ minWidht: "13rem" }}
-                          body={(e) => (
-                            <div
-                              className={
-                                e.type === "header"
-                                  ? "font-weight-bold text-right"
-                                  : e.type === "footer"
-                                  ? "font-weight-bold text-right"
-                                  : "text-right"
-                              }
-                            >
-                              {e.value.giro}
-                            </div>
-                          )}
-                        />
-                      </DataTable>
-                    );
-                  })}
-                  <Row className="m-0 mt-5">
-                    <div className="text-left font-weight-bold col-6">
-                      Total Hutang
-                    </div>
-                    <div className="col-6 text-right font-weight-bold">
-                      Rp. {formatIdr(total)}
-                    </div>
-                  </Row>
-                </>
+                            })}
+                          </>
+                        }
+                      />
+                    </Card.Body>
+                  </Card>
+                );
               }
-            />
+            )}
           </Card.Body>
         </Card>
       </Row>

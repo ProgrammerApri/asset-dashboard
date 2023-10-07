@@ -48079,14 +48079,14 @@ a .sidebar-logo .logo{
   text-align: left;
 }
 
-.header-report.single.row div {
+/* .header-report.single.row div {
   background: var(--input-bg);
   padding: 0rem;
   color: black;
   font-weight: bold;
   font-size: 13px;
   text-align: left;
-}
+} */
 
 .header-report {
   background: var(--card-bg);

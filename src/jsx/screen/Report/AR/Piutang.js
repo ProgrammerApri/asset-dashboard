@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { request, endpoints } from "src/utils";
+import { request } from "src/utils";
 import { FilterMatchMode, FilterOperator } from "primereact/api";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
@@ -12,19 +12,24 @@ import ReactExport from "react-data-export";
 import ReactToPrint from "react-to-print";
 import CustomeWrapper from "src/jsx/components/CustomeWrapper/CustomeWrapper";
 import CustomDropdown from "src/jsx/components/CustomDropdown/CustomDropdown";
-import { el } from "date-fns/locale";
+
 import PrimeSingleButton from "src/jsx/components/PrimeSingleButton/PrimeSingleButton";
 import { Dropdown } from "primereact/dropdown";
+// import ExcelExportHelper from "../../../components/ExportExcel/ExcelExportHelper";
 import { MultiSelect } from "primereact/multiselect";
+import endpoints from "../../../../utils/endpoints";
+import { tr } from "../../../../data/tr";
 
 const ExcelFile = ReactExport.ExcelFile;
 const ExcelSheet = ReactExport.ExcelFile.ExcelSheet;
 
-const ReportPiutang = () => {
+const ReportPiutang = ({ month, year, cus_id }) => {
   const [report, setReport] = useState(null);
   const [loading, setLoading] = useState(true);
   const printPage = useRef(null);
-  const [filtDate, setFiltDate] = useState(new Date());
+  const [filtDate, setFiltDate] = useState(
+    year && month ? new Date(year, month - 1, 31) : null
+  );
   const [customer, setCustomer] = useState(null);
   const [acc, setAcc] = useState(null);
   const [selectedCus, setSelected] = useState([]);
@@ -32,10 +37,11 @@ const ReportPiutang = () => {
   const [ar, setAr] = useState(null);
   const [total, setTotal] = useState(null);
   const [cp, setCp] = useState("");
-  const chunkSize = 5;
+  const chunkSize = 20;
+  const dummy = Array.from({ length: 10 });
 
   useEffect(() => {
-    getARCard();
+    getARCard(cus_id);
   }, []);
 
   const getARCard = async (id) => {
@@ -53,20 +59,19 @@ const ReportPiutang = () => {
         let acq_amnh = 0;
         let total = 0;
         data.forEach((el) => {
-          if (el.lunas == false) {
-            if (el.trx_dbcr === "D") {
-              trx_amnh += el?.trx_amnh ?? 0;
-            } else {
-              if (
-                el.trx_type === "DP" ||
-                (el.trx_type === "SA" && el.trx_dbcr === "K")
-              ) {
-                acq_amnh += el?.trx_amnh ?? 0;
-              } else {
-                acq_amnh += el?.acq_amnh ?? 0;
-              }
-            }
+          // if (el.lunas == false) {
+          if (el.trx_dbcr === "D" && el?.pay_type === "P1") {
+            trx_amnh += el?.trx_amnh ?? 0;
           }
+
+          if (el.trx_dbcr === "K" && el.pay_type !== "J4") {
+            acq_amnh += el?.trx_amnh ?? 0;
+          }
+
+          if (el?.trx_dbcr === "K" && el?.pay_type === "J4") {
+            acq_amnh += el?.acq_amnh ?? 0;
+          }
+          // }
         });
         total += trx_amnh - acq_amnh ?? 0;
 
@@ -152,14 +157,15 @@ const ReportPiutang = () => {
               let acq = 0;
               let val = [
                 {
-                  cus: `${cus.cus_id?.cus_name} (${cus.cus_id?.cus_code})`,
+                  cus: `${cus.cus_id?.cus_name} \n (${cus.cus_id?.cus_code})`,
                   type: "header",
                   value: {
-                    ref: "Transaction Code",
-                    date: "Transaction Date",
-                    jt: "Due Date",
-                    value: "Receivable",
-                    lns: "Payment",
+                    ref: "Kode Transaksi",
+                    date: "Tanggal Transaksi",
+                    jt: "Tanggal J/T",
+                    type: "Tipe Trans",
+                    value: "Nominal Piutang",
+                    lns: "Penerimaan",
                     // sisa: `${formatIdr(0)}`,
                   },
                 },
@@ -173,14 +179,29 @@ const ReportPiutang = () => {
                   value: {
                     ref: ek.trx_code,
                     date: formatDate(ek.trx_date),
-                    jt: ek.trx_due ? formatDate(ek.trx_due) : "-",
+                    jt:
+                      ek.trx_due && ek?.pay_type !== "J4"
+                        ? formatDate(ek.trx_due)
+                        : "-",
+                    type:
+                      ek?.pay_type === "P1"
+                        ? ek?.trx_type === "JL"
+                          ? "Penjualan"
+                          : ek?.trx_type === "SA"
+                          ? "Saldo Awal"
+                          : ek?.trx_type === "KOR"
+                          ? "Koreksi Piutang"
+                          : ek?.trx_type == "DP"
+                          ? "Uang Muka"
+                          : ek?.trx_type
+                        : "Penerimaan",
                     value: `${formatIdr(
                       ek.trx_dbcr === "D" ? ek.trx_amnh : 0
                     )}`,
                     lns: `${formatIdr(
-                      ek.trx_dbcr === "K" && ek.trx_type !== "JL"
+                      ek.trx_dbcr === "K" && ek.pay_type !== "J4"
                         ? ek.trx_amnh
-                        : ek.trx_dbcr === "K" && ek.trx_type === "JL"
+                        : ek.trx_dbcr === "K" && ek.pay_type === "J4"
                         ? ek.acq_amnh
                         : 0
                     )}`,
@@ -189,9 +210,9 @@ const ReportPiutang = () => {
 
                 amn += ek.trx_dbcr === "D" ? ek.trx_amnh : 0;
                 acq +=
-                  ek.trx_dbcr === "K" && ek.trx_type !== "JL"
+                  ek.trx_dbcr === "K" && ek.pay_type !== "J4"
                     ? ek.trx_amnh
-                    : ek.trx_dbcr === "K" && ek.trx_type === "JL"
+                    : ek.trx_dbcr === "K" && ek.pay_type === "J4"
                     ? ek.acq_amnh
                     : 0;
               }
@@ -203,6 +224,7 @@ const ReportPiutang = () => {
                   ref: "Total",
                   date: "",
                   jt: "",
+                  type: "",
                   value: `${formatIdr(amn)}`,
                   lns: `${formatIdr(acq)}`,
                   // sisa: "",
@@ -220,14 +242,15 @@ const ReportPiutang = () => {
         let acq = 0;
         let val = [
           {
-            cus: `${p.cus_id?.cus_name} (${p.cus_id?.cus_code})`,
+            cus: `${p.cus_id?.cus_name} \n (${p.cus_id?.cus_code})`,
             type: "header",
             value: {
-              ref: "Transaction Code",
-              date: "Transaction Date",
-              jt: "Due Date",
-              value: "Receivable",
-              lns: "Payment",
+              ref: "Kode Transaksi",
+              date: "Tanggal Transaksi",
+              jt: "Tanggal J/T",
+              type: "Tipe Trans",
+              value: "Nominal Piutang",
+              lns: "Penerimaan",
               // sisa: `${formatIdr(0)}`,
             },
           },
@@ -243,12 +266,27 @@ const ReportPiutang = () => {
                 value: {
                   ref: ek.trx_code,
                   date: formatDate(ek.trx_date),
-                  jt: ek.trx_due ? formatDate(ek.trx_due) : "-",
+                  jt:
+                    ek.trx_due && ek?.pay_type !== "J4"
+                      ? formatDate(ek.trx_due)
+                      : "-",
+                  type:
+                    ek?.pay_type === "P1"
+                      ? ek?.trx_type === "JL"
+                        ? "Penjualan"
+                        : ek?.trx_type === "SA"
+                        ? "Saldo Awal"
+                        : ek?.trx_type === "KOR"
+                        ? "Koreksi Piutang"
+                        : ek?.trx_type == "DP"
+                        ? "Uang Muka"
+                        : ek?.trx_type
+                      : "Penerimaan",
                   value: `${formatIdr(ek.trx_dbcr === "D" ? ek.trx_amnh : 0)}`,
                   lns: `${formatIdr(
-                    ek.trx_dbcr === "K" && ek.trx_type !== "JL"
+                    ek.trx_dbcr === "K" && ek.pay_type !== "J4"
                       ? ek.trx_amnh
-                      : ek.trx_dbcr === "K" && ek.trx_type === "JL"
+                      : ek.trx_dbcr === "K" && ek.pay_type === "J4"
                       ? ek.acq_amnh
                       : 0
                   )}`,
@@ -257,9 +295,9 @@ const ReportPiutang = () => {
 
               amn += ek.trx_dbcr === "D" ? ek.trx_amnh : 0;
               acq +=
-                ek.trx_dbcr === "K" && ek.trx_type !== "JL"
+                ek.trx_dbcr === "K" && ek.pay_type !== "J4"
                   ? ek.trx_amnh
-                  : ek.trx_dbcr === "K" && ek.trx_type === "JL"
+                  : ek.trx_dbcr === "K" && ek.pay_type === "J4"
                   ? ek.acq_amnh
                   : 0;
             }
@@ -273,12 +311,42 @@ const ReportPiutang = () => {
             ref: "Total",
             date: "",
             jt: "",
+            type: "",
             value: `${formatIdr(amn)}`,
             lns: `${formatIdr(acq)}`,
             // sisa: "",
           },
         });
+
+        val.push({
+          sup: ``,
+          type: "footer",
+          value: {
+            ref: "Sisa",
+            date: "",
+            jt: "",
+            type: "",
+            value: "",
+            lns: `${formatIdr(amn - acq)}`,
+            // sisa: "",
+          },
+        });
+
         data.push(val);
+
+        // data.push({
+        //   header: [
+        //     {
+        //       cus:
+        //         p === null
+        //           ? "-"
+        //           : `${p.cus_id?.cus_name} \n (${p.cus_id?.cus_code})`,
+        //       sisa: p === null ? "-" : `${formatIdr(amn - acq)}`,
+        //     },
+        //   ],
+
+        //   val: val,
+        // });
         // });
       });
     } else if (selectedAcc?.length) {
@@ -289,14 +357,15 @@ const ReportPiutang = () => {
             let acq = 0;
             let val = [
               {
-                cus: `${ek.cus_id?.cus_name} (${ek.cus_id?.cus_code})`,
+                cus: `${ek.cus_id?.cus_name} \n (${ek.cus_id?.cus_code})`,
                 type: "header",
                 value: {
-                  ref: "Transaction Code",
-                  date: "Transaction Date",
-                  jt: "Due Date",
-                  value: "Receivable",
-                  lns: "Payment",
+                  ref: "Kode Transaksi",
+                  date: "Tanggal Transaksi",
+                  jt: "Tanggal J/T",
+                  type: "Tipe Trans",
+                  value: "Nominal Piutang",
+                  lns: "Penerimaan",
                   // sisa: `${formatIdr(0)}`,
                 },
               },
@@ -310,12 +379,27 @@ const ReportPiutang = () => {
                 value: {
                   ref: ek.trx_code,
                   date: formatDate(ek.trx_date),
-                  jt: ek.trx_due ? formatDate(ek.trx_due) : "-",
+                  jt:
+                    ek.trx_due && ek?.pay_type !== "J4"
+                      ? formatDate(ek.trx_due)
+                      : "-",
+                  type:
+                    ek?.pay_type === "P1"
+                      ? ek?.trx_type === "JL"
+                        ? "Penjualan"
+                        : ek?.trx_type === "SA"
+                        ? "Saldo Awal"
+                        : ek?.trx_type === "KOR"
+                        ? "Koreksi Piutang"
+                        : ek?.trx_type == "DP"
+                        ? "Uang Muka"
+                        : ek?.trx_type
+                      : "Penerimaan",
                   value: `${formatIdr(ek.trx_dbcr === "D" ? ek.trx_amnh : 0)}`,
                   lns: `${formatIdr(
-                    ek.trx_dbcr === "K" && ek.trx_type !== "JL"
+                    ek.trx_dbcr === "K" && ek.pay_type !== "J4"
                       ? ek.trx_amnh
-                      : ek.trx_dbcr === "K" && ek.trx_type === "JL"
+                      : ek.trx_dbcr === "K" && ek.pay_type === "J4"
                       ? ek.acq_amnh
                       : 0
                   )}`,
@@ -324,9 +408,9 @@ const ReportPiutang = () => {
 
               amn += ek.trx_dbcr === "D" ? ek.trx_amnh : 0;
               acq +=
-                ek.trx_dbcr === "K" && ek.trx_type !== "JL"
+                ek.trx_dbcr === "K" && ek.pay_type !== "J4"
                   ? ek.trx_amnh
-                  : ek.trx_dbcr === "K" && ek.trx_type === "JL"
+                  : ek.trx_dbcr === "K" && ek.pay_type === "J4"
                   ? ek.acq_amnh
                   : 0;
             }
@@ -338,6 +422,7 @@ const ReportPiutang = () => {
                 ref: "Total",
                 date: "",
                 jt: "",
+                type: "",
                 value: `${formatIdr(amn)}`,
                 lns: `${formatIdr(acq)}`,
                 // sisa: "",
@@ -348,6 +433,71 @@ const ReportPiutang = () => {
         });
       });
     }
+    // else {
+    //   if (filtDate) {
+    //     ar?.forEach((ek) => {
+    //       let amn = 0;
+    //       let acq = 0;
+    //       let val = [
+    //         {
+    //           cus: `${ek.cus_id?.cus_name} \n (${ek.cus_id?.cus_code})`,
+    //           type: "header",
+    //           value: {
+    //             ref: tr[localStorage.getItem("language")].kd_trans,
+    //             date: tr[localStorage.getItem("language")].tgl_tran,
+    //             jt: "Due Date",
+    //             value: "Receivable",
+    //             lns: "Payment",
+    //             // sisa: `${formatIdr(0)}`,
+    //           },
+    //         },
+    //       ];
+    //       // el.ar.forEach((ek) => {
+    //       let filt = new Date(`${ek?.trx_date}Z`);
+    //       if (filt <= filtDate) {
+    //         val.push({
+    //           cus: `${ek.cus_id?.cus_name} (${ek.cus_id?.cus_code})`,
+    //           type: "item",
+    //           value: {
+    //             ref: ek.trx_code,
+    //             date: formatDate(ek.trx_date),
+    //             jt: ek.trx_due ? formatDate(ek.trx_due) : "-",
+    //             value: `${formatIdr(ek.trx_dbcr === "D" ? ek.trx_amnh : 0)}`,
+    //             lns: `${formatIdr(
+    //               ek.trx_dbcr === "K" && ek.trx_type !== "JL"
+    //                 ? ek.trx_amnh
+    //                 : ek.trx_dbcr === "K" && ek.trx_type === "JL"
+    //                 ? ek.acq_amnh
+    //                 : 0
+    //             )}`,
+    //           },
+    //         });
+
+    //         amn += ek.trx_dbcr === "D" ? ek.trx_amnh : 0;
+    //         acq +=
+    //           ek.trx_dbcr === "K" && ek.trx_type !== "JL"
+    //             ? ek.trx_amnh
+    //             : ek.trx_dbcr === "K" && ek.trx_type === "JL"
+    //             ? ek.acq_amnh
+    //             : 0;
+    //       }
+    //       // });
+    //       val.push({
+    //         sup: ``,
+    //         type: "footer",
+    //         value: {
+    //           ref: "Total",
+    //           date: "",
+    //           jt: "",
+    //           value: `${formatIdr(amn)}`,
+    //           lns: `${formatIdr(acq)}`,
+    //           // sisa: "",
+    //         },
+    //       });
+    //       data.push(val);
+    //     });
+    //   }
+    // }
 
     let final = [
       {
@@ -395,9 +545,10 @@ const ReportPiutang = () => {
         data: [[]],
       },
     ];
+
     data.forEach((el) => {
       let item = [];
-      data.forEach((ek) => {
+      data?.forEach((ek) => {
         item.push([
           {
             value: `${ek?.value?.ref}`,
@@ -587,7 +738,13 @@ const ReportPiutang = () => {
     if (excel) {
       return final;
     } else {
-      return data;
+      let page = [];
+      data?.forEach((element) => {
+        element?.forEach((el) => {
+          page.push(el);
+        });
+      });
+      return page;
     }
   };
 
@@ -607,12 +764,26 @@ const ReportPiutang = () => {
     );
   };
 
+  const valTemp = (option, props) => {
+    if (option) {
+      return (
+        <div>
+          {option !== null
+            ? `${option.account.acc_name} - ${option.account.acc_code}`
+            : ""}
+        </div>
+      );
+    }
+
+    return <span>{props.placeholder}</span>;
+  };
+
   const renderHeader = () => {
     return (
       <div className="flex justify-content-between">
         <div className="col-10 ml-0 mr-0 pl-0 pt-0">
           <Row className="mt-0">
-            <div className="p-inputgroup col-3  ">
+            <div className="p-inputgroup col-2">
               <span className="p-inputgroup-addon">
                 <i className="pi pi-calendar" />
               </span>
@@ -624,13 +795,13 @@ const ReportPiutang = () => {
                   setFiltDate(e.value);
                 }}
                 // selectionMode="range"
-                placeholder="Pilih Tanggal"
+                placeholder={tr[localStorage.getItem("language")].pilih_tgl}
                 readOnlyInput
                 dateFormat="dd-mm-yy"
               />
             </div>
 
-            <div className="p-inputgroup col-3 mr-0">
+            <div className="p-inputgroup col-3 ml-0">
               <MultiSelect
                 value={selectedCus ?? null}
                 options={customer}
@@ -639,7 +810,7 @@ const ReportPiutang = () => {
                   // console.log("===========");
                   // console.log(e.value);
                 }}
-                placeholder="Pilih Customer"
+                placeholder={tr[localStorage.getItem("language")].pilih_cus}
                 optionLabel="cus_id.cus_name"
                 showClear
                 filterBy="cus_id.cus_name"
@@ -649,7 +820,7 @@ const ReportPiutang = () => {
                 maxSelectedLabels={3}
               />
             </div>
-            <div className="p-inputgroup col-3 mr-0">
+            <div className="p-inputgroup col-3 ml-0">
               <MultiSelect
                 value={selectedAcc ?? null}
                 options={acc}
@@ -658,7 +829,7 @@ const ReportPiutang = () => {
                   // console.log("===========");
                   // console.log(e.value);
                 }}
-                placeholder="Pilih Account"
+                placeholder={tr[localStorage.getItem("language")].pilih_acc}
                 optionLabel="account.acc_name"
                 showClear
                 filterBy="account.acc_name"
@@ -673,20 +844,11 @@ const ReportPiutang = () => {
         </div>
         <Row className="mr-1 mt-2" style={{ height: "3rem" }}>
           <div className="mr-3">
-            <ExcelFile
-              filename={`receivable_details_report_export_${new Date().getTime()}`}
-              element={
-                <PrimeSingleButton
-                  label="Excel"
-                  icon={<i class="pi pi-file-excel px-2"></i>}
-                />
-              }
-            >
-              <ExcelSheet
-                dataSet={ar ? jsonForExcel(ar, true) : null}
-                name="Receivable Details Report"
-              />
-            </ExcelFile>
+            <ExcelSheet
+              json={ar ? jsonForExcel(ar, true) : null}
+              filename={`receivable_report_export_${new Date().getTime()}`}
+              sheetname="report"
+            />
           </div>
           <ReactToPrint
             trigger={() => {
@@ -707,9 +869,11 @@ const ReportPiutang = () => {
   const renderFooter = () => {
     return (
       <Row className="m-0 mt-0">
-        <div className="text-left font-weight-bold col-6">Total Hutang</div>
+        <div className="text-left font-weight-bold col-6">
+          {tr[localStorage.getItem("language")].ttl_piutang}
+        </div>
         <div className="col-6 text-right font-weight-bold">
-          Rp. {formatIdr(total)}
+          {formatIdr(total < 0 ? 0 : total)}
         </div>
       </Row>
     );
@@ -751,117 +915,81 @@ const ReportPiutang = () => {
                   body={
                     <>
                       {val.map((v) => {
-                        return (
-                          <DataTable
-                            responsiveLayout="scroll"
-                            value={v}
-                            showGridlines
-                            dataKey="id"
-                            rowHover
-                            emptyMessage="Data Tidak Ditemukan"
-                          >
-                            <Column
-                              className="header-center"
-                              header={(e) =>
-                                e.props.value ? e.props?.value[0]?.cus : null
-                              }
-                              style={{ minWidth: "10rem" }}
-                              body={(e) => (
-                                <div
-                                  className={
-                                    e.type === "header" || e.type === "footer"
-                                      ? "font-weight-bold"
-                                      : ""
-                                  }
-                                >
-                                  {e.value.ref}
+                        if (v.type === "header") {
+                          return (
+                            <>
+                              <div className="header-report single">
+                                {v.cus}
+                                {/* <div className="col-3">{"Customer"}</div>
+                                <div className="col-2">{""}</div>
+                                <div className="col-2">{""}</div>
+                                <div className="col-1">{""}</div>
+                                <div className="col-2 text-right">{""}</div>
+                                <div className="col-2 text-right">
+                                  {"Sisa Piutang"}
+                                </div> */}
+                              </div>
+
+                              {/* <div className="item-report row m-0">
+                                <div className="col-3">{v.head.cus}</div>
+                                <div className="col-2">{""}</div>
+                                <div className="col-2">{""}</div>
+                                <div className="col-1">{""}</div>
+                                <div className="col-2 text-right">{""}</div>
+                                <div className="col-2 text-right">
+                                  {v.head.sisa}
                                 </div>
-                              )}
-                            />
-                            <Column
-                              className="header-center"
-                              header=""
-                              style={{ minWidth: "10rem" }}
-                              body={(e) => (
-                                <div
-                                  className={
-                                    e.type === "header" && "font-weight-bold"
-                                  }
-                                >
-                                  {e.value.date}
+                              </div> */}
+
+                              <div className="header-report row m-0">
+                                <div className="col-3">{v.value.ref}</div>
+                                <div className="col-2">{v.value.date}</div>
+                                <div className="col-2">{v.value.jt}</div>
+                                <div className="col-1">{v.value.type}</div>
+                                <div className="col-2 text-right">
+                                  {v.value.value}
                                 </div>
-                              )}
-                            />
-                            <Column
-                              className="header-center"
-                              header=""
-                              style={{ minWidth: "8rem" }}
-                              body={(e) => (
-                                <div
-                                  className={
-                                    e.type === "header" && "font-weight-bold"
-                                  }
-                                >
-                                  {e.value.jt}
+                                <div className="col-2 text-right">
+                                  {v.value.lns}
                                 </div>
-                              )}
-                            />
-                            <Column
-                              className="header-center"
-                              header=""
-                              style={{ minWidth: "10rem" }}
-                              body={(e) => (
-                                <div
-                                  className={
-                                    e.type === "header"
-                                      ? "font-weight-bold text-right"
-                                      : e.type === "footer"
-                                      ? "font-weight-bold text-right"
-                                      : "text-right"
-                                  }
-                                >
-                                  {e.value.value}
+                              </div>
+                            </>
+                          );
+                        } else if (v.type === "item") {
+                          return (
+                            <>
+                              <div className="item-report row m-0">
+                                <div className="col-3">{v.value.ref}</div>
+                                <div className="col-2">{v.value.date}</div>
+                                <div className="col-2">{v.value.jt}</div>
+                                <div className="col-1">{v.value.type}</div>
+                                <div className="col-2 text-right">
+                                  {v.value.value}
                                 </div>
-                              )}
-                            />
-                            <Column
-                              className="header-center"
-                              header=""
-                              style={{ minWidth: "10rem" }}
-                              body={(e) => (
-                                <div
-                                  className={
-                                    e.type === "header"
-                                      ? "font-weight-bold text-right mr-2"
-                                      : e.type === "footer"
-                                      ? "font-weight-bold text-right mr-2"
-                                      : "text-right mr-2"
-                                  }
-                                >
-                                  {e.value.lns}
+                                <div className="col-2 text-right">
+                                  {v.value.lns}
                                 </div>
-                              )}
-                            />
-                            {/* <Column
-                              className="header-center"
-                              header=""
-                              style={{ minWidth: "10rem" }}
-                              body={(e) => (
-                                <div
-                                  className={
-                                    e.type === "header"
-                                      ? "font-weight-bold text-right"
-                                      : e.type === "footer"
-                                      ? "font-weight-bold text-right"
-                                      : "text-right"
-                                  }
-                                >
-                                  {e.value.sisa}
+                              </div>
+                            </>
+                          );
+                        } else if (v.type === "footer") {
+                          return (
+                            <>
+                              <div className="footer-report row m-0 mb-4">
+                                <div className="col-3">{v.value.ref}</div>
+                                <div className="col-2">{v.value.date}</div>
+                                <div className="col-2">{v.value.jt}</div>
+                                <div className="col-1">{v.value.type}</div>
+                                <div className="col-2 text-right">
+                                  {v.value.value}
                                 </div>
-                              )}
-                            /> */}
-                          </DataTable>
-                        );
+                                <div className="col-2 text-right">
+                                  {v.value.lns}
+                                </div>
+                              </div>
+                            </>
+                          );
+                        }
                       })}
                     </>
                   }
@@ -880,141 +1008,84 @@ const ReportPiutang = () => {
         </Col>
       </Row>
 
-      <Row className="m-0 d-none">
-        <Card ref={printPage}>
-          <Card.Body className="p-0">
-            <CustomeWrapper
-              tittle={"Account Receivable Details"}
-              subTittle={`Account Receivable Details as of ${formatDate(
-                filtDate
-              )}`}
-              onComplete={(cp) => setCp(cp)}
-              body={
-                <>
-                  {jsonForExcel(ar, false)?.map((v) => {
-                    return (
-                      <DataTable
-                        responsiveLayout="scroll"
-                        value={v}
-                        showGridlines
-                        dataKey="id"
-                        rowHover
-                        emptyMessage="Data Tidak Ditemukan"
-                      >
-                        <Column
-                          className="header-center"
-                          header={(e) =>
-                            e.props.value ? e.props?.value[0]?.cus : null
-                          }
-                          style={{ width: "15rem" }}
-                          body={(e) => (
-                            <div
-                              className={
-                                e.type === "header" || e.type === "footer"
-                                  ? "font-weight-bold"
-                                  : ""
-                              }
-                            >
-                              {e.value.ref}
-                            </div>
-                          )}
-                        />
-                        <Column
-                          className="header-center"
-                          header=""
-                          style={{ width: "10rem" }}
-                          body={(e) => (
-                            <div
-                              className={
-                                e.type === "header" && "font-weight-bold"
-                              }
-                            >
-                              {e.value.date}
-                            </div>
-                          )}
-                        />
-                        <Column
-                          className="header-center"
-                          header=""
-                          style={{ width: "10rem" }}
-                          body={(e) => (
-                            <div
-                              className={
-                                e.type === "header" && "font-weight-bold"
-                              }
-                            >
-                              {e.value.jt}
-                            </div>
-                          )}
-                        />
-                        <Column
-                          className="header-center"
-                          header=""
-                          style={{ width: "10rem" }}
-                          body={(e) => (
-                            <div
-                              className={
-                                e.type === "header"
-                                  ? "font-weight-bold text-right"
-                                  : e.type === "footer"
-                                  ? "font-weight-bold text-right"
-                                  : "text-right"
-                              }
-                            >
-                              {e.value.value}
-                            </div>
-                          )}
-                        />
-                        <Column
-                          className="header-center"
-                          header=""
-                          style={{ width: "10rem" }}
-                          body={(e) => (
-                            <div
-                              className={
-                                e.type === "header"
-                                  ? "font-weight-bold text-right"
-                                  : e.type === "footer"
-                                  ? "font-weight-bold text-right"
-                                  : "text-right"
-                              }
-                            >
-                              {e.value.lns}
-                            </div>
-                          )}
-                        />
-                        <Column
-                          className="header-center"
-                          header=""
-                          style={{ width: "10rem" }}
-                          body={(e) => (
-                            <div
-                              className={
-                                e.type === "header"
-                                  ? "font-weight-bold text-right"
-                                  : e.type === "footer"
-                                  ? "font-weight-bold text-right"
-                                  : "text-right"
-                              }
-                            >
-                              {e.value.sisa}
-                            </div>
-                          )}
-                        />
-                      </DataTable>
-                    );
-                  })}
-                  <Row className="m-0 mt-5">
-                    <div className="text-left font-weight-bold col-6">
-                      Total Hutang
-                    </div>
-                    <div className="col-6 text-right font-weight-bold">
-                      Rp. {formatIdr(total)}
-                    </div>
-                  </Row>
-                </>
-              }
-            />
+      <Row className="m-0 justify-content-center d-none">
+        <Card>
+          <Card.Body className="p-0" ref={printPage}>
+            {chunk(jsonForExcel(ar) ?? [], chunkSize)?.map((val, idx) => {
+              return (
+                <Card className="ml-1 mr-1 mt-2">
+                  <Card.Body className="p-0 m-0">
+                    <CustomeWrapper
+                      horizontal
+                      tittle={"Balance Receivable Details"}
+                      subTittle={`Balance Receivable Details Report as ${formatDate(
+                        filtDate
+                      )}`}
+                      onComplete={(cp) => setCp(cp)}
+                      page={idx + 1}
+                      body={
+                        <>
+                          {val.map((v) => {
+                            if (v.type === "header") {
+                              return (
+                                <>
+                                  <div className="header-report single">
+                                    {v.cus}
+                                  </div>
+                                  <div className="header-report row m-0">
+                                    <div className="col-4">{v.value.ref}</div>
+                                    <div className="col-2">{v.value.date}</div>
+                                    <div className="col-2">{v.value.jt}</div>
+                                    <div className="col-2 text-right">
+                                      {v.value.value}
+                                    </div>
+                                    <div className="col-2 text-right">
+                                      {v.value.lns}
+                                    </div>
+                                  </div>
+                                </>
+                              );
+                            } else if (v.type === "item") {
+                              return (
+                                <>
+                                  <div className="item-report row m-0">
+                                    <div className="col-4">{v.value.ref}</div>
+                                    <div className="col-2">{v.value.date}</div>
+                                    <div className="col-2">{v.value.jt}</div>
+                                    <div className="col-2 text-right">
+                                      {v.value.value}
+                                    </div>
+                                    <div className="col-2 text-right">
+                                      {v.value.lns}
+                                    </div>
+                                  </div>
+                                </>
+                              );
+                            } else if (v.type === "footer") {
+                              return (
+                                <>
+                                  <div className="footer-report row m-0 mb-5">
+                                    <div className="col-4">{v.value.ref}</div>
+                                    <div className="col-2">{v.value.date}</div>
+                                    <div className="col-2">{v.value.jt}</div>
+                                    <div className="col-2 text-right">
+                                      {v.value.value}
+                                    </div>
+                                    <div className="col-2 text-right">
+                                      {v.value.lns}
+                                    </div>
+                                  </div>
+                                </>
+                              );
+                            }
+                          })}
+                        </>
+                      }
+                    />
+                  </Card.Body>
+                </Card>
+              );
+            })}
           </Card.Body>
         </Card>
       </Row>

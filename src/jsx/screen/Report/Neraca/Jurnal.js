@@ -14,6 +14,7 @@ import CustomeWrapper from "src/jsx/components/CustomeWrapper/CustomeWrapper";
 import PrimeSingleButton from "src/jsx/components/PrimeSingleButton/PrimeSingleButton";
 import { MultiSelect } from "primereact/multiselect";
 import endpoints from "../../../../utils/endpoints";
+import { tr } from "../../../../data/tr";
 
 // const ExcelFile = ReactExport.ExcelFile;
 // const ExcelSheet = ReactExport.ExcelFile.ExcelSheet;
@@ -29,7 +30,7 @@ const ReportJurnal = ({ trx_code }) => {
   const [filtTrn, setFiltTrn] = useState(null);
   const [cp, setCp] = useState("");
   const page = [];
-  const chunkSize = 2;
+  const chunkSize = 19;
 
   useEffect(() => {
     var d = new Date();
@@ -205,10 +206,10 @@ const ReportJurnal = ({ trx_code }) => {
                 type: "header",
                 value: {
                   acc: "Account",
-                  trx_date: "Tanggal",
-                  debit: "Mutasi Debit",
-                  kredit: "Mutasi Kredit",
-                  desc: "Deskripsi",
+                  trx_date: tr[localStorage.getItem("language")]["tgl"],
+                  debit: tr[localStorage.getItem("language")]["mutasi_deb"],
+                  kredit: tr[localStorage.getItem("language")]["mutasi_kred"],
+                  desc: tr[localStorage.getItem("language")]["ket"],
                 },
               },
             ];
@@ -259,10 +260,10 @@ const ReportJurnal = ({ trx_code }) => {
             type: "header",
             value: {
               acc: "Account",
-              trx_date: "Tanggal",
-              debit: "Mutasi Debit",
-              kredit: "Mutasi Kredit",
-              desc: "Deskripsi",
+              trx_date: tr[localStorage.getItem("language")]["tgl"],
+              debit: tr[localStorage.getItem("language")]["mutasi_deb"],
+              kredit: tr[localStorage.getItem("language")]["mutasi_kred"],
+              desc: tr[localStorage.getItem("language")]["ket"],
             },
           },
         ];
@@ -538,16 +539,15 @@ const ReportJurnal = ({ trx_code }) => {
     if (excel) {
       return final;
     } else {
-      // let page = [];
+      let page = [];
       let total_row = 0;
       data.forEach((el) => {
         el.forEach((element) => {
           page.push(element);
         });
       });
-
-      console.log("PAGE");
-      return data;
+      console.log("PAGE", page);
+      return page;
     }
   };
 
@@ -576,7 +576,7 @@ const ReportJurnal = ({ trx_code }) => {
                   setDate(e.value);
                 }}
                 selectionMode="range"
-                placeholder="Pilih Tanggal"
+                placeholder={tr[localStorage.getItem("language")].pilih_tgl}
                 readOnlyInput
               />
             </div>
@@ -588,7 +588,7 @@ const ReportJurnal = ({ trx_code }) => {
                 onChange={(e) => {
                   setSelectTrn(e.value);
                 }}
-                placeholder="Pilih Kode Transaksi"
+                    placeholder={tr[localStorage.getItem("language")].pilih_kd_tran}
                 optionLabel="trx_code"
                 showClear
                 filterBy="trx_code"
@@ -669,107 +669,64 @@ const ReportJurnal = ({ trx_code }) => {
                     body={
                       <>
                         {val.map((v) => {
-                          return (
-                            <DataTable
-                              responsiveLayout="scroll"
-                              value={v}
-                              showGridlines
-                              dataKey="id"
-                              rowHover
-                              emptyMessage="Data Tidak Ditemukan"
-                            >
-                              <Column
-                                className="header-center"
-                                header={(e) =>
-                                  e.props.value
-                                    ? e.props?.value[0]?.trx_code
-                                    : null
-                                }
-                                style={{ width: "15rem" }}
-                                body={(e) => (
-                                  <div
-                                    className={
-                                      e.type == "header" || e.type == "footer"
-                                        ? "font-weight-bold"
-                                        : ""
-                                    }
-                                  >
-                                    {e.value.acc}
+                          if (v.type === "header") {
+                            return (
+                              <>
+                                <div className="header-report single">
+                                  {v.trx_code}
+                                </div>
+                                <div className="header-report row m-0">
+                                  <div className="col-3">{v.value.acc}</div>
+                                  <div className="col-2">
+                                    {v.value.trx_date}
                                   </div>
-                                )}
-                              />
-                              <Column
-                                className="header-center"
-                                header=""
-                                style={{ width: "5rem" }}
-                                body={(e) => (
-                                  <div
-                                    className={
-                                      e.type == "header" || e.type == "footer"
-                                        ? "font-weight-bold"
-                                        : ""
-                                    }
-                                  >
-                                    {e.value.trx_date}
+                                  <div className="col-2 text-right">
+                                    {v.value.debit}
                                   </div>
-                                )}
-                              />
-                              <Column
-                                className="header-center"
-                                header=""
-                                style={{ width: "10rem" }}
-                                body={(e) => (
-                                  <div
-                                    className={
-                                      e.type == "header"
-                                        ? "font-weight-bold text-right"
-                                        : e.type == "footer"
-                                        ? "font-weight-bold text-right"
-                                        : "text-right"
-                                    }
-                                  >
-                                    {e.value.debit}
+                                  <div className="col-2 text-right">
+                                    {v.value.kredit}
                                   </div>
-                                )}
-                              />
-                              <Column
-                                className="header-center"
-                                header=""
-                                style={{ width: "10rem" }}
-                                body={(e) => (
-                                  <div
-                                    className={
-                                      e.type == "header"
-                                        ? "font-weight-bold text-right mr-4"
-                                        : e.type == "footer"
-                                        ? "font-weight-bold text-right mr-4"
-                                        : "text-right mr-4"
-                                    }
-                                  >
-                                    {e.value.kredit}
+                                  <div className="col-3">{v.value.desc}</div>
+                                </div>
+                              </>
+                            );
+                          } else if (v.type === "item") {
+                            return (
+                              <>
+                                <div className="item-report row m-0">
+                                  <div className="col-3">{v.value.acc}</div>
+                                  <div className="col-2">
+                                    {v.value.trx_date}
                                   </div>
-                                )}
-                              />
-                              <Column
-                                className="header-center"
-                                header=""
-                                style={{ width: "15rem" }}
-                                body={(e) => (
-                                  <div
-                                    className={
-                                      e.type == "header"
-                                        ? "ml-3 font-weight-bold text-left"
-                                        : e.type == "footer"
-                                        ? "font-weight-bold text-left"
-                                        : "text-left ml-3"
-                                    }
-                                  >
-                                    {e.value.desc}
+                                  <div className="col-2 text-right">
+                                    {v.value.debit}
                                   </div>
-                                )}
-                              />
-                            </DataTable>
-                          );
+                                  <div className="col-2 text-right">
+                                    {v.value.kredit}
+                                  </div>
+                                  <div className="col-3">{v.value.desc}</div>
+                                </div>
+                              </>
+                            );
+                          } else if (v.type === "footer") {
+                            return (
+                              <>
+                                <div className="footer-report row m-0">
+                                  <div className="col-3">{v.value.acc}</div>
+                                  <div className="col-2">
+                                    {v.value.trx_date}
+                                  </div>
+                                  <div className="col-2 text-right">
+                                    {v.value.debit}
+                                  </div>
+                                  <div className="col-2 text-right">
+                                    {v.value.kredit}
+                                  </div>
+                                  <div className="col-3">{v.value.desc}</div>
+                                </div>
+                              </>
+                            );
+                          }
                         })}
                       </>
                     }

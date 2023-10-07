@@ -93,6 +93,10 @@ const InputMemorial = ({ onCancel, onSuccess }) => {
             filt.push(element);
           }
         });
+
+        filt?.forEach((element) => {
+          element.displayName = `${element?.account?.acc_name} - ${element?.account?.acc_code}`;
+        });
         setAccount(filt);
       }
     } catch (error) {}
@@ -114,7 +118,8 @@ const InputMemorial = ({ onCancel, onSuccess }) => {
 
         setNumb(data);
       }
-    } catch (error) {setNumb(false);
+    } catch (error) {
+      setNumb(false);
       console.error("Error:", error);
     }
   };
@@ -583,7 +588,7 @@ const InputMemorial = ({ onCancel, onSuccess }) => {
                           itemTemplate={glTemplate}
                           valueTemplate={valTemp}
                           filter
-                          filterBy={"account.acc_name"}
+                          filterBy="displayName"
                           placeholder={
                             tr[localStorage.getItem("language")].pilih
                           }

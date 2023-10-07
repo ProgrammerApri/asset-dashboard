@@ -2,41 +2,25 @@ import { Divider } from "@material-ui/core";
 import { Column } from "primereact/column";
 import { DataTable } from "primereact/datatable";
 import { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { SET_COMPANY } from "src/redux/actions";
 import { endpoints, request } from "src/utils";
 
 const CustomeWrapper = ({
   body,
   subTittle,
-  subTittle1,
   tittle,
   page,
-  horizontal = false, //for big layout
+  horizontal = false,
+  viewOnly = false,
   onComplete = () => {},
 }) => {
   const [comp, setComp] = useState(null);
+  const company = useSelector((state) => state.cp.company);
 
   useEffect(() => {
-    getComp();
+    onComplete(company?.cp_name);
   }, []);
-
-  const getComp = async () => {
-    const config = {
-      ...endpoints.getCompany,
-      data: {},
-    };
-    console.log(config.data);
-    let response = null;
-    try {
-      response = await request(null, config);
-      console.log(response);
-      if (response.status) {
-        const { data } = response;
-        console.log(data);
-        setComp(data);
-        onComplete(data.cp_name);
-      }
-    } catch (error) {}
-  };
 
   const formatDate = (date) => {
     let today = new Date();
@@ -53,15 +37,23 @@ const CustomeWrapper = ({
 
   return (
     <div className="book">
-      <div className={`page ${horizontal ? "horizontal" : ""}`}>
+      {horizontal && (
+        <style type="text/css" media="print">
+          {" @page { size: 48.3cm 32.9cm; } "}
+        </style>
+      )}
+      <div
+        className={`page ${horizontal ? "horizontal a3" : ""} ${
+          viewOnly ? "view" : ""
+        }`}
+      >
         <div className="subpage">
           <h3 className="center">
             <b>
-              {tittle} <br /> {comp?.cp_name}
+              {tittle} <br /> {company?.cp_name}
             </b>
           </h3>
           <h5 className="mt-2">{subTittle}</h5>
-          <h5 className="mt-2">{subTittle1}</h5>
           <div className="mt-5">{body}</div>
         </div>
         <Divider className="ml-3 mr-3"></Divider>

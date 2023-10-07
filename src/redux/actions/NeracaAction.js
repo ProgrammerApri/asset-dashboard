@@ -1,0 +1,1 @@
+export const SET_FILTER_DATE = "neraca.SET_FILTER_DATE"

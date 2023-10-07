@@ -12,8 +12,12 @@ import ReactExport from "react-data-export";
 import ReactToPrint from "react-to-print";
 import CustomeWrapper from "src/jsx/components/CustomeWrapper/CustomeWrapper";
 import CustomDropdown from "src/jsx/components/CustomDropdown/CustomDropdown";
-import { el } from "date-fns/locale";
+
 import PrimeSingleButton from "src/jsx/components/PrimeSingleButton/PrimeSingleButton";
+import { Dropdown } from "primereact/dropdown";
+// import ExcelExportHelper from "../../../components/ExportExcel/ExcelExportHelper";
+import { MultiSelect } from "primereact/multiselect";
+import { tr } from "../../../../data/tr";
 
 const ExcelFile = ReactExport.ExcelFile;
 const ExcelSheet = ReactExport.ExcelFile.ExcelSheet;
@@ -22,16 +26,18 @@ const UmurPiutang = () => {
   const [report, setReport] = useState(null);
   const [loading, setLoading] = useState(true);
   const printPage = useRef(null);
-  const [date, setDate] = useState(new Date());
+  const [date, setDate] = useState(null);
   const [customer, setCustomer] = useState(null);
-  const [selectCus, setSelectCus] = useState(null);
+  const [selectCus, setSelectCus] = useState([]);
   const [ar, setAr] = useState(null);
+  const [arAll, setArAll] = useState(null);
   const [total, setTotal] = useState(null);
   const [cp, setCp] = useState("");
-  const chunkSize = 4;
+  const chunkSize = 15;
+  const dummy = Array.from({ length: 10 });
 
   useEffect(() => {
-    getCustomer();
+    getARCard();
   }, []);
 
   const getARCard = async (plg) => {
@@ -45,51 +51,28 @@ const UmurPiutang = () => {
       console.log(response);
       if (response.status) {
         const { data } = response;
-        let pel = [];
-        let total = 0;
-        plg.forEach((element) => {
-          element.ar = [];
-          data.forEach((el) => {
-            if (el.trx_type === "JL" && el.pay_type === "P1") {
-              if (element.customer.id === el.cus_id.id) {
-                element.ar.push({ ...el, trx_amnh: 0, acq_amnh: 0 });
-              }
-            }
-          });
-          element.ar.forEach((el) => {
-            data.forEach((ek) => {
-              if (el.id === ek.id) {
-                el.trx_amnh = ek?.trx_amnh ?? 0;
-                el.acq_amnh += ek?.acq_amnh ?? 0;
-              }
-            });
-            total += el?.trx_amnh ?? 0 - el?.acq_amnh ?? 0;
-          });
-          if (element.ar.length > 0) {
-            pel.push(element);
+        let filt = [];
+        let filt_acq = [];
+        data.forEach((el) => {
+          if (el.trx_dbcr === "D" && el.pay_type === "P1") {
+            // if (el.lunas === false) {
+            filt.push(el);
+            // }
+          }
+
+          if (el?.trx_dbcr === "K" && el?.pay_type === "J4") {
+            filt_acq.push(el);
           }
         });
-        setAr(pel);
-        setTotal(total);
-      }
-    } catch (error) {
-      console.log(error);
-    }
-  };
 
-  const getCustomer = async () => {
-    const config = {
-      ...endpoints.customer,
-      data: {},
-    };
-    let response = null;
-    try {
-      response = await request(null, config);
-      console.log(response);
-      if (response.status) {
-        const { data } = response;
-        setCustomer(data);
-        getARCard(data);
+        setAr(filt);
+        setArAll(data);
+
+        let grouped = filt?.filter(
+          (el, i) =>
+            i === filt.findIndex((ek) => el?.cus_id?.id === ek?.cus_id?.id)
+        );
+        setCustomer(grouped);
       }
     } catch (error) {
       console.log(error);
@@ -111,90 +94,284 @@ const UmurPiutang = () => {
   const jsonForExcel = (ar, excel = false) => {
     let data = [];
 
-    ar?.forEach((el) => {
-      let val = [
-        {
-          cus: `${el.customer.cus_name} (${el.customer.cus_code})`,
-          type: "header",
-          value: {
-            ref: "Code",
-            tgl: "Date",
-            jt: "Before Due",
-            day1: "7 Day",
-            day2: "14 Day",
-            day3: "30 Day",
-            day4: "60 Day",
-            older: "Older",
-            // nota: "Debit",
-            // rtr: "Retur",
-            total: "Total",
-            // giro: "Giro",
+    if (selectCus?.length) {
+      selectCus?.forEach((pr) => {
+        let val = [
+          {
+            cus: `${pr?.cus_id.cus_name} (${pr?.cus_id.cus_code})`,
+            type: "header",
+            value: {
+              ref: "Code",
+              tgl: "Date",
+              due: "Due Date",
+              nota: "Receivable",
+              jt: "Before Due",
+              day1: "7 Day",
+              day2: "14 Day",
+              day3: "30 Day",
+              day4: "60 Day",
+              older: "Older",
+              rtr: "Received",
+              total: "Total",
+              giro: "Giro",
+            },
           },
-        },
-      ];
-      let amn = 0;
-      let t_jt = 0;
-      let t_day1 = 0;
-      let t_day2 = 0;
-      let t_day3 = 0;
-      let t_day4 = 0;
-      let t_older = 0;
-      el.ar.forEach((ek) => {
-        let due = new Date(`${ek?.trx_due}Z`);
-        let diff = (date - due) / (1000 * 60 * 60 * 24);
+        ];
+
+        let t_jt = 0;
+        let t_day1 = 0;
+        let t_day2 = 0;
+        let t_day3 = 0;
+        let t_day4 = 0;
+        let t_older = 0;
+        let t_piutang = 0;
+        let t_received = 0;
+
+        ar?.forEach((ek) => {
+          console.log("dataaaa ar", ar);
+          let acq_amnh = 0;
+          if (pr?.cus_id?.id === ek?.cus_id?.id) {
+            let item = [];
+            // el.ar.forEach((ek) => {
+            let dt = new Date(`${ek?.trx_date}Z`);
+            let due = new Date(`${ek?.trx_due}Z`);
+            let diff = (date - due) / (1000 * 60 * 60 * 24);
+            if (dt <= date) {
+              arAll?.forEach((all) => {
+                if (
+                  (all?.bkt_id && ek?.bkt_id?.id === all.bkt_id?.id) ||
+                  (all?.sa_id && ek?.sa_id?.id === all.sa_id?.id) ||
+                  (all?.kor_id && ek?.kor_id?.id === all.kor_id?.id)
+                ) {
+                  if (all?.trx_dbcr === "K" && all?.pay_type === "J4") {
+                    acq_amnh += all?.acq_amnh;
+                  }
+                  if (all?.trx_dbcr === "K" && all?.pay_type === "P1") {
+                    acq_amnh += all?.trx_amnh;
+                  }
+                }
+              });
+
+              val.push({
+                cus: `${ek.cus_id.cus_name} \n (${ek.cus_id.cus_code})`,
+                type: "item",
+                value: {
+                  ref: ek.trx_code,
+                  tgl: formatDate(ek.trx_date),
+                  due: formatDate(ek.trx_due),
+                  jt:
+                    diff <= 0
+                      ? `${formatIdr(ek.trx_amnh - acq_amnh)}`
+                      : formatIdr(0),
+                  day1:
+                    diff <= 7 && diff > 0
+                      ? `${formatIdr(ek.trx_amnh - acq_amnh)}`
+                      : formatIdr(0),
+                  day2:
+                    diff <= 14 && diff > 7
+                      ? `${formatIdr(ek.trx_amnh - acq_amnh)}`
+                      : formatIdr(0),
+
+                  day3:
+                    diff <= 30 && diff > 14
+                      ? `${formatIdr(ek.trx_amnh - acq_amnh)}`
+                      : formatIdr(0),
+                  day4:
+                    diff <= 60 && diff > 30
+                      ? `${formatIdr(ek.trx_amnh - acq_amnh)}`
+                      : formatIdr(0),
+                  older:
+                    diff > 60
+                      ? `${formatIdr(ek.trx_amnh - acq_amnh)}`
+                      : formatIdr(0),
+                  nota: `${formatIdr(ek.trx_amnh)}`,
+                  rtr: `${formatIdr(acq_amnh)}`,
+                  giro: `${formatIdr(0)}`,
+                  total: `${formatIdr(
+                    ek.trx_dbcr === "D" ? ek.trx_amnh : ek.trx_amnh
+                  )}`,
+                },
+              });
+
+              t_jt += diff <= 0 ? ek.trx_amnh - acq_amnh : 0;
+              t_day1 += diff <= 7 && diff > 0 ? ek.trx_amnh - acq_amnh : 0;
+              t_day2 += diff <= 14 && diff > 7 ? ek.trx_amnh - acq_amnh : 0;
+              t_day3 += diff <= 30 && diff > 14 ? ek.trx_amnh - acq_amnh : 0;
+              t_day4 += diff <= 60 && diff > 30 ? ek.trx_amnh - acq_amnh : 0;
+              t_older += diff > 60 ? ek.trx_amnh - acq_amnh : 0;
+              t_piutang += ek?.trx_amnh;
+              t_received += acq_amnh;
+            }
+          }
+        });
+
         val.push({
-          cus: `${el.customer.cus_name} (${el.customer.cus_code})`,
-          type: "item",
+          type: "footer",
           value: {
-            ref: ek.trx_code,
-            tgl: formatDate(ek.trx_date),
-            jt: diff <= 0 ? `Rp. ${formatIdr(ek.trx_amnh)}` : "-",
-            day1: diff <= 7 && diff > 0 ? `Rp. ${formatIdr(ek.trx_amnh)}` : "-",
-            day2:
-              diff <= 14 && diff > 7 ? `Rp. ${formatIdr(ek.trx_amnh)}` : "-",
-            day3:
-              diff <= 30 && diff > 14 ? `Rp. ${formatIdr(ek.trx_amnh)}` : "-",
-            day4:
-              diff <= 60 && diff > 30 ? `Rp. ${formatIdr(ek.trx_amnh)}` : "-",
-            older: diff > 60 ? `Rp. ${formatIdr(ek.trx_amnh)}` : "-",
-            // nota: `Rp. ${formatIdr(0)}`,
-            // rtr: `Rp. ${formatIdr(0)}`,
-            total: `Rp. ${formatIdr(ek.trx_amnh)}`,
-            // giro: `Rp. ${formatIdr(0)}`,
+            ref: "Total",
+            tgl: "",
+            due: "",
+            jt: formatIdr(t_jt),
+            day1: formatIdr(t_day1),
+            day2: formatIdr(t_day2),
+            day3: formatIdr(t_day3),
+            day4: formatIdr(t_day4),
+            older: formatIdr(t_older),
+            nota: formatIdr(t_piutang ?? 0),
+            rtr: formatIdr(t_received ?? 0),
+            total: ``,
+            giro: ``,
           },
         });
-        amn += ek.trx_amnh;
-        t_jt += diff <= 0 ? ek.trx_amnh : 0;
-        t_day1 += diff <= 7 && diff > 0 ? ek.trx_amnh : 0;
-        t_day2 += diff <= 14 && diff > 7 ? ek.trx_amnh : 0;
-        t_day3 += diff <= 30 && diff > 14 ? ek.trx_amnh : 0;
-        t_day4 += diff <= 30 && diff > 14 ? ek.trx_amnh : 0;
-        t_older += diff > 60 ? ek.trx_amnh : 0;
+
+        data.push(val);
       });
-      val.push({
-        cus: `${el.customer.cus_name} (${el.customer.cus_code})`,
-        type: "footer",
-        value: {
-          ref: "Total",
-          tgl: "",
-          jt: `Rp. ${formatIdr(t_jt)}`,
-          day1: `Rp. ${formatIdr(t_day1)}`,
-          day2: `Rp. ${formatIdr(t_day2)}`,
-          day3: `Rp. ${formatIdr(t_day3)}`,
-          day4: `Rp. ${formatIdr(t_day4)}`,
-          older: `Rp. ${formatIdr(t_older)}`,
-          // nota: "",
-          // rtr: "",
-          total: `Rp. ${formatIdr(amn)}`,
-        },
-      });
-      data.push(val);
-    });
+    } else {
+      if (date) {
+        let grouped = customer?.filter(
+          (el, i) =>
+            i === customer.findIndex((ek) => el?.cus_id?.id === ek?.cus_id?.id)
+        );
+
+        grouped?.forEach((p) => {
+          let t_jt = 0;
+          let t_day1 = 0;
+          let t_day2 = 0;
+          let t_day3 = 0;
+          let t_day4 = 0;
+          let t_older = 0;
+          let t_received = 0;
+          let t_piutang = 0;
+
+          let val = [
+            {
+              cus: `${p?.cus_id.cus_name} \n (${p?.cus_id.cus_code})`,
+              type: "header",
+              value: {
+                ref: "Code",
+                tgl: "Date",
+                due: "Due Date",
+                jt: "Before Due",
+                day1: "7 Day",
+                day2: "14 Day",
+                day3: "30 Day",
+                day4: "60 Day",
+                older: "Older",
+                nota: "Receivable",
+                rtr: "Received",
+                total: "Total",
+                giro: "Giro",
+              },
+            },
+          ];
+
+          ar?.forEach((ek) => {
+            if (p?.cus_id?.id === ek?.cus_id?.id) {
+              let acq_amnh = 0;
+
+              let item = [];
+              // el.ar.forEach((ek) => {
+              let dt = new Date(`${ek?.trx_date}Z`);
+              let due = new Date(`${ek?.trx_due}Z`);
+              let diff = (date - due) / (1000 * 60 * 60 * 24);
+              if (dt <= date) {
+                arAll?.forEach((all) => {
+                  if (
+                    (all?.bkt_id && ek?.bkt_id?.id === all.bkt_id?.id) ||
+                    (all?.sa_id && ek?.sa_id?.id === all.sa_id?.id) ||
+                    (all?.kor_id && ek?.kor_id?.id === all.kor_id?.id)
+                  ) {
+                    if (all?.trx_dbcr === "K" && all?.pay_type === "J4") {
+                      acq_amnh += all?.acq_amnh;
+                    }
+                    if (all?.trx_dbcr === "K" && all?.pay_type === "P1") {
+                      acq_amnh += all?.trx_amnh;
+                    }
+                  }
+                });
+
+                val.push({
+                  cus: `${ek.cus_id.cus_name} (${ek.cus_id.cus_code})`,
+                  type: "item",
+                  value: {
+                    ref: ek.trx_code,
+                    tgl: formatDate(ek.trx_date),
+                    due: formatDate(ek.trx_due),
+                    nota: `${formatIdr(ek?.trx_amnh)}`,
+                    jt:
+                      diff <= 0
+                        ? `${formatIdr(ek.trx_amnh - acq_amnh)}`
+                        : formatIdr(0),
+                    day1:
+                      diff <= 7 && diff > 0
+                        ? `${formatIdr(ek.trx_amnh - acq_amnh)}`
+                        : formatIdr(0),
+                    day2:
+                      diff <= 14 && diff > 7
+                        ? `${formatIdr(ek.trx_amnh - acq_amnh)}`
+                        : formatIdr(0),
+
+                    day3:
+                      diff <= 30 && diff > 14
+                        ? `${formatIdr(ek.trx_amnh - acq_amnh)}`
+                        : formatIdr(0),
+                    day4:
+                      diff <= 60 && diff > 30
+                        ? `${formatIdr(ek.trx_amnh - acq_amnh)}`
+                        : formatIdr(0),
+                    older:
+                      diff > 60
+                        ? `${formatIdr(ek.trx_amnh - acq_amnh)}`
+                        : formatIdr(0),
+                    rtr: `${formatIdr(acq_amnh)}`,
+                    total: `${formatIdr(
+                      ek.trx_dbcr === "D" ? ek.trx_amnh : ek.trx_amnh
+                    )}`,
+                    giro: `${formatIdr(0)}`,
+                  },
+                });
+
+                t_piutang += ek?.trx_amnh;
+                t_jt += diff <= 0 ? ek.trx_amnh : 0;
+                t_day1 += diff <= 7 && diff > 0 ? ek.trx_amnh - acq_amnh : 0;
+                t_day2 += diff <= 14 && diff > 7 ? ek.trx_amnh - acq_amnh : 0;
+                t_day3 += diff <= 30 && diff > 14 ? ek.trx_amnh - acq_amnh : 0;
+                t_day4 += diff <= 60 && diff > 30 ? ek.trx_amnh - acq_amnh : 0;
+                t_older += diff > 60 ? ek.trx_amnh - acq_amnh : 0;
+                t_received += acq_amnh;
+              }
+            }
+          });
+
+          val.push({
+            type: "footer",
+            value: {
+              ref: "Total",
+              tgl: "",
+              due: "",
+              nota: formatIdr(t_piutang),
+              jt: formatIdr(t_jt),
+              day1: formatIdr(t_day1),
+              day2: formatIdr(t_day2),
+              day3: formatIdr(t_day3),
+              day4: formatIdr(t_day4),
+              older: formatIdr(t_older),
+              rtr: formatIdr(t_received),
+              total: ``,
+              giro: ``,
+            },
+          });
+          data.push(val);
+        });
+      }
+    }
+
+    let item = [];
     let final = [
       {
         columns: [
           {
-            title: "Age of Accounts Receivable Details",
+            title: "Age Receivable Details",
             width: { wch: 20 },
             style: {
               font: { sz: "14", bold: true },
@@ -231,7 +408,7 @@ const UmurPiutang = () => {
 
     data.forEach((el) => {
       let item = [];
-      el.forEach((ek) => {
+      el?.forEach((ek) => {
         item.push([
           {
             value: `${ek.value.ref}`,
@@ -310,28 +487,28 @@ const UmurPiutang = () => {
               alignment: { horizontal: "right", vertical: "center" },
             },
           },
-          // {
-          //   value: `${ek.value.nota}`,
-          //   style: {
-          //     font: {
-          //       sz: "14",
-          //       bold:
-          //         ek.type === "header" || ek.type === "footer" ? true : false,
-          //     },
-          //     alignment: { horizontal: "right", vertical: "center" },
-          //   },
-          // },
-          // {
-          //   value: `${ek.value.rtr}`,
-          //   style: {
-          //     font: {
-          //       sz: "14",
-          //       bold:
-          //         ek.type === "header" || ek.type === "footer" ? true : false,
-          //     },
-          //     alignment: { horizontal: "right", vertical: "center" },
-          //   },
-          // },
+          {
+            value: `${ek.value.nota}`,
+            style: {
+              font: {
+                sz: "14",
+                bold:
+                  ek.type === "header" || ek.type === "footer" ? true : false,
+              },
+              alignment: { horizontal: "right", vertical: "center" },
+            },
+          },
+          {
+            value: `${ek.value.rtr}`,
+            style: {
+              font: {
+                sz: "14",
+                bold:
+                  ek.type === "header" || ek.type === "footer" ? true : false,
+              },
+              alignment: { horizontal: "right", vertical: "center" },
+            },
+          },
           {
             value: `${ek.value.total}`,
             style: {
@@ -354,12 +531,75 @@ const UmurPiutang = () => {
             alignment: { horizontal: "left", vertical: "center" },
           },
         },
+        {
+          value: "",
+          style: {
+            font: { sz: "14", bold: false },
+            alignment: { horizontal: "left", vertical: "center" },
+          },
+        },
+        {
+          value: "",
+          style: {
+            font: { sz: "14", bold: false },
+            alignment: { horizontal: "left", vertical: "center" },
+          },
+        },
+        {
+          value: "",
+          style: {
+            font: { sz: "14", bold: false },
+            alignment: { horizontal: "left", vertical: "center" },
+          },
+        },
+        {
+          value: "",
+          style: {
+            font: { sz: "14", bold: false },
+            alignment: { horizontal: "right", vertical: "center" },
+          },
+        },
+        {
+          value: "",
+          style: {
+            font: { sz: "14", bold: false },
+            alignment: { horizontal: "right", vertical: "center" },
+          },
+        },
+        {
+          value: "",
+          style: {
+            font: { sz: "14", bold: false },
+            alignment: { horizontal: "right", vertical: "center" },
+          },
+        },
+        {
+          value: "",
+          style: {
+            font: { sz: "14", bold: false },
+            alignment: { horizontal: "right", vertical: "center" },
+          },
+        },
+        {
+          value: "",
+          style: {
+            font: { sz: "14", bold: false },
+            alignment: { horizontal: "right", vertical: "center" },
+          },
+        },
+        {
+          value: "",
+          style: {
+            font: { sz: "14", bold: false },
+            alignment: { horizontal: "right", vertical: "center" },
+          },
+        },
       ]);
 
       final.push({
         columns: [
           {
-            title: `${el[0].cus}`,
+            title: `${el[0]?.cus}`,
             width: { wch: 20 },
             style: {
               font: { sz: "14", bold: false },
@@ -466,18 +706,18 @@ const UmurPiutang = () => {
               },
             },
           },
-          // {
-          //   title: "",
-          //   width: { wch: 15 },
-          //   style: {
-          //     font: { sz: "14", bold: true },
-          //     alignment: { horizontal: "right", vertical: "center" },
-          //     fill: {
-          //       paternType: "solid",
-          //       fgColor: { rgb: "F3F3F3" },
-          //     },
-          //   },
-          // },
+          {
+            title: "",
+            width: { wch: 15 },
+            style: {
+              font: { sz: "14", bold: true },
+              alignment: { horizontal: "right", vertical: "center" },
+              fill: {
+                paternType: "solid",
+                fgColor: { rgb: "F3F3F3" },
+              },
+            },
+          },
         ],
         data: item,
       });
@@ -486,12 +726,18 @@ const UmurPiutang = () => {
     if (excel) {
       return final;
     } else {
-      return data;
+      let page = [];
+      data?.forEach((element) => {
+        element?.forEach((el) => {
+          page.push(el);
+        });
+      });
+      return page;
     }
   };
 
   const formatIdr = (value) => {
-    return `${value?.toFixed(2)}`
+    return `Rp. ${value?.toFixed(2)}`
       .replace(".", ",")
       .replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1.");
   };
@@ -511,30 +757,43 @@ const UmurPiutang = () => {
                   console.log(e.value);
                   setDate(e.value);
                 }}
-                placeholder="Pilih Tanggal"
+                placeholder={tr[localStorage.getItem("language")].pilih_tgl}
                 readOnlyInput
                 dateFormat="dd-mm-yy"
               />
             </div>
-            {/* <div className="col-4">
-              <CustomDropdown
-                value={customer && selectCus}
-                option={customer}
+            <div className="col-4">
+              <MultiSelect
+                value={selectCus ?? null}
+                options={customer}
                 onChange={(e) => {
-                  setSelectCus(e);
+                  setSelectCus(e.value);
                 }}
-                label={"[customer.cus_name] ([customer.cus_code])"}
-                placeholder="Pilih Pelanggan"
+                placeholder={tr[localStorage.getItem("language")].pilih_cus}
+                optionLabel="cus_id.cus_name"
+                filter
+                filterBy="cus_id.cus_name"
+                showClear
+                display="chip"
+                className="w-full md:w-22rem"
+                maxSelectedLabels={3}
               />
-            </div> */}
+            </div>
           </Row>
         </div>
         <Row className="mr-1 mt-2" style={{ height: "3rem" }}>
           <div className="mr-3">
-            <ExcelFile
-              filename={`due_date_receivable_${formatDate(new Date())
+            {/* <ExcelExportHelper
+              json={ar ? jsonForExcel(ar, true) : null}
+              filename={`Age_Receivable_Details_${formatDate(new Date())
                 .replace("-", "")
                 .replace("-", "")}`}
+              sheetname="report"
+            /> */}
+            <ExcelFile
+              filename={`Age_Receivable_Details_${formatDate(
+                new Date()
+              ).replace("/", "")}`}
               element={
                 <PrimeSingleButton
                   label="Excel"
@@ -544,7 +803,7 @@ const UmurPiutang = () => {
             >
               <ExcelSheet
                 dataSet={ar ? jsonForExcel(ar, true) : null}
-                name="Report"
+                name={"Report"}
               />
             </ExcelFile>
           </div>
@@ -583,249 +842,145 @@ const UmurPiutang = () => {
         </Col>
       </Row>
 
-      <Row className="ml-0 pt-0 justify-content-center" ref={printPage}>
+      <Row className="ml-0 pt-0 justify-content-center">
         {chunk(jsonForExcel(ar, false) ?? [], chunkSize)?.map((val, idx) => {
           return (
-            <Card>
+            <Card className="w-100">
               <Card.Body className="p-0 m-0">
                 <CustomeWrapper
                   viewOnly
                   horizontal
-                  tittle={"Age of Accounts Receivable Details"}
-                  subTittle={`Age of Accounts Receivable Details as of ${formatDate(
-                    date
-                  )}`}
+                  tittle={"Age Receivable Details"}
+                  subTittle={`Age Receivable Details as of ${formatDate(date)}`}
                   onComplete={(cp) => setCp(cp)}
                   page={idx + 1}
                   body={
                     <>
                       {val.map((v) => {
-                        return (
-                          <DataTable
-                            responsiveLayout="scroll"
-                            value={v}
-                            showGridlines
-                            dataKey="id"
-                            rowHover
-                            className="mt-3"
-                            emptyMessage="Data Tidak Ditemukan"
-                          >
-                            <Column
-                              className="header-center border-left border-right"
-                              header={(e) =>
-                                e.props.value ? e.props?.value[0]?.cus : null
-                              }
-                              style={{ width: "12rem" }}
-                              body={(e) => (
-                                <div
-                                  className={
-                                    e.type === "header" || e.type === "footer"
-                                      ? "font-weight-bold"
-                                      : ""
-                                  }
-                                >
-                                  {e.value.ref}
+                        if (v.type === "header") {
+                          return (
+                            <>
+                              <div className="header-report single">
+                                {v.cus}
+                              </div>
+                              <div className="header-report row m-0">
+                                <div style={{ width: "7vw" }}>
+                                  {v.value.ref}
                                 </div>
-                              )}
-                            />
-                            <Column
-                              className="header-center border-right"
-                              header=""
-                              style={{ widht: "10rem" }}
-                              body={(e) => (
-                                <div
-                                  className={
-                                    e.type === "header"
-                                      ? "font-weight-bold"
-                                      : ""
-                                  }
-                                >
-                                  {e.value.tgl}
+                                <div style={{ width: "5vw" }}>
+                                  {v.value.tgl}
                                 </div>
-                              )}
-                            />
-                            <Column
-                              className="header-center border-right"
-                              header=""
-                              style={{ widht: "10rem" }}
-                              body={(e) => (
-                                <div
-                                  className={
-                                    e.type === "header"
-                                      ? "font-weight-bold text-right"
-                                      : e.type === "footer"
-                                      ? "font-weight-bold text-right"
-                                      : "text-right"
-                                  }
-                                >
-                                  {e.value.jt}
+                                <div style={{ width: "5vw" }}>
+                                  {v.value.due}
                                 </div>
-                              )}
-                            />
-                            <Column
-                              className="header-center border-right"
-                              header=""
-                              style={{ widht: "10rem" }}
-                              body={(e) => (
-                                <div
-                                  className={
-                                    e.type === "header"
-                                      ? "font-weight-bold text-right"
-                                      : e.type === "footer"
-                                      ? "font-weight-bold text-right"
-                                      : "text-right"
-                                  }
-                                >
-                                  {e.value.day1}
+                                <div className="col text-right">
+                                  {v.value.nota}
                                 </div>
-                              )}
-                            />
-                            <Column
-                              className="header-center border-right"
-                              header=""
-                              style={{ widht: "10rem" }}
-                              body={(e) => (
-                                <div
-                                  className={
-                                    e.type === "header"
-                                      ? "font-weight-bold text-right"
-                                      : e.type === "footer"
-                                      ? "font-weight-bold text-right"
-                                      : "text-right"
-                                  }
-                                >
-                                  {e.value.day2}
+                                <div className="col text-right">
+                                  {v.value.jt}
                                 </div>
-                              )}
-                            />
-                            <Column
-                              className="header-center border-right"
-                              header=""
-                              style={{ widht: "10rem" }}
-                              body={(e) => (
-                                <div
-                                  className={
-                                    e.type === "header"
-                                      ? "font-weight-bold text-right"
-                                      : e.type === "footer"
-                                      ? "font-weight-bold text-right"
-                                      : "text-right"
-                                  }
-                                >
-                                  {e.value.day3}
+                                <div className="col text-right">
+                                  {v.value.day1}
                                 </div>
-                              )}
-                            />
-                            <Column
-                              className="header-center border-right"
-                              header=""
-                              style={{ widht: "10rem" }}
-                              body={(e) => (
-                                <div
-                                  className={
-                                    e.type === "header"
-                                      ? "font-weight-bold text-right"
-                                      : e.type === "footer"
-                                      ? "font-weight-bold text-right"
-                                      : "text-right"
-                                  }
-                                >
-                                  {e.value.day4}
+                                <div className="col text-right">
+                                  {v.value.day2}
                                 </div>
-                              )}
-                            />
-                            <Column
-                              className="header-center border-right"
-                              header=""
-                              style={{ widht: "10rem" }}
-                              body={(e) => (
-                                <div
-                                  className={
-                                    e.type === "header"
-                                      ? "font-weight-bold text-right"
-                                      : e.type === "footer"
-                                      ? "font-weight-bold text-right"
-                                      : "text-right"
-                                  }
-                                >
-                                  {e.value.older}
+                                <div className="col text-right">
+                                  {v.value.day3}
                                 </div>
-                              )}
-                            />
-                            {/* <Column
-                              className="header-center border-right"
-                              header=""
-                              style={{ widht: "10rem" }}
-                              body={(e) => (
-                                <div
-                                  className={
-                                    e.type === "header"
-                                      ? "font-weight-bold text-right"
-                                      : e.type === "footer"
-                                      ? "font-weight-bold text-right"
-                                      : "text-right"
-                                  }
-                                >
-                                  {e.value.nota}
+                                <div className="col text-right">
+                                  {v.value.day4}
                                 </div>
-                              )}
-                            />
-                            <Column
-                              className="header-center border-right"
-                              header=""
-                              style={{ widht: "10rem" }}
-                              body={(e) => (
-                                <div
-                                  className={
-                                    e.type === "header"
-                                      ? "font-weight-bold text-right"
-                                      : e.type === "footer"
-                                      ? "font-weight-bold text-right"
-                                      : "text-right"
-                                  }
-                                >
-                                  {e.value.rtr}
+                                <div className="col text-right">
+                                  {v.value.older}
                                 </div>
-                              )}
-                            /> */}
-                            <Column
-                              className="header-center border-right"
-                              header=""
-                              style={{ widht: "10rem" }}
-                              body={(e) => (
-                                <div
-                                  className={
-                                    e.type === "header"
-                                      ? "font-weight-bold text-right"
-                                      : e.type === "footer"
-                                      ? "font-weight-bold text-right"
-                                      : "text-right"
-                                  }
-                                >
-                                  {e.value.total}
+                                <div className="col text-right">
+                                  {v.value.rtr}
                                 </div>
-                              )}
-                            />
-                            {/* <Column
-                              className="header-center border-right"
-                              header=""
-                              style={{ widht: "10rem" }}
-                              body={(e) => (
-                                <div
-                                  className={
-                                    e.type === "header"
-                                      ? "font-weight-bold text-right"
-                                      : e.type === "footer"
-                                      ? "font-weight-bold text-right"
-                                      : "text-right"
-                                  }
-                                >
-                                  {e.value.giro}
+                              </div>
+                            </>
+                          );
+                        } else if (v.type === "item") {
+                          return (
+                            <>
+                              <div className="item-report row m-0">
+                                <div style={{ width: "7vw" }}>
+                                  {v.value.ref}
                                 </div>
-                              )}
-                            /> */}
-                          </DataTable>
-                        );
+                                <div style={{ width: "5vw" }}>
+                                  {v.value.tgl}
+                                </div>
+                                <div style={{ width: "5vw" }}>
+                                  {v.value.due}
+                                </div>
+                                <div className="col text-right">
+                                  {v.value.nota}
+                                </div>
+                                <div className="col text-right">
+                                  {v.value.jt}
+                                </div>
+                                <div className="col text-right">
+                                  {v.value.day1}
+                                </div>
+                                <div className="col text-right">
+                                  {v.value.day2}
+                                </div>
+                                <div className="col text-right">
+                                  {v.value.day3}
+                                </div>
+                                <div className="col text-right">
+                                  {v.value.day4}
+                                </div>
+                                <div className="col text-right">
+                                  {v.value.older}
+                                </div>
+                                <div className="col text-right">
+                                  {v.value.rtr}
+                                </div>
+                              </div>
+                            </>
+                          );
+                        } else if (v.type === "footer") {
+                          return (
+                            <>
+                              <div className="footer-report row m-0 mb-4">
+                                <div style={{ width: "7vw" }}>
+                                  {v.value.ref}
+                                </div>
+                                <div style={{ width: "5vw" }}>
+                                  {v.value.tgl}
+                                </div>
+                                <div style={{ width: "5vw" }}>
+                                  {v.value.due}
+                                </div>
+                                <div className="col text-right">
+                                  {v.value.nota}
+                                </div>
+                                <div className="col text-right">
+                                  {v.value.jt}
+                                </div>
+                                <div className="col text-right">
+                                  {v.value.day1}
+                                </div>
+                                <div className="col text-right">
+                                  {v.value.day2}
+                                </div>
+                                <div className="col text-right">
+                                  {v.value.day3}
+                                </div>
+                                <div className="col text-right">
+                                  {v.value.day4}
+                                </div>
+                                <div className="col text-right">
+                                  {v.value.older}
+                                </div>
+                                <div className="col text-right">
+                                  {v.value.rtr}
+                                </div>
+                              </div>
+                            </>
+                          );
+                        }
                       })}
                     </>
                   }
@@ -836,238 +991,149 @@ const UmurPiutang = () => {
         })}
       </Row>
 
-      <Row className="m-0 d-none">
-        <Card ref={printPage}>
-          <Card.Body className="p-0">
-            <CustomeWrapper
-              tittle={"Age of Accounts Receivable Details"}
-              subTittle={`Age of Accounts Receivable Details as of ${formatDate(
-                date
-              )}`}
-              body={
-                <>
-                  {jsonForExcel(ar, false)?.map((v) => {
-                    return (
-                      <DataTable
-                        responsiveLayout="scroll"
-                        value={v}
-                        showGridlines
-                        dataKey="id"
-                        rowHover
-                        emptyMessage="Data Tidak Ditemukan"
-                      >
-                        <Column
-                          className="header-center border-right border-left"
-                          header={(e) =>
-                            e.props.value ? e.props?.value[0]?.cus : null
-                          }
-                          style={{ width: "11rem" }}
-                          body={(e) => (
-                            <div
-                              className={
-                                e.type === "header" || e.type === "footer"
-                                  ? "font-weight-bold"
-                                  : ""
+      <Row className="ml-0 pt-0 justify-content-center d-none">
+        <Card>
+          <Card.Body className="p-0 m-0" ref={printPage}>
+            {chunk(jsonForExcel(ar, false) ?? [], chunkSize)?.map(
+              (val, idx) => {
+                return (
+                  <Card>
+                    <Card.Body className="p-0 m-0">
+                      <CustomeWrapper
+                        horizontal
+                        tittle={"Age Receivable Details"}
+                        subTittle={`Age Receivable Details as of ${formatDate(
+                          date
+                        )}`}
+                        onComplete={(cp) => setCp(cp)}
+                        page={idx + 1}
+                        body={
+                          <>
+                            {val.map((v) => {
+                              if (v.type === "header") {
+                                return (
+                                  <>
+                                    <div className="header-report single">
+                                      {v.cus}
+                                    </div>
+                                    <div className="header-report row m-0">
+                                      <div style={{ width: "7vw" }}>
+                                        {v.value.ref}
+                                      </div>
+                                      <div style={{ width: "5vw" }}>
+                                        {v.value.tgl}
+                                      </div>
+                                      <div className="col text-right">
+                                        {v.value.jt}
+                                      </div>
+                                      <div className="col text-right">
+                                        {v.value.day1}
+                                      </div>
+                                      <div className="col text-right">
+                                        {v.value.day2}
+                                      </div>
+                                      <div className="col text-right">
+                                        {v.value.day3}
+                                      </div>
+                                      <div className="col text-right">
+                                        {v.value.day4}
+                                      </div>
+                                      <div className="col text-right">
+                                        {v.value.older}
+                                      </div>
+                                      <div className="col text-right">
+                                        {v.value.nota}
+                                      </div>
+                                      <div className="col text-right">
+                                        {v.value.rtr}
+                                      </div>
+                                    </div>
+                                  </>
+                                );
+                              } else if (v.type === "item") {
+                                return (
+                                  <>
+                                    <div className="item-report row m-0">
+                                      <div style={{ width: "7vw" }}>
+                                        {v.value.ref}
+                                      </div>
+                                      <div style={{ width: "5vw" }}>
+                                        {v.value.tgl}
+                                      </div>
+                                      <div className="col text-right">
+                                        {v.value.jt}
+                                      </div>
+                                      <div className="col text-right">
+                                        {v.value.day1}
+                                      </div>
+                                      <div className="col text-right">
+                                        {v.value.day2}
+                                      </div>
+                                      <div className="col text-right">
+                                        {v.value.day3}
+                                      </div>
+                                      <div className="col text-right">
+                                        {v.value.day4}
+                                      </div>
+                                      <div className="col text-right">
+                                        {v.value.older}
+                                      </div>
+                                      <div className="col text-right">
+                                        {v.value.nota}
+                                      </div>
+                                      <div className="col text-right">
+                                        {v.value.rtr}
+                                      </div>
+                                    </div>
+                                  </>
+                                );
+                              } else if (v.type === "footer") {
+                                return (
+                                  <>
+                                    <div className="footer-report row m-0 mb-4">
+                                      <div style={{ width: "7vw" }}>
+                                        {v.value.ref}
+                                      </div>
+                                      <div style={{ width: "5vw" }}>
+                                        {v.value.tgl}
+                                      </div>
+                                      <div className="col text-right">
+                                        {v.value.jt}
+                                      </div>
+                                      <div className="col text-right">
+                                        {v.value.day1}
+                                      </div>
+                                      <div className="col text-right">
+                                        {v.value.day2}
+                                      </div>
+                                      <div className="col text-right">
+                                        {v.value.day3}
+                                      </div>
+                                      <div className="col text-right">
+                                        {v.value.day4}
+                                      </div>
+                                      <div className="col text-right">
+                                        {v.value.older}
+                                      </div>
+                                      <div className="col text-right">
+                                        {v.value.nota}
+                                      </div>
+                                      <div className="col text-right">
+                                        {v.value.rtr}
+                                      </div>
+                                    </div>
+                                  </>
+                                );
                               }
-                            >
-                              {e.value.ref}
-                            </div>
-                          )}
-                        />
-                        <Column
-                          className="header-center border-right"
-                          header=""
-                          style={{ widht: "7rem" }}
-                          body={(e) => (
-                            <div
-                              className={
-                                e.type === "header"
-                                  ? "font-weight-bold text-right"
-                                  : e.type === "footer"
-                                  ? "font-weight-bold text-right"
-                                  : "text-right"
-                              }
-                            >
-                              {e.value.jt}
-                            </div>
-                          )}
-                        />
-                        <Column
-                          className="header-center border-right"
-                          header=""
-                          style={{ widht: "7rem" }}
-                          body={(e) => (
-                            <div
-                              className={
-                                e.type === "header"
-                                  ? "font-weight-bold text-right"
-                                  : e.type === "footer"
-                                  ? "font-weight-bold text-right"
-                                  : "text-right"
-                              }
-                            >
-                              {e.value.day1}
-                            </div>
-                          )}
-                        />
-                        <Column
-                          className="header-center border-right"
-                          header=""
-                          style={{ widht: "10rem" }}
-                          body={(e) => (
-                            <div
-                              className={
-                                e.type === "header"
-                                  ? "font-weight-bold text-right"
-                                  : e.type === "footer"
-                                  ? "font-weight-bold text-right"
-                                  : "text-right"
-                              }
-                            >
-                              {e.value.day2}
-                            </div>
-                          )}
-                        />
-                        <Column
-                          className="header-center border-right"
-                          header=""
-                          style={{ widht: "10rem" }}
-                          body={(e) => (
-                            <div
-                              className={
-                                e.type === "header"
-                                  ? "font-weight-bold text-right"
-                                  : e.type === "footer"
-                                  ? "font-weight-bold text-right"
-                                  : "text-right"
-                              }
-                            >
-                              {e.value.day3}
-                            </div>
-                          )}
-                        />
-                        <Column
-                          className="header-center border-right"
-                          header=""
-                          style={{ widht: "10rem" }}
-                          body={(e) => (
-                            <div
-                              className={
-                                e.type === "header"
-                                  ? "font-weight-bold text-right"
-                                  : e.type === "footer"
-                                  ? "font-weight-bold text-right"
-                                  : "text-right"
-                              }
-                            >
-                              {e.value.day4}
-                            </div>
-                          )}
-                        />
-                        <Column
-                          className="header-center border-right"
-                          header=""
-                          style={{ widht: "10rem" }}
-                          body={(e) => (
-                            <div
-                              className={
-                                e.type === "header"
-                                  ? "font-weight-bold text-right"
-                                  : e.type === "footer"
-                                  ? "font-weight-bold text-right"
-                                  : "text-right"
-                              }
-                            >
-                              {e.value.older}
-                            </div>
-                          )}
-                        />
-                        {/* <Column
-                          className="header-center border-right"
-                          header=""
-                          style={{ widht: "10rem" }}
-                          body={(e) => (
-                            <div
-                              className={
-                                e.type === "header"
-                                  ? "font-weight-bold text-right"
-                                  : e.type === "footer"
-                                  ? "font-weight-bold text-right"
-                                  : "text-right"
-                              }
-                            >
-                              {e.value.nota}
-                            </div>
-                          )}
-                        />
-                        <Column
-                          className="header-center border-right"
-                          header=""
-                          style={{ widht: "10rem" }}
-                          body={(e) => (
-                            <div
-                              className={
-                                e.type === "header"
-                                  ? "font-weight-bold text-right"
-                                  : e.type === "footer"
-                                  ? "font-weight-bold text-right"
-                                  : "text-right"
-                              }
-                            >
-                              {e.value.rtr}
-                            </div>
-                          )}
-                        /> */}
-                        <Column
-                          className="header-center border-right"
-                          header=""
-                          style={{ widht: "10rem" }}
-                          body={(e) => (
-                            <div
-                              className={
-                                e.type === "header"
-                                  ? "font-weight-bold text-right"
-                                  : e.type === "footer"
-                                  ? "font-weight-bold text-right"
-                                  : "text-right"
-                              }
-                            >
-                              {e.value.total}
-                            </div>
-                          )}
-                        />
-                        {/* <Column
-                          className="header-center border-right"
-                          header=""
-                          style={{ widht: "10rem" }}
-                          body={(e) => (
-                            <div
-                              className={
-                                e.type === "header"
-                                  ? "font-weight-bold text-right"
-                                  : e.type === "footer"
-                                  ? "font-weight-bold text-right"
-                                  : "text-right"
-                              }
-                            >
-                              {e.value.giro}
-                            </div>
-                          )}
-                        /> */}
-                      </DataTable>
-                    );
-                  })}
-                  <Row className="m-0 mt-5">
-                    <div className="text-left font-weight-bold col-6">
-                      Total Piutang
-                    </div>
-                    <div className="col-6 text-right font-weight-bold">
-                      Rp. {formatIdr(total)}
-                    </div>
-                  </Row>
-                </>
+                            })}
+                          </>
+                        }
+                      />
+                    </Card.Body>
+                  </Card>
+                );
               }
-            />
+            )}
           </Card.Body>
         </Card>
       </Row>

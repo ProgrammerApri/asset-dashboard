@@ -8,7 +8,7 @@ import { Button, Card, Col, Row } from "react-bootstrap";
 import { Toast } from "primereact/toast";
 import { Skeleton } from "primereact/skeleton";
 
-// import ReactExport from "react-data-export";
+import ReactExport from "react-data-export";
 import ReactToPrint from "react-to-print";
 import CustomeWrapper from "src/jsx/components/CustomeWrapper/CustomeWrapper";
 import CustomDropdown from "src/jsx/components/CustomDropdown/CustomDropdown";
@@ -16,36 +16,37 @@ import CustomDropdown from "src/jsx/components/CustomDropdown/CustomDropdown";
 import PrimeSingleButton from "src/jsx/components/PrimeSingleButton/PrimeSingleButton";
 import { Dropdown } from "primereact/dropdown";
 import { Link } from "react-router-dom";
+// import ExcelExportHelper from "../../../components/ExportExcel/ExcelExportHelper";
 import { MultiSelect } from "primereact/multiselect";
 import { CardHeader } from "@material-ui/core";
 import endpoints from "../../../../utils/endpoints";
-// import ExcelExportHelper from "src/jsx/components/ExportExcel/ExcelExportHelper";
-import ExcelFile from "react-data-export/dist/ExcelPlugin/components/ExcelFile";
-import ExcelSheet from "react-data-export/dist/ExcelPlugin/elements/ExcelSheet";
+import { tr } from "../../../../data/tr";
 
-// const ExcelFile = ReactExport.ExcelFile;
-// const ExcelSheet = ReactExport.ExcelFile.ExcelSheet;
+const ExcelFile = ReactExport.ExcelFile;
+const ExcelSheet = ReactExport.ExcelFile.ExcelSheet;
 
 const ReportPiutangRingkasan = () => {
   const [report, setReport] = useState(null);
   const [loading, setLoading] = useState(true);
   const printPage = useRef(null);
-  const [filtDate, setFiltDate] = useState(new Date());
+  const [filtDate, setFiltDate] = useState(null);
   const [customer, setCustomer] = useState(null);
   const [acc, setAcc] = useState(null);
+  const [saldoAr, setSaldoAr] = useState(null);
   const [selectedCus, setSelected] = useState(null);
   const [selectedAcc, setSelectedAcc] = useState([]);
   const [ar, setAr] = useState(null);
   const [total, setTotal] = useState(null);
   const [cp, setCp] = useState("");
-  const chunkSize = 10;
+  const chunkSize = 13;
 
   useEffect(() => {
-    getCustomer();
+    getARCard();
     // getAcc();
+    getSaldoAr();
   }, []);
 
-  const getARCard = async (plg) => {
+  const getARCard = async (cus) => {
     const config = {
       ...endpoints.arcard,
       data: {},
@@ -56,36 +57,8 @@ const ReportPiutangRingkasan = () => {
       console.log(response);
       if (response.status) {
         const { data } = response;
-        let pel = [];
-        let total = 0;
-        plg?.forEach((element) => {
-          element.ar = [];
-          data?.forEach((el) => {
-            // if (el.trx_type === "JL" && el.pay_type === "P1") {
-            if (element?.customer?.id === el?.cus_id?.id) {
-              element.ar.push({ ...el, trx_amnh: 0, acq_amnh: 0 });
-            }
-            // }
-          });
-          element?.ar.forEach((el) => {
-            data?.forEach((ek) => {
-              if (el.id === ek.id) {
-                el.trx_amnh = ek?.trx_amnh ?? 0;
-                el.acq_amnh += ek?.acq_amnh ?? 0;
-              }
-            });
 
-            // total +=
-            //   el.trx_dbcr === "SA" && ek.trx_type === "K"
-            //     ? ek.trx_amnh
-            //     : 0 - ek.trx_amnh - ek.trx_amnh;
-            // total += el?.trx_amnh ?? 0 - el?.acq_amnh ?? 0;
-          });
-          if (element.ar.length > 0) {
-            pel.push(element);
-          }
-        });
-        setAr(pel);
+        setAr(data);
         setTotal(total);
 
         let grouped = data?.filter(
@@ -93,25 +66,6 @@ const ReportPiutangRingkasan = () => {
             i === data.findIndex((ek) => el?.cus_id?.id === ek?.cus_id?.id)
         );
         setCustomer(grouped);
-      }
-    } catch (error) {
-      console.log(error);
-    }
-  };
-
-  const getCustomer = async () => {
-    const config = {
-      ...endpoints.customer,
-      data: {},
-    };
-    let response = null;
-    try {
-      response = await request(null, config);
-      console.log(response);
-      if (response.status) {
-        const { data } = response;
-        setCustomer(data);
-        getARCard(data);
         getAcc(data);
       }
     } catch (error) {
@@ -134,7 +88,7 @@ const ReportPiutangRingkasan = () => {
         let filt = [];
         data?.forEach((elem) => {
           cus?.forEach((el) => {
-            if (elem.account?.id === el.customer?.cus_gl) {
+            if (elem.account?.id === el.cus_id?.cus_gl) {
               filt.push(elem);
             }
             // console.log("============");
@@ -147,6 +101,24 @@ const ReportPiutangRingkasan = () => {
             i === filt.findIndex((ek) => el?.account?.id === ek?.account?.id)
         );
         setAcc(grouped);
+      }
+    } catch (error) {}
+  };
+
+  const getSaldoAr = async (cus) => {
+    const config = {
+      ...endpoints.saldo_sa_ar,
+      data: {},
+    };
+    console.log(config.data);
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log(response);
+      if (response.status) {
+        const { data } = response;
+
+        setSaldoAr(data);
       }
     } catch (error) {}
   };
@@ -166,7 +138,7 @@ const ReportPiutangRingkasan = () => {
   const checkAcc = (value) => {
     let selected = {};
     acc?.forEach((element) => {
-      if (value === element?.account.id) {
+      if (value === element?.account?.id) {
         selected = element;
       }
     });
@@ -177,185 +149,203 @@ const ReportPiutangRingkasan = () => {
   const jsonForExcel = (ar, excel = false) => {
     let data = [];
 
-    if (selectedCus?.length && selectedAcc?.length) {
+    // if (selectedCus?.length && selectedAcc?.length) {
+    //   let total_nd = 0;
+    //   let total_nk = 0;
+    //   let sisa = 0;
+    //   selectedCus.forEach((cus) => {
+    //     selectedAcc.forEach((sel) => {
+    //       ar?.forEach((el) => {
+    //         if (
+    //           cus?.cus_id?.id === el.customer?.id &&
+    //           sel?.account?.id === el?.customer?.cus_gl
+    //         ) {
+    //           let amn = 0;
+    //           let acq = 0;
+    //           let trx_amnh = 0;
+    //           let acq_amnh = 0;
+    //           let dp = 0;
+    //           let sld_efektif = 0;
+    //           let type = null;
+
+    //           el.ar.forEach((ek) => {
+    //             let filt = new Date(`${ek?.trx_date}Z`);
+    //             console.log(filt);
+    //             if (cus?.cus_id?.id === ek?.cus_id?.id) {
+    //               if (filt <= filtDate) {
+    //                 if (ek.trx_dbcr === "D") {
+    //                   trx_amnh += ek.trx_amnh ?? 0;
+    //                 } else {
+    //                   if (ek.trx_type === "SA") {
+    //                     acq_amnh += ek.trx_amnh ?? 0;
+    //                   } else {
+    //                     acq_amnh += ek.acq_amnh ?? 0;
+    //                   }
+    //                 }
+
+    //                 if (ek.trx_dbcr === "K" && ek.trx_type === "DP") {
+    //                   dp += ek.trx_amnh;
+    //                 }
+
+    //                 if (ek.trx_dbcr === "K" && ek.trx_type === "SA") {
+    //                   sld_efektif += ek.trx_amnh;
+    //                 }
+
+    //                 saldoAr?.forEach((element) => {
+    //                   if (
+    //                     ek?.trx_code === element?.code &&
+    //                     ek?.sa_id?.id === element?.id
+    //                   ) {
+    //                     type =
+    //                       element.type === "JL"
+    //                         ? "Jual"
+    //                         : element?.type === "ND"
+    //                         ? "Nota Debet"
+    //                         : element.type === "NK"
+    //                         ? "Nota Kredit"
+    //                         : "Uang Muka";
+    //                   }
+    //                 });
+    //               }
+    //             }
+    //           });
+    //           sisa = trx_amnh > 0 ? trx_amnh - (acq_amnh + dp) : 0;
+    //           acq = acq_amnh + dp;
+
+    //           data.push({
+    //             cus: `${el.customer.cus_name} (${el.customer.cus_code})`,
+    //             type: "item",
+    //             value: {
+    //               ref: `${el.customer.cus_name} (${el.customer.cus_code})`,
+    //               cus_id: el.customer?.id,
+    //               SE: `${checkAcc(el.customer?.cus_gl)?.account?.acc_code} - ${
+    //                 checkAcc(el.customer?.cus_gl)?.account?.acc_name
+    //               }`,
+    //               type: type,
+    //               NB: `Rp. ${formatIdr(trx_amnh)}`,
+    //               PB: `Rp. ${formatIdr(acq_amnh)}`,
+    //               SB: `Rp. ${
+    //                 trx_amnh > 0
+    //                   ? formatIdr(acq >= trx_amnh ? 0 : sisa)
+    //                   : formatIdr(acq)
+    //               }`,
+    //             },
+    //           });
+
+    //           total_nd += trx_amnh;
+    //           total_nk += acq;
+    //         }
+    //       });
+    //     });
+    //   });
+
+    //   data.push({
+    //     type: "footer",
+    //     value: {
+    //       ref: tr[localStorage.getItem("language")]["ttl_piutang"],
+    //       SE: "",
+    //       NB: `Rp. ${formatIdr(total_nd)}`,
+    //       PB: `Rp. ${formatIdr(total_nk)}`,
+    //       SB: `Rp. ${
+    //         total_nd > 0 ? formatIdr(total_nd - total_nk) : formatIdr(total_nk)
+    //       }`,
+    //     },
+    //   });
+    // } else
+    if (selectedCus?.length) {
       let total_nd = 0;
       let total_nk = 0;
-      selectedCus.forEach((cus) => {
-        selectedAcc.forEach((sel) => {
-          ar?.forEach((el) => {
-            if (
-              cus?.cus_id?.id === el.customer?.id &&
-              sel?.account?.id === el?.customer?.cus_gl
-            ) {
-              let amn = 0;
-              let acq = 0;
-              let trx_amnh = 0;
-              let acq_amnh = 0;
-              let dp = 0;
-              let sisa = 0;
-              let sld_efektif = 0;
-              let type = null;
+      let sisa = 0;
+      selectedCus?.forEach((p) => {
+        let amn = 0;
+        let acq = 0;
+        let trx_amnh = 0;
+        let acq_amnh = 0;
+        let dp = 0;
+        let sld_efektif = 0;
+        let type = null;
 
-              el.ar.forEach((ek) => {
-                let filt = new Date(`${ek?.trx_date}Z`);
-                console.log(filt);
-                if (filt <= filtDate) {
-                  // if (p?.cus_id?.id === ek?.cus_id?.id) {
-                  if (ek.trx_dbcr === "D") {
-                    trx_amnh += ek.trx_amnh ?? 0;
-                  } else {
-                    if (ek.trx_type === "SA") {
-                      acq_amnh += ek.trx_amnh ?? 0;
-                    } else {
-                      acq_amnh += ek.acq_amnh ?? 0;
-                    }
-                  }
-
-                  if (ek.trx_dbcr === "K" && ek.trx_type === "DP") {
-                    dp += ek.trx_amnh;
-                  }
-
-                  if (ek.trx_dbcr === "K" && ek.trx_type === "SA") {
-                    sld_efektif += ek.trx_amnh;
-                  }
-                  // }
-
-                  type =
-                    ek?.trx_type === "JL"
-                      ? "Jual"
-                      : ek?.trx_type === "SA"
-                      ? "Saldo Awal"
-                      : "Pelunasan";
-                }
-              });
-              sisa = trx_amnh > 0 ? trx_amnh - (acq_amnh + dp) : 0;
-              acq = acq_amnh + dp;
-
-              data.push({
-                cus: `${el.customer.cus_name} (${el.customer.cus_code})`,
-                type: "item",
-                value: {
-                  ref: `${el.customer.cus_name} (${el.customer.cus_code})`,
-                  cus_id: el.customer?.id,
-                  SE: `${checkAcc(el.customer?.cus_gl)?.account?.acc_code} - ${
-                    checkAcc(el.customer?.cus_gl)?.account?.acc_name
-                  }`,
-                  type: type,
-                  NB: `Rp. ${formatIdr(trx_amnh)}`,
-                  PB: `Rp. ${formatIdr(acq)}`,
-                  SB: `Rp. ${
-                    trx_amnh > 0
-                      ? formatIdr(acq >= trx_amnh ? 0 : sisa)
-                      : formatIdr(acq)
-                  }`,
-                },
-              });
-
-              total_nd += trx_amnh;
-              total_nk += acq;
-            }
-          });
-        });
-      });
-
-      data.push({
-        type: "footer",
-        value: {
-          ref: "Total Piutang",
-          SE: "",
-          NB: `Rp. ${formatIdr(total_nd)}`,
-          PB: `Rp. ${formatIdr(total_nk)}`,
-          SB: `Rp. ${
-            total_nd > 0 ? formatIdr(total_nd - total_nk) : formatIdr(total_nk)
-          }`,
-        },
-      });
-    } else if (selectedCus?.length) {
-      let total_nd = 0;
-      let total_nk = 0;
-      selectedCus.forEach((p) => {
-        ar?.forEach((el) => {
-          if (p?.cus_id?.id === el?.customer?.id) {
-            let amn = 0;
-            let acq = 0;
-            let trx_amnh = 0;
-            let acq_amnh = 0;
-            let dp = 0;
-            let sisa = 0;
-            let sld_efektif = 0;
-            let type = null;
-
-            el.ar.forEach((ek) => {
-              let filt = new Date(`${ek?.trx_date}Z`);
-              if (filt <= filtDate) {
-                if (p?.cus_id?.id === ek?.cus_id?.id) {
-                  if (ek.trx_dbcr === "D") {
-                    trx_amnh += ek.trx_amnh ?? 0;
-                  } else {
-                    if (ek.trx_type === "SA") {
-                      acq_amnh += ek.trx_amnh ?? 0;
-                    } else {
-                      acq_amnh += ek.acq_amnh ?? 0;
-                    }
-                  }
-
-                  if (ek.trx_dbcr === "K" && ek.trx_type === "DP") {
-                    dp += ek.trx_amnh;
-                  }
-
-                  if (ek.trx_dbcr === "K" && ek.trx_type === "SA") {
-                    sld_efektif += ek.trx_amnh;
-                  }
-
-                  type =
-                    ek?.trx_type === "JL"
-                      ? "Jual"
-                      : ek?.trx_type === "SA"
-                      ? "Saldo Awal"
-                      : "Pelunasan";
-                }
+        ar?.forEach((ek) => {
+          if (p?.cus_id?.id === ek?.cus_id?.id) {
+            let filt = new Date(`${ek?.trx_date}Z`);
+            if (filt <= filtDate) {
+              if (ek.trx_dbcr === "D" && ek?.pay_type === "P1") {
+                trx_amnh += ek.trx_amnh ?? 0;
               }
-            });
-            sisa = trx_amnh > 0 ? trx_amnh - (acq_amnh + dp) : 0;
-            acq = acq_amnh + dp;
+              if (ek.trx_dbcr === "K" && ek?.pay_type === "J4") {
+                // if (el.trx_type === "SA") {
+                //   acq_amnh += el.trx_amnh;
+                // } else {
+                acq_amnh += ek.acq_amnh ?? 0;
+                // }
+              }
 
-            data.push({
-              cus: `${el.customer.cus_name} (${el.customer.cus_code})`,
-              type: "item",
-              value: {
-                ref: `${el.customer.cus_name} (${el.customer.cus_code})`,
-                cus_id: el.customer?.id,
-                SE: `${checkAcc(el.customer?.cus_gl)?.account?.acc_code} - ${
-                  checkAcc(el.customer?.cus_gl)?.account?.acc_name
-                }`,
-                type: type,
-                NB: `Rp. ${formatIdr(trx_amnh)}`,
-                PB: `Rp. ${formatIdr(acq)}`,
-                SB: `Rp. ${
-                  trx_amnh > 0
-                    ? formatIdr(acq >= trx_amnh ? 0 : sisa)
-                    : formatIdr(acq)
-                }`,
-              },
-            });
+              if (ek.trx_dbcr === "K" && ek?.pay_type === "P1") {
+                acq_amnh += ek.trx_amnh ?? 0;
+              }
 
-            total_nk += trx_amnh;
-            total_nd += acq_amnh;
+              if (ek.trx_dbcr === "K" && ek.trx_type === "DP") {
+                dp += ek.trx_amnh;
+              }
+
+              if (ek.trx_dbcr === "K" && ek.trx_type === "SA") {
+                sld_efektif += ek.trx_amnh;
+              }
+
+              saldoAr?.forEach((element) => {
+                if (
+                  ek?.trx_code === element?.code &&
+                  ek?.sa_id?.id === element?.id
+                ) {
+                  type =
+                    element.type === "JL"
+                      ? "Jual"
+                      : element?.type === "ND"
+                      ? "Nota Debet"
+                      : element.type === "NK"
+                      ? "Nota Kredit"
+                      : "Uang Muka";
+                }
+              });
+            }
           }
+          // }
         });
+
+        data.push({
+          cus: `${p?.cus_id?.cus_name} (${p?.cus_id?.cus_code})`,
+          type: "item",
+          value: {
+            ref: `${p?.cus_id?.cus_name} (${p?.cus_id?.cus_code})`,
+            cus_id: p?.cus_id?.id,
+            SE: `${checkAcc(p.cus_id?.cus_gl)?.account?.acc_code} - ${
+              checkAcc(p.cus_id?.cus_gl)?.account?.acc_name
+            }`,
+            type: type,
+            NB: `Rp. ${formatIdr(trx_amnh)}`,
+            PB: `Rp. ${formatIdr(acq_amnh)}`,
+            SB: `Rp. ${
+              trx_amnh > 0
+                ? formatIdr(acq_amnh >= trx_amnh ? 0 : trx_amnh - acq_amnh)
+                : formatIdr(acq_amnh)
+            }`,
+          },
+        });
+
+        total_nk += trx_amnh;
+        total_nd += acq_amnh;
+        sisa += trx_amnh - acq_amnh;
       });
 
       data.push({
         // cus: `${el.customer.cus_name} (${el.customer.cus_code})`,
         type: "footer",
         value: {
-          ref: "Total Piutang",
+          ref: tr[localStorage.getItem("language")]["ttl_piutang"],
           SE: "",
           NB: `Rp. ${formatIdr(total_nk)}`,
           PB: `Rp. ${formatIdr(total_nd)}`,
-          SB: `Rp. ${
-            total_nd > 0 ? formatIdr(total_nd - total_nk) : formatIdr(total_nk)
-          }`,
+          SB: `Rp. ${total_nd > 0 ? formatIdr(sisa) : formatIdr(total_nk)}`,
         },
       });
     } else if (selectedAcc?.length) {
@@ -371,6 +361,8 @@ const ReportPiutangRingkasan = () => {
             let dp = 0;
             let sisa = 0;
             let sld_efektif = 0;
+            let type = null;
+
             el.ar.forEach((ek) => {
               let filt = new Date(`${ek?.trx_date}Z`);
               console.log(filt);
@@ -390,10 +382,21 @@ const ReportPiutangRingkasan = () => {
                   dp += ek.trx_amnh;
                 }
 
-                // if (ek.trx_dbcr === "K" && ek.trx_type === "SA") {
-                //   acq_amnh += ek.trx_amnh;
-                // }
-                // }
+                saldoAr?.forEach((element) => {
+                  if (
+                    ek?.trx_code === element?.code &&
+                    ek?.sa_id?.id === element?.id
+                  ) {
+                    type =
+                      element.type === "JL"
+                        ? "Jual"
+                        : element?.type === "ND"
+                        ? "Nota Debet"
+                        : element.type === "NK"
+                        ? "Nota Kredit"
+                        : "Uang Muka";
+                  }
+                });
               }
             });
             sisa = trx_amnh > 0 ? trx_amnh - (acq_amnh + dp) : 0;
@@ -408,18 +411,19 @@ const ReportPiutangRingkasan = () => {
                 SE: `${checkAcc(el.customer?.cus_gl)?.account?.acc_code} - ${
                   checkAcc(el.customer?.cus_gl)?.account?.acc_name
                 }`,
+                type: type,
                 NB: `Rp. ${formatIdr(trx_amnh)}`,
-                PB: `Rp. ${formatIdr(acq)}`,
+                PB: `Rp. ${formatIdr(acq_amnh)}`,
                 SB: `Rp. ${
                   trx_amnh > 0
-                    ? formatIdr(acq >= trx_amnh ? 0 : sisa)
-                    : formatIdr(acq)
+                    ? formatIdr(acq_amnh >= trx_amnh ? 0 : sisa)
+                    : formatIdr(acq_amnh)
                 }`,
               },
             });
 
             total_nd += trx_amnh;
-            total_nk += acq;
+            total_nk += acq_amnh;
           }
         });
       });
@@ -427,7 +431,7 @@ const ReportPiutangRingkasan = () => {
       data.push({
         type: "footer",
         value: {
-          ref: "Total Piutang",
+          ref: tr[localStorage.getItem("language")]["ttl_piutang"],
           SE: "",
           NB: `Rp. ${formatIdr(total_nd)}`,
           PB: `Rp. ${formatIdr(total_nk)}`,
@@ -439,81 +443,122 @@ const ReportPiutangRingkasan = () => {
     } else {
       let total_nd = 0;
       let total_nk = 0;
+      let sisa = 0;
 
-      ar?.forEach((el) => {
-        let amn = 0;
-        let acq = 0;
-        let trx_amnh = 0;
-        let acq_amnh = 0;
-        let dp = 0;
-        let sisa = 0;
-        let sld_efektif = 0;
+      if (filtDate) {
+        customer?.forEach((cus) => {
+          let amn = 0;
+          let acq = 0;
+          let trx_amnh = 0;
+          let acq_amnh = 0;
+          let dp = 0;
+          let sld_efektif = 0;
+          let type = null;
+          ar?.forEach((el) => {
+            if (cus?.cus_id?.id === el?.cus_id?.id) {
+              let filt = new Date(`${el?.trx_date}Z`);
+              if (filt <= filtDate) {
+                if (el.trx_dbcr === "D" && el?.pay_type === "P1") {
+                  trx_amnh += el.trx_amnh ?? 0;
+                }
 
-        el.ar.forEach((ek) => {
-          let filt = new Date(`${ek?.trx_date}Z`);
+                if (el.trx_dbcr === "K" && el?.pay_type === "J4") {
+                  // if (el.trx_type === "SA") {
+                  //   acq_amnh += el.trx_amnh;
+                  // } else {
+                  acq_amnh += el.acq_amnh ?? 0;
+                  // }
+                }
 
-          if (filt <= filtDate) {
-            if (ek.trx_dbcr === "D") {
-              trx_amnh += ek.trx_amnh ?? 0;
-            } else {
-              if (ek.trx_type === "SA") {
-                acq_amnh += ek.trx_amnh;
-              } else {
-                acq_amnh += ek.acq_amnh ?? 0;
+                if (el.trx_dbcr === "K" && el?.pay_type === "P1") {
+                  acq_amnh += el.trx_amnh ?? 0;
+                }
+
+                if (el.trx_dbcr === "K" && el.trx_type === "DP") {
+                  dp += el.trx_amnh;
+                }
+
+                if (el.trx_dbcr === "K" && el.trx_type === "SA") {
+                  sld_efektif += el.trx_amnh;
+                }
+
+                type =
+                  el?.trx_type === "JL"
+                    ? "Penjualan"
+                    : el?.trx_type === "SA"
+                    ? "Saldo Awal"
+                    : el?.trx_type === "KOR"
+                    ? "Koreksi Pitang"
+                    : el?.trx_type;
+
+                // saldoAr?.forEach((element) => {
+                //   if (
+                //     el?.trx_code === element?.code &&
+                //     el?.sa_id?.id === element?.id
+                //   ) {
+                //     type =
+                //       element.type === "JL"
+                //         ? "Jual"
+                //         : element?.type === "ND"
+                //         ? "Nota Debet"
+                //         : element.type === "NK"
+                //         ? "Nota Kredit"
+                //         : "Uang Muka";
+                //   }
+                //   console.log("===type");
+                //   console.log(element);
+                // });
               }
-            }
 
-            if (ek.trx_dbcr === "K" && ek.trx_type === "DP") {
-              dp += ek.trx_amnh;
+              // sisa =
+              //   trx_amnh > 0
+              //     ? trx_amnh - (acq_amnh + dp)
+              //     : trx_amnh === 0
+              //     ? acq_amnh
+              //     : 0;
+              acq = acq_amnh + dp;
             }
+          });
 
-            if (ek.trx_dbcr === "K" && ek.trx_type === "SA") {
-              sld_efektif += ek.trx_amnh;
-            }
-          }
+          data.push({
+            cus: `${cus?.cus_id?.cus_name} \n (${cus?.cus_id?.cus_code})`,
+            type: "item",
+            value: {
+              ref: `${cus?.cus_id?.cus_name} \n (${cus?.cus_id?.cus_code})`,
+              cus_id: cus?.cus_id?.id,
+              SE: `${checkAcc(cus?.cus_id?.cus_gl)?.account?.acc_code} - ${
+                checkAcc(cus?.cus_id?.cus_gl)?.account?.acc_name
+              }`,
+              type: type,
+              NB: `Rp. ${formatIdr(trx_amnh)}`,
+              PB: `Rp. ${formatIdr(acq_amnh)}`,
+              SB: `Rp. ${
+                trx_amnh > 0
+                  ? formatIdr(acq_amnh >= trx_amnh ? 0 : trx_amnh - acq_amnh)
+                  : formatIdr(acq_amnh)
+              }`,
+            },
+          });
+          total_nd += trx_amnh;
+          total_nk += acq_amnh;
+          sisa += trx_amnh - acq_amnh;
         });
-        sisa =
-          trx_amnh > 0
-            ? trx_amnh - (acq_amnh + dp)
-            : trx_amnh === 0
-            ? acq_amnh
-            : 0;
-        acq = acq_amnh + dp;
+
         data.push({
-          cus: `${el.customer.cus_name} \n (${el.customer.cus_code})`,
-          type: "item",
+          type: "footer",
           value: {
-            ref: `${el.customer.cus_name} \n (${el.customer.cus_code})`,
-            cus_id: el.customer?.id,
-            SE: `${checkAcc(el.customer?.cus_gl)?.account?.acc_code} - ${
-              checkAcc(el.customer?.cus_gl)?.account?.acc_name
-            }`,
-            NB: `Rp. ${formatIdr(trx_amnh)}`,
-            PB: `Rp. ${formatIdr(acq)}`,
+            ref: tr[localStorage.getItem("language")]["ttl_piutang"],
+            SE: "",
+            NB: `Rp. ${formatIdr(total_nd)}`,
+            PB: `Rp. ${formatIdr(total_nk)}`,
             SB: `Rp. ${
-              trx_amnh > 0
-                ? formatIdr(acq >= trx_amnh ? 0 : sisa)
-                : formatIdr(acq)
+              total_nd > 0
+                ? formatIdr(total_nd - total_nk)
+                : formatIdr(total_nk)
             }`,
           },
         });
-
-        total_nd += trx_amnh;
-        total_nk += acq;
-      });
-
-      data.push({
-        type: "footer",
-        value: {
-          ref: "Total Piutang",
-          SE: "",
-          NB: `Rp. ${formatIdr(total_nd)}`,
-          PB: `Rp. ${formatIdr(total_nk)}`,
-          SB: `Rp. ${
-            total_nd > 0 ? formatIdr(total_nd - total_nk) : formatIdr(total_nk)
-          }`,
-        },
-      });
+      }
     }
 
     let final = [
@@ -577,6 +622,26 @@ const ReportPiutangRingkasan = () => {
           },
         },
         {
+          value: `${ek.value.SE}`,
+          style: {
+            font: {
+              sz: "14",
+              bold: ek.type === "header" || ek.type === "footer" ? true : false,
+            },
+            alignment: { horizontal: "left", vertical: "center" },
+          },
+        },
+        {
+          value: `${ek.value.type}`,
+          style: {
+            font: {
+              sz: "14",
+              bold: ek.type === "header" || ek.type === "footer" ? true : false,
+            },
+            alignment: { horizontal: "left", vertical: "center" },
+          },
+        },
+        {
           value: `${ek.value.NB}`,
           style: {
             font: {
@@ -606,21 +671,17 @@ const ReportPiutangRingkasan = () => {
             alignment: { horizontal: "right", vertical: "center" },
           },
         },
-
-        {
-          value: `${ek.value.SE}`,
-          style: {
-            font: {
-              sz: "14",
-              bold: ek.type === "header" || ek.type === "footer" ? true : false,
-            },
-            alignment: { horizontal: "right", vertical: "center" },
-          },
-        },
       ]);
     });
 
     item.push([
+      {
+        value: "",
+        style: {
+          font: { sz: "14", bold: false },
+          alignment: { horizontal: "left", vertical: "center" },
+        },
+      },
       {
         value: "",
         style: {
@@ -715,44 +776,56 @@ const ReportPiutangRingkasan = () => {
           },
         },
         {
-          title: "Nilai",
-          width: { wch: 17 },
-          style: {
-            font: { sz: "14", bold: true },
-            alignment: { horizontal: "right", vertical: "center" },
-            fill: {
-              paternType: "solid",
-              fgColor: { rgb: "F3F3F3" },
-            },
-          },
-        },
-        {
-          title: "Pembayaran",
-          width: { wch: 17 },
-          style: {
-            font: { sz: "14", bold: true },
-            alignment: { horizontal: "right", vertical: "center" },
-            fill: {
-              paternType: "solid",
-              fgColor: { rgb: "F3F3F3" },
-            },
-          },
-        },
-        {
-          title: "Sisa Bayar",
-          width: { wch: 17 },
-          style: {
-            font: { sz: "14", bold: true },
-            alignment: { horizontal: "right", vertical: "center" },
-            fill: {
-              paternType: "solid",
-              fgColor: { rgb: "F3F3F3" },
-            },
-          },
-        },
-        {
-          title: "Saldo Efektif",
+          title: "Account Distribution",
           width: { wch: 25 },
+          style: {
+            font: { sz: "14", bold: true },
+            alignment: { horizontal: "left", vertical: "center" },
+            fill: {
+              paternType: "solid",
+              fgColor: { rgb: "F3F3F3" },
+            },
+          },
+        },
+        {
+          title: "Transaction type",
+          width: { wch: 20 },
+          style: {
+            font: { sz: "14", bold: true },
+            alignment: { horizontal: "left", vertical: "center" },
+            fill: {
+              paternType: "solid",
+              fgColor: { rgb: "F3F3F3" },
+            },
+          },
+        },
+        {
+          title: tr[localStorage.getItem("language")].nilai,
+          width: { wch: 17 },
+          style: {
+            font: { sz: "14", bold: true },
+            alignment: { horizontal: "right", vertical: "center" },
+            fill: {
+              paternType: "solid",
+              fgColor: { rgb: "F3F3F3" },
+            },
+          },
+        },
+        {
+          title: tr[localStorage.getItem("language")].bayar,
+          width: { wch: 17 },
+          style: {
+            font: { sz: "14", bold: true },
+            alignment: { horizontal: "right", vertical: "center" },
+            fill: {
+              paternType: "solid",
+              fgColor: { rgb: "F3F3F3" },
+            },
+          },
+        },
+        {
+          title: tr[localStorage.getItem("language")].sisa_bayar,
+          width: { wch: 17 },
           style: {
             font: { sz: "14", bold: true },
             alignment: { horizontal: "right", vertical: "center" },
@@ -796,7 +869,7 @@ const ReportPiutangRingkasan = () => {
       <div className="flex justify-content-between">
         <div className="col-10 ml-0 mr-0 pl-0 pt-0">
           <Row className="mt-0">
-            <div className="p-inputgroup col-3">
+            <div className="p-inputgroup col-2">
               <span className="p-inputgroup-addon">
                 <i className="pi pi-calendar" />
               </span>
@@ -808,19 +881,19 @@ const ReportPiutangRingkasan = () => {
                   setFiltDate(e.value);
                 }}
                 // selectionMode="range"
-                placeholder="Pilih Tanggal"
+                placeholder={tr[localStorage.getItem("language")].pilih_tgl}
                 readOnlyInput
                 dateFormat="dd-mm-yy"
               />
             </div>
-            <div className="p-inputgroup col-3 mr-0">
+            <div className="p-inputgroup col-3">
               <MultiSelect
                 value={selectedCus ?? null}
                 options={customer}
                 onChange={(e) => {
                   setSelected(e.value);
                 }}
-                placeholder="Pilih Customer"
+                placeholder={tr[localStorage.getItem("language")].pilih_cus}
                 optionLabel="cus_id.cus_name"
                 filter
                 filterBy="cus_id.cus_name"
@@ -830,21 +903,21 @@ const ReportPiutangRingkasan = () => {
                 maxSelectedLabels={3}
               />
             </div>
-            <div className="p-inputgroup col-3 mr-0">
+            <div className="p-inputgroup col-3">
               <MultiSelect
                 value={selectedAcc ?? null}
                 options={acc}
                 onChange={(e) => {
                   setSelectedAcc(e.value);
                 }}
-                placeholder="Pilih Account"
+                placeholder={tr[localStorage.getItem("language")].pilih_acc}
                 optionLabel="account.acc_name"
                 showClear
                 filterBy="account.acc_name"
                 filter
                 itemTemplate={glTemplate}
                 display="chip"
-                // className="w-full md:w-22rem"
+                // className="md:w-22rem"
                 maxSelectedLabels={3}
               />
             </div>
@@ -852,6 +925,12 @@ const ReportPiutangRingkasan = () => {
         </div>
         <Row className="mr-1 mt-2" style={{ height: "3rem" }}>
           <div className="mr-3">
+            {/* <ExcelExportHelper
+              json={ar ? jsonForExcel(ar, true) : null}
+              filename={`Accounts_Receivable_Summary_Balance_export_${new Date().getTime()}`}
+              sheetname="report"
+            /> */}
+
             <ExcelFile
               filename={`Accounts_Receivable_Summary_Balance_export_${new Date().getTime()}`}
               element={
@@ -863,7 +942,7 @@ const ReportPiutangRingkasan = () => {
             >
               <ExcelSheet
                 dataSet={ar ? jsonForExcel(ar, true) : null}
-                name="Accounts Receivable Summary Balance Report"
+                name={"Report"}
               />
             </ExcelFile>
           </div>
@@ -935,17 +1014,20 @@ const ReportPiutangRingkasan = () => {
                         showGridlines
                         dataKey="id"
                         rowHover
-                        emptyMessage="Data Tidak Ditemukan"
+                        // className="header-white report"
+                        emptyMessage={
+                          tr[localStorage.getItem("language")].data_kosong
+                        }
                       >
                         <Column
                           header="Customer"
-                          style={{ minWidth: "7rem" }}
+                          style={{ minWidth: "15rem" }}
                           // field={(e) => e[e.length - 1]?.value?.ref}
                           body={(e) =>
                             e?.type === "item" ? (
                               <Link
                                 to={`/laporan/ar/saldo-piutang-rincian/${btoa(
-                                  `m'${filtDate.getMonth() + 1}`
+                                  `m'${filtDate?.getMonth() + 1}`
                                 )}/${btoa(
                                   `y'${filtDate.getFullYear()}`
                                 )}/${btoa(
@@ -955,7 +1037,7 @@ const ReportPiutangRingkasan = () => {
                                 )}`}
                               >
                                 <div
-                                  style={{ whiteSpace: "pre-wrap" }}
+                                  // style={{ whiteSpace: "pre-wrap" }}
                                   className={
                                     e.type === "header"
                                       ? "font-weight-bold"
@@ -1000,9 +1082,31 @@ const ReportPiutangRingkasan = () => {
                             </div>
                           )}
                         />
+                        {/* <Column
+                          // className="header"
+                          header={
+                            tr[localStorage.getItem("language")].type_trans
+                          }
+                          style={{ minWidth: "7rem" }}
+                          body={(e) => (
+                            <div
+                              className={
+                                e.type === "header"
+                                  ? "font-weight-bold"
+                                  : e.type === "footer"
+                                  ? "font-weight-bold"
+                                  : ""
+                              }
+                            >
+                              {e.value.type}
+                            </div>
+                          )}
+                        /> */}
                         <Column
                           className="header-right text-right"
-                          header="Nilai Debet"
+                          header={
+                            tr[localStorage.getItem("language")].debit_scor
+                          }
                           style={{ minWidth: "7rem" }}
                           body={(e) => (
                             <div
@@ -1020,7 +1124,9 @@ const ReportPiutangRingkasan = () => {
                         />
                         <Column
                           className="header-right text-right"
-                          header="Nilai Kredit"
+                          header={
+                            tr[localStorage.getItem("language")].cred_scor
+                          }
                           style={{ minWidth: "7rem" }}
                           body={(e) => (
                             <div
@@ -1038,7 +1144,7 @@ const ReportPiutangRingkasan = () => {
                         />
                         <Column
                           className="header-right text-right"
-                          header="Sisa"
+                          header={tr[localStorage.getItem("language")].sisa}
                           style={{ minWidth: "7rem" }}
                           body={(e) => (
                             <div
@@ -1086,7 +1192,9 @@ const ReportPiutangRingkasan = () => {
                             showGridlines
                             dataKey="id"
                             rowHover
-                            emptyMessage="Data Tidak Ditemukan"
+                            emptyMessage={
+                              tr[localStorage.getItem("language")].data_kosong
+                            }
                           >
                             <Column
                               header="Customer"
@@ -1126,8 +1234,30 @@ const ReportPiutangRingkasan = () => {
                               )}
                             />
                             <Column
+                              // className="header"
+                              header={
+                                tr[localStorage.getItem("language")].type_trans
+                              }
+                              style={{ minWidth: "7rem" }}
+                              body={(e) => (
+                                <div
+                                  className={
+                                    e.type === "header"
+                                      ? "font-weight-bold"
+                                      : e.type === "footer"
+                                      ? "font-weight-bold"
+                                      : ""
+                                  }
+                                >
+                                  {e.value.type}
+                                </div>
+                              )}
+                            />
+                            <Column
                               className="header-right text-right"
-                              header="Nilai Debet"
+                              header={
+                                tr[localStorage.getItem("language")].debit_scor
+                              }
                               style={{ minWidth: "7rem" }}
                               body={(e) => (
                                 <div
@@ -1145,7 +1275,9 @@ const ReportPiutangRingkasan = () => {
                             />
                             <Column
                               className="header-right text-right"
-                              header="Nilai Kredit"
+                              header={
+                                tr[localStorage.getItem("language")].cred_scor
+                              }
                               style={{ minWidth: "7rem" }}
                               body={(e) => (
                                 <div
@@ -1163,7 +1295,7 @@ const ReportPiutangRingkasan = () => {
                             />
                             <Column
                               className="header-right text-right"
-                              header="Sisa"
+                              header={tr[localStorage.getItem("language")].sisa}
                               style={{ minWidth: "7rem" }}
                               body={(e) => (
                                 <div

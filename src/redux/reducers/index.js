@@ -38,6 +38,8 @@ import WorkCenterReducer from "./WorkCenterReducer";
 import JENISKERJAReducer from "./JENISKERJAReducer";
 import RAKReducer from "./RAKReducer";
 import FiltDateReducer from "./FiltDateReducer";
+import NeracaReducer from "./NeracaReducer";
+import CompanyReducer from "./CompanyReducer";
 // import PBNReducer from "./PBNReducer";
 
 
@@ -83,6 +85,8 @@ const rootReducer = combineReducers({
   jns_kerja: JENISKERJAReducer,
   rak: RAKReducer,
   filtDate: FiltDateReducer,
+  neraca: NeracaReducer,
+  cp: CompanyReducer,
 });
 
 export default rootReducer;

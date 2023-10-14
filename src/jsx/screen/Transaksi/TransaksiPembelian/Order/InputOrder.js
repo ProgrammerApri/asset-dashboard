@@ -1399,7 +1399,7 @@ const InputOrder = ({ onCancel, onSuccess }) => {
           </div>
           <div
             className="col-2"
-            hidden={order?.sup_id == null || order?.kurs == null}
+            hidden={order?.sup_id == null}
           >
             <label className="text-label">{"Kurs"}</label>
             <div className="p-inputgroup">

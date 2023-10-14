@@ -690,6 +690,9 @@ const DataSupplier = ({
               ...def,
               supplier: {
                 ...def.supplier,
+                sup_code: comp?.auto_code_supplier
+                  ? generateCodePreview()
+                  : null,
                 // sup_hutang: setup?.ap?.id,
                 // sup_uang_muka: setup?.pur_advance?.id,
               },
@@ -1026,8 +1029,8 @@ const DataSupplier = ({
                     </Badge>
                   ) : (
                     <Badge variant="danger light">
-                      <i className="bx bx-x text-danger mr-1 mt-1"></i>{" "}
-                      Tidak Aktif
+                      <i className="bx bx-x text-danger mr-1 mt-1"></i> Tidak
+                      Aktif
                     </Badge>
                   )}
                 </div>
@@ -1091,14 +1094,22 @@ const DataSupplier = ({
                 <div className="col-4 mt-0">
                   <PrimeInput
                     label={tr[localStorage.getItem("language")].kd_pem}
-                    value={
-                      !isEdit
-                        ? generateCodePreview(currentItem?.supplier?.sup_code)
-                        : currentItem?.supplier?.sup_code
-                    }
+                    value={currentItem?.supplier?.sup_code ?? null}
+                    onChange={(e) => {
+                      setCurrentItem({
+                        ...currentItem,
+                        supplier: {
+                          ...currentItem.supplier,
+                          sup_code: e.target.value,
+                        },
+                      });
+                      // let newError = error;
+                      // newError[0].name = false;
+                      // setError(newError);
+                    }}
                     placeholder={tr[localStorage.getItem("language")].masuk}
                     // error={error[0]?.code}
-                    disabled
+                    disabled={comp?.auto_code_supplier}
                   />
                 </div>
                 <div className="col-4 mt-0">
@@ -1390,13 +1401,15 @@ const DataSupplier = ({
 
               <div className="row ml-0 mt-0">
                 <div className="col-6">
-                  {checkCountry(currentItem?.supplier?.sup_country)?.code === "IND" ? (
+                  {checkCountry(currentItem?.supplier?.sup_country)?.code ===
+                  "IND" ? (
                     <PrimeDropdown
                       label={tr[localStorage.getItem("language")].kota}
-                      value={ currentItem &&
-                        currentItem?.supplier?.sup_kota !== null
+                      value={
+                        currentItem && currentItem?.supplier?.sup_kota !== null
                           ? kota(currentItem?.supplier?.sup_kota)
-                          : null}
+                          : null
+                      }
                       options={city}
                       onChange={(e) => {
                         setCurrentItem({

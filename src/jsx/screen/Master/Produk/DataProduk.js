@@ -115,7 +115,7 @@ const DataProduk = ({
   const [prdCode, setPrdCode] = useState(null);
   const [stcard, setStcard] = useState(null);
   const [group, setGroup] = useState(null);
-  const [nomor, setNomor] = useState(null);
+  const [comp, setComp] = useState(null);
   const [departement, setDept] = useState(null);
   const [unit, setUnit] = useState(null);
   const [suplier, setSupplier] = useState(null);
@@ -154,6 +154,7 @@ const DataProduk = ({
     }
 
     initFilters1();
+    getCompany();
     getCodeProd();
     getGroup();
     getStcard();
@@ -195,6 +196,24 @@ const DataProduk = ({
   //     console.error(error);
   //   }
   // };
+
+  const getCompany = async () => {
+    const config = {
+      ...endpoints.getCompany,
+      data: {},
+    };
+    console.log(config.data);
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log(response);
+      if (response.status) {
+        const { data } = response;
+
+        setComp(data);
+      }
+    } catch (error) {}
+  };
 
   const getGroup = async () => {
     const config = {
@@ -426,7 +445,7 @@ const DataProduk = ({
       ...endpoints.addProduct,
       data: {
         ...currentItem,
-        code: generateCodePreview(),
+        // code: generateCodePreview(),
         departement: profile.previlage?.dep_id,
         image: image,
       },
@@ -784,7 +803,9 @@ const DataProduk = ({
                   await getCodeProd();
                   setCurrentItem({
                     ...def,
-                    code: generateCodePreview(),
+                    code: comp?.auto_code_product
+                      ? generateCodePreview()
+                      : null,
                     suplier: [
                       {
                         id: 0,
@@ -1408,9 +1429,18 @@ const DataProduk = ({
                   <PrimeInput
                     label={tr[localStorage.getItem("language")].kd_prod}
                     value={currentItem?.code}
+                    onChange={(e) => {
+                      setCurrentItem({
+                        ...currentItem,
+                        code: e?.target?.value,
+                      });
+                      // let newError = error;
+                      // newError[0].code = false;
+                      // setError(newError);
+                    }}
                     placeholder={tr[localStorage.getItem("language")].masuk}
                     // error={error[0]?.code}
-                    disabled
+                    disabled={comp?.auto_code_product}
                   />
                 </div>
 
@@ -1486,10 +1516,6 @@ const DataProduk = ({
                       newError[0].name = false;
                       setError(newError);
 
-                      setCurrentItem({
-                        ...currentItem,
-                        name: e.target.value,
-                      });
                     }}
                     placeholder={tr[localStorage.getItem("language")].masuk}
                     error={error[0]?.name}

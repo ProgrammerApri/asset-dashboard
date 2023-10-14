@@ -727,7 +727,7 @@ const DataPajak = ({
                     placeholder={tr[localStorage.getItem("language")].pilih}
                     // errorMessage="Akun Pajak Pembelian Belum Dipilih"
                     // error={error?.acc1}
-                    disabled={localStorage.getItem("product") !== "inv+gl"}
+                    // disabled={localStorage.getItem("product") !== "inv+gl"}
                     showClear
                   />
                 </div>

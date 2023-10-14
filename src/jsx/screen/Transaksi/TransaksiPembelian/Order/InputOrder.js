@@ -2603,42 +2603,43 @@ const InputOrder = ({ onCancel, onSuccess }) => {
                     header=""
                     className="align-text-top"
                     field={""}
-                    body={(e) =>
-                      e.index === order.djasa?.length - 1 ? (
-                        <Link
-                          onClick={() => {
-                            let newError = error;
-                            newError.jasa.push({
-                              id: false,
-                              jum: false,
-                              prc: false,
-                            });
-                            setError(newError);
+                    body={
+                      (e) => (
+                        // e.index === order.djasa?.length - 1 ? (
+                        //   <Link
+                        //     onClick={() => {
+                        //       let newError = error;
+                        //       newError.jasa.push({
+                        //         id: false,
+                        //         jum: false,
+                        //         prc: false,
+                        //       });
+                        //       setError(newError);
 
-                            updateORD({
-                              ...order,
-                              djasa: [
-                                ...order.djasa,
-                                {
-                                  id: 0,
-                                  jasa_id: null,
-                                  sup_id: null,
-                                  unit_id: null,
-                                  order: null,
-                                  price: null,
-                                  disc: null,
-                                  total_fc: null,
-                                  total: null,
-                                },
-                              ],
-                            });
-                          }}
-                          className="btn btn-primary shadow btn-xs sharp"
-                          disabled={order && order.po_id !== null}
-                        >
-                          <i className="fa fa-plus"></i>
-                        </Link>
-                      ) : (
+                        //       updateORD({
+                        //         ...order,
+                        //         djasa: [
+                        //           ...order.djasa,
+                        //           {
+                        //             id: 0,
+                        //             jasa_id: null,
+                        //             sup_id: null,
+                        //             unit_id: null,
+                        //             order: null,
+                        //             price: null,
+                        //             disc: null,
+                        //             total_fc: null,
+                        //             total: null,
+                        //           },
+                        //         ],
+                        //       });
+                        //     }}
+                        //     className="btn btn-primary shadow btn-xs sharp"
+                        //     disabled={order && order.po_id !== null}
+                        //   >
+                        //     <i className="fa fa-plus"></i>
+                        //   </Link>
+                        // ) : (
                         <Link
                           onClick={() => {
                             let temp = [...order.djasa];
@@ -2650,6 +2651,7 @@ const InputOrder = ({ onCancel, onSuccess }) => {
                           <i className="fa fa-trash"></i>
                         </Link>
                       )
+                      // )
                     }
                   />
                 </DataTable>
@@ -2672,7 +2674,7 @@ const InputOrder = ({ onCancel, onSuccess }) => {
                         {
                           id: 0,
                           jasa_id: null,
-                          sup_id: null,
+                          sup_id: order?.same_sup ? order?.sup_id : null,
                           unit_id: null,
                           order: null,
                           price: null,

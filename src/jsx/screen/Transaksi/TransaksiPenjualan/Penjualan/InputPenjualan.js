@@ -15,7 +15,7 @@ import DataSupplier from "../../../Mitra/Pemasok/DataPemasok";
 import DataRulesPay from "src/jsx/screen/MasterLainnya/RulesPay/DataRulesPay";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
-import { el } from "date-fns/locale";
+import { el, fil } from "date-fns/locale";
 import CustomDropdown from "src/jsx/components/CustomDropdown/CustomDropdown";
 import DataCustomer from "src/jsx/screen/Mitra/Pelanggan/DataCustomer";
 import DataSatuan from "src/jsx/screen/MasterLainnya/Satuan/DataSatuan";
@@ -368,6 +368,10 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
           if (elem.customer.sub_cus === false) {
             filt.push(elem);
           }
+        });
+
+        filt?.forEach((el) => {
+          el.displayName = `${el?.customer?.cus_name} (${el?.customer?.cus_code})`;
         });
 
         setCustomer(filt);
@@ -1314,7 +1318,7 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
               placeholder={tr[localStorage.getItem("language")].pilih}
               detail
               onDetail={() => setShowCustomer(true)}
-              label={"[customer.cus_name] ([customer.cus_code])"}
+              label={"[displayName]"}
               errorMessage="Pelanggan Belum Dipilih"
               error={error?.pel}
               disabled={sale && sale.so_id}
@@ -1603,7 +1607,7 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
             <Row>
               <div className="col-12">
                 <DataTable
-                  responsiveLayout="none"
+                  responsiveLayout="scroll"
                   value={sale?.jprod.map((v, i) => {
                     return {
                       ...v,
@@ -1853,8 +1857,8 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
                         value={e.order && e.order}
                         onChange={(u) => {
                           let temp = [...sale.jprod];
-                            console.log("qty_unit");
-                            console.log(checkUnit(temp[e.index].unit_id)?.qty);
+                          console.log("qty_unit");
+                          console.log(checkUnit(temp[e.index].unit_id)?.qty);
                           if (sale.so_id) {
                             let val =
                               u.value > e.r_remain ? e.r_remain : u?.value;
@@ -1911,7 +1915,6 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
                             temp[e.index].order = u?.value;
                             temp[e.index].konv_qty =
                               u.value * checkUnit(temp[e.index].unit_id)?.qty;
-
 
                             if (
                               sale.pel_id &&
@@ -2426,6 +2429,7 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
                 />
 
                 <Column
+                  hidden
                   header={tr[localStorage.getItem("language")].sat}
                   className="align-text-top"
                   field={""}
@@ -2648,55 +2652,58 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
 
                 <Column
                   className="align-text-top"
-                  body={(e) =>
-                    e.index === sale.jjasa.length - 1 ? (
-                      <Link
-                        onClick={() => {
-                          let newError = error;
-                          newError.jasa.push({ jum: false, prc: false });
-                          setError(newError);
-
-                          updateSL({
-                            ...sale,
-                            jjasa: [
-                              ...sale.jjasa,
-                              {
-                                id: 0,
-                                jasa_id: null,
-                                unit_id: null,
-                                sup_id: null,
-                                order: null,
-                                price: null,
-                                disc: null,
-                                nett_price: null,
-                                total_fc: null,
-                                total: null,
-                              },
-                            ],
-                          });
-                        }}
-                        className="btn btn-primary shadow btn-xs sharp ml-1"
-                      >
-                        <i className="fa fa-plus"></i>
-                      </Link>
-                    ) : (
-                      <Link
-                        onClick={() => {
-                          let temp = [...sale.jjasa];
-                          temp.splice(e.index, 1);
-                          updateSL({
-                            ...sale,
-                            jjasa: temp,
-                          });
-                        }}
-                        className="btn btn-danger shadow btn-xs sharp ml-1"
-                      >
-                        <i className="fa fa-trash"></i>
-                      </Link>
-                    )
-                  }
+                  body={(e) => (
+                    <Link
+                      onClick={() => {
+                        let temp = [...sale.jjasa];
+                        temp.splice(e.index, 1);
+                        updateSL({
+                          ...sale,
+                          jjasa: temp,
+                        });
+                      }}
+                      className="btn btn-danger shadow btn-xs sharp ml-1"
+                    >
+                      <i className="fa fa-trash"></i>
+                    </Link>
+                  )}
                 />
               </DataTable>
+
+              <div className="col-12 d-flex justify-content-end">
+                <Link
+                  onClick={() => {
+                    let newError = error;
+                    newError.jasa.push({ jum: false, prc: false });
+                    setError(newError);
+
+                    updateSL({
+                      ...sale,
+                      jjasa: [
+                        ...sale.jjasa,
+                        {
+                          id: 0,
+                          jasa_id: null,
+                          unit_id: null,
+                          sup_id: null,
+                          order: null,
+                          price: null,
+                          disc: null,
+                          nett_price: null,
+                          total_fc: null,
+                          total: null,
+                        },
+                      ],
+                    });
+                  }}
+                  className="btn btn-primary shadow btn-s sharp ml-1 mt-3"
+                >
+                  <span className="align-middle mx-1">
+                    <i className="fa fa-plus"></i>{" "}
+                    {tr[localStorage.getItem("language")].tambh}
+                  </span>
+                </Link>
+              </div>
             </>
           }
         />
@@ -2755,6 +2762,85 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
               </label>
             </div>
 
+            <div className="col-6 mt-2">
+              <label className="text-label">
+                {tr[localStorage.getItem("language")].disc_tambh}
+              </label>
+            </div>
+
+            <div className="col-3">
+              <div className="p-inputgroup">
+                <PButton label="Rp." className={"p-button-outlined"} />
+                <PrimeNumber
+                  price
+                  value={sale.total_disc_rp ?? null}
+                  placeholder="0"
+                  min={0}
+                  onChange={(e) => {
+                    let disc_persen = 0;
+                    if (sale?.split_inv) {
+                      disc_persen = (e.value / getSubTotalBarang()) * 100;
+                    } else {
+                      disc_persen =
+                        (e.value / (getSubTotalBarang() + getSubTotalJasa())) *
+                        100;
+                    }
+
+                    updateSL({
+                      ...sale,
+                      total_disc_rp: e.value,
+                      total_disc: disc_persen,
+                      total_b: getSubTotalBarang() + getSubTotalJasa(),
+                      total_bayar:
+                        getSubTotalBarang() +
+                        getSubTotalJasa() -
+                        e.value +
+                        ((getSubTotalBarang() + getSubTotalJasa()) * pjk()) /
+                          100,
+                    });
+                  }}
+                />
+              </div>
+            </div>
+
+            <div className="col-3">
+              <div className="p-inputgroup">
+                <PButton className={"p-button-outlined"}>
+                  {" "}
+                  <b>%</b>{" "}
+                </PButton>
+                <PrimeNumber
+                  price
+                  value={sale.total_disc ?? null}
+                  placeholder="0"
+                  min={0}
+                  onChange={(e) => {
+                    let disc_rp = 0;
+
+                    if (sale?.split_inv) {
+                      disc_rp = (e.value * getSubTotalBarang()) / 100;
+                    } else {
+                      disc_rp =
+                        (e.value * (getSubTotalBarang() + getSubTotalJasa())) /
+                        100;
+                    }
+                    updateSL({
+                      ...sale,
+                      total_disc: e.value,
+                      total_disc_rp: disc_rp,
+                      total_b: getSubTotalBarang() + getSubTotalJasa(),
+                      total_bayar:
+                        getSubTotalBarang() +
+                        getSubTotalJasa() -
+                        disc_rp +
+                        ((getSubTotalBarang() + getSubTotalJasa()) * pjk()) /
+                          100,
+                    });
+                  }}
+                />
+              </div>
+            </div>
+
             <div className="col-6">
               <label className="text-label">
                 {sale.split_inv ? "DPP Barang" : "DPP"}
@@ -2764,10 +2850,17 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
             <div className="col-6">
               <label className="text-label">
                 {sale.split_inv ? (
-                  <b>Rp. {formatIdr(getSubTotalBarang())}</b>
+                  <b>
+                    Rp. {formatIdr(getSubTotalBarang() - sale?.total_disc_rp)}
+                  </b>
                 ) : (
                   <b>
-                    Rp. {formatIdr(getSubTotalBarang() + getSubTotalJasa())}
+                    Rp.{" "}
+                    {formatIdr(
+                      getSubTotalBarang() +
+                        getSubTotalJasa() -
+                        sale?.total_disc_rp
+                    )}
                   </b>
                 )}
               </label>
@@ -2786,77 +2879,26 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
             <div className="col-6">
               <label className="text-label">
                 {sale.split_inv ? (
-                  <b>Rp. {formatIdr((getSubTotalBarang() * pjk()) / 100)}</b>
+                  <b>
+                    Rp.{" "}
+                    {formatIdr(
+                      ((getSubTotalBarang() - sale?.total_disc_rp) * pjk()) /
+                        100
+                    )}
+                  </b>
                 ) : (
                   <b>
                     Rp.{" "}
                     {formatIdr(
-                      ((getSubTotalBarang() + getSubTotalJasa()) * pjk()) / 100
+                      ((getSubTotalBarang() +
+                        getSubTotalJasa() -
+                        sale?.total_disc_rp) *
+                        pjk()) /
+                        100
                     )}
                   </b>
                 )}
               </label>
-            </div>
-
-            <div className="col-6 mt-3">
-              <label className="text-label">
-                {tr[localStorage.getItem("language")].disc_tambh}
-              </label>
-            </div>
-
-            <div className="col-6">
-              <div className="p-inputgroup">
-                <PButton
-                  label="Rp."
-                  className={`${isRp ? "" : "p-button-outlined"}`}
-                  onClick={() => setRp(true)}
-                />
-                <InputText
-                  value={
-                    sale.split_inv
-                      ? isRp
-                        ? (getSubTotalBarang() * sale.prod_disc) / 100
-                        : sale.prod_disc
-                      : isRp
-                      ? ((getSubTotalBarang() + getSubTotalJasa()) *
-                          sale.total_disc) /
-                        100
-                      : sale.total_disc
-                  }
-                  placeholder={tr[localStorage.getItem("language")].disc_tambh}
-                  type="number"
-                  min={0}
-                  onChange={(e) => {
-                    if (sale.split_inv) {
-                      let disc = 0;
-                      if (isRp) {
-                        disc = (e.target.value / getSubTotalBarang()) * 100;
-                      } else {
-                        disc = e.target.value;
-                      }
-                      updateSL({ ...sale, prod_disc: disc });
-                    } else {
-                      let disc = 0;
-                      if (isRp) {
-                        disc =
-                          (e.target.value /
-                            (getSubTotalBarang() + getSubTotalJasa())) *
-                          100;
-                      } else {
-                        disc = e.target.value;
-                      }
-                      updateSL({ ...sale, total_disc: disc });
-                    }
-                  }}
-                />
-                <PButton
-                  className={`${isRp ? "p-button-outlined" : ""}`}
-                  onClick={() => setRp(false)}
-                >
-                  {" "}
-                  <b>%</b>{" "}
-                </PButton>
-              </div>
             </div>
 
             <div className="col-12">
@@ -2877,7 +2919,10 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
                   <b>
                     Rp.{" "}
                     {formatIdr(
-                      getSubTotalBarang() + (getSubTotalBarang() * pjk()) / 100
+                      getSubTotalBarang() -
+                        sale?.total_disc_rp +
+                        ((getSubTotalBarang() - sale?.total_disc_rp) * pjk()) /
+                          100
                     )}
                   </b>
                 ) : (
@@ -2885,8 +2930,12 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
                     Rp.{" "}
                     {formatIdr(
                       getSubTotalBarang() +
-                        getSubTotalJasa() +
-                        ((getSubTotalBarang() + getSubTotalJasa()) * pjk()) /
+                        getSubTotalJasa() -
+                        sale?.total_disc_rp +
+                        ((getSubTotalBarang() +
+                          getSubTotalJasa() -
+                          sale?.total_disc_rp) *
+                          pjk()) /
                           100
                     )}
                   </b>
@@ -2920,8 +2969,12 @@ const InputPenjualan = ({ onCancel, onSuccess }) => {
                   Rp.{" "}
                   {formatIdr(
                     getSubTotalBarang() +
-                      getSubTotalJasa() +
-                      ((getSubTotalBarang() + getSubTotalJasa()) * pjk()) /
+                      getSubTotalJasa() -
+                      sale?.total_disc_rp +
+                      ((getSubTotalBarang() +
+                        getSubTotalJasa() -
+                        sale?.total_disc_rp) *
+                        pjk()) /
                         100 -
                       getUangMuka()
                   )}

@@ -42,6 +42,7 @@ const data = {
   prod_disc: null,
   jasa_disc: null,
   total_disc: null,
+  total_disc_rp: null,
   total_b: null,
   total_bayar: null,
   jprod: [],
@@ -60,6 +61,7 @@ const DataPenjualan = ({ onAdd, onEdit, onDetail }) => {
   const [isEdit, setEdit] = useState(false);
   const [first2, setFirst2] = useState(0);
   const [rows2, setRows2] = useState(20);
+  const [supplier, setSupp] = useState(null);
   const [currency, setCurrency] = useState(null);
   const dispatch = useDispatch();
   const sale = useSelector((state) => state.sl.sl);
@@ -71,6 +73,7 @@ const DataPenjualan = ({ onAdd, onEdit, onDetail }) => {
 
   useEffect(() => {
     getSale();
+    getSupp();
     getCur();
     initFilters1();
   }, []);
@@ -88,7 +91,8 @@ const DataPenjualan = ({ onAdd, onEdit, onDetail }) => {
       console.log(response);
       if (response.status) {
         const { data } = response;
-        console.log(data); const filteredData = data.filter((item) => item.modul !== "sale");
+        console.log(data);
+        const filteredData = data.filter((item) => item.modul !== "sale");
 
         dispatch({ type: SET_SL, payload: filteredData });
       }
@@ -120,7 +124,7 @@ const DataPenjualan = ({ onAdd, onEdit, onDetail }) => {
           type: SET_CURRENT_SL,
           payload: {
             ...data,
-            ord_code:kode,
+            ord_code: kode,
             surat_jalan: 2,
             jprod: [
               {
@@ -160,6 +164,23 @@ const DataPenjualan = ({ onAdd, onEdit, onDetail }) => {
     } catch (error) {}
   };
 
+  const getSupp = async () => {
+    const config = {
+      ...endpoints.supplier,
+      data: {},
+    };
+
+    let response = null;
+    try {
+      response = await request(null, config);
+
+      if (response.status) {
+        const { data } = response;
+
+        setSupp(data);
+      }
+    } catch (error) {}
+  };
 
   const getCur = async () => {
     const config = {
@@ -384,7 +405,7 @@ const DataPenjualan = ({ onAdd, onEdit, onDetail }) => {
           icon={<i class="bx bx-plus px-2"></i>}
           onClick={() => {
             onAdd();
-            getSaleCode()
+            getSaleCode();
             dispatch({
               type: SET_EDIT_SL,
               payload: false,
@@ -557,6 +578,16 @@ const DataPenjualan = ({ onAdd, onEdit, onDetail }) => {
     return total;
   };
 
+  const checkSupp = (value) => {
+    let selected = {};
+    supplier?.forEach((element) => {
+      if (value === element?.supplier?.id) {
+        selected = element;
+      }
+    });
+    return selected;
+  };
+
   const rowExpansionTemplate = (data) => {
     let cur_rate = 0;
     let cur_code = null;
@@ -639,7 +670,9 @@ const DataPenjualan = ({ onAdd, onEdit, onDetail }) => {
                 header="Supplier"
                 field={(e) =>
                   e.sup_id
-                    ? `${e.sup_id?.supplier?.sup_name} (${e.sup_id?.supplier?.sup_code})`
+                    ? `${checkSupp(e.sup_id)?.supplier?.sup_name} (${
+                        checkSupp(e.sup_id)?.supplier?.sup_code
+                      })`
                     : "-"
                 }
                 style={{ minWidth: "21rem" }}
@@ -659,7 +692,7 @@ const DataPenjualan = ({ onAdd, onEdit, onDetail }) => {
               />
               <Column
                 header="Total"
-                field={(e) => e.total}
+                field={(e) => `Rp. ${formatIdr(e.total)}`}
                 style={{ minWidth: "15rem" }}
                 // body={loading && <Skeleton />}
               />

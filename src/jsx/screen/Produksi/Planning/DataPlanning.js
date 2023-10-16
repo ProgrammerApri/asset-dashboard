@@ -16,6 +16,8 @@ import { SET_CURRENT_PL, SET_EDIT_PL, SET_PL } from "src/redux/actions";
 import { Divider } from "@material-ui/core";
 import ReactToPrint from "react-to-print";
 import PrimeSingleButton from "src/jsx/components/PrimeSingleButton/PrimeSingleButton";
+import { tr } from "src/data/tr";
+import { Timeline } from "primereact/timeline";
 
 const data = {
   id: null,
@@ -34,6 +36,7 @@ const data = {
 const DataPlanning = ({ onAdd, onEdit, onDetail }) => {
   const [loading, setLoading] = useState(true);
   const [update, setUpdate] = useState(true);
+  const [displayData, setDisplayData] = useState(false);
   const [displayDel, setDisplayDel] = useState(false);
   const [currentItem, setCurrentItem] = useState(null);
   const toast = useRef(null);
@@ -46,6 +49,7 @@ const DataPlanning = ({ onAdd, onEdit, onDetail }) => {
   const plan = useSelector((state) => state.plan.plan);
   const show = useSelector((state) => state.plan.current);
   const printPage = useRef(null);
+  const [expandedRows, setExpandedRows] = useState(null);
 
   const dummy = Array.from({ length: 10 });
 
@@ -53,7 +57,6 @@ const DataPlanning = ({ onAdd, onEdit, onDetail }) => {
     getPlan();
     initFilters1();
   }, []);
-
 
   const getPlan_code = async (isUpdate = false) => {
     setLoading(true);
@@ -179,55 +182,25 @@ const DataPlanning = ({ onAdd, onEdit, onDetail }) => {
     return (
       // <React.Fragment>
       <div className="d-flex">
-        {/* <Link
+        <Link
           onClick={() => {
-            onDetail();
-            let dprod = data.dprod;
-            let djasa = data.djasa;
+            setDisplayData(data);
+
+            let product = data.product;
+            let material = data.material;
             dispatch({
-              type: SET_CURRENT_ODR,
+              type: SET_CURRENT_PL,
               payload: {
                 ...data,
-                dprod:
-                  dprod.length > 0
-                    ? dprod
-                    : [
-                        {
-                          id: 0,
-                          do_id: null,
-                          prod_id: null,
-                          unit_id: null,
-                          location: null,
-                          order: null,
-                          price: null,
-                          disc: null,
-                          nett_price: null,
-                          total: null,
-                        },
-                      ],
-                djasa:
-                  djasa.length > 0
-                    ? djasa
-                    : [
-                        {
-                          id: 0,
-                          do_id: null,
-                          jasa_id: null,
-                          sup_id: null,
-                          unit_id: null,
-                          order: null,
-                          price: null,
-                          disc: null,
-                          total: null,
-                        },
-                      ],
+                product: product.length > 0 ? product : null,
+                material: material.length > 0 ? material : null,
               },
             });
           }}
           className="btn btn-info shadow btn-xs sharp ml-1"
         >
           <i className="bx bx-show mt-1"></i>
-        </Link> */}
+        </Link>
 
         <Link
           onClick={() => {
@@ -354,6 +327,20 @@ const DataPlanning = ({ onAdd, onEdit, onDetail }) => {
     );
   };
 
+  const renderFooterDet = () => {
+    return (
+      <div>
+        <PButton
+          label="Kembali"
+          onClick={() => {
+            setDisplayData(false);
+          }}
+          autoFocus
+        />
+      </div>
+    );
+  };
+
   const onGlobalFilterChange1 = (e) => {
     const value = e.target.value;
     let _filters1 = { ...filters1 };
@@ -385,7 +372,7 @@ const DataPlanning = ({ onAdd, onEdit, onDetail }) => {
           icon={<i class="bx bx-plus px-2"></i>}
           onClick={() => {
             onAdd();
-            getPlan_code()
+            getPlan_code();
             dispatch({
               type: SET_EDIT_PL,
               payload: false,
@@ -507,10 +494,51 @@ const DataPlanning = ({ onAdd, onEdit, onDetail }) => {
     return [day, month, year].join("-");
   };
 
-  const formatIdr = (value) => {
-    return `${value}`
+  const formatDateTime = (date) => {
+    var d = new Date(`${date}Z`),
+      month = "" + (d.getMonth() + 1),
+      day = "" + d.getDate(),
+      year = d.getFullYear(),
+      hour = d.getHours(),
+      minute = d.getMinutes(),
+      second = d.getSeconds();
+
+    if (month.length < 2) month = "0" + month;
+    if (day.length < 2) day = "0" + day;
+    if (hour.length < 2) hour = "0" + hour;
+    if (minute.length < 2) minute = "0" + minute;
+    if (second.length < 2) second = "0" + second;
+
+    return [hour, minute, second].join(":");
+  };
+
+  const formatTh = (value) => {
+    return `${value?.toFixed(2)}`
       .replace(".", ",")
       .replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1.");
+  };
+
+  const customizedMarker = (item, index, data) => {
+    console.log(index);
+    return (
+      <span
+        className="flex align-items-center justify-content-center z-1 p-1 border-circle"
+        style={{
+          backgroundColor:
+            item.proses === 1
+              ? "orange"
+              : item.proses === 0
+              ? "#21BF99"
+              : "white",
+          border: item.proses == 1 ? "2px solid orange" : "2px solid #21BF99",
+        }}
+      >
+        <i
+          className={item.proses === 1 ? "pi pi-times" : "pi pi-check"}
+          style={{ fontSize: "0.4rem", fontWeight: "bold", color: "white" }}
+        ></i>
+      </span>
+    );
   };
 
   return (
@@ -587,6 +615,152 @@ const DataPlanning = ({ onAdd, onEdit, onDetail }) => {
           </DataTable>
         </Col>
       </Row>
+
+      <Dialog
+        header={"Routing Produk & Material"}
+        visible={displayData}
+        style={{ width: "65vw", height: "50vw" }}
+        footer={renderFooterDet("displayData")}
+        onHide={() => {
+          setDisplayData(false);
+        }}
+      >
+        <div className="ml-3 mr-3">
+          <label className="text-label fs-13 text-black mt-0">
+            <b>Routing Sequence</b>
+          </label>
+          <Timeline
+            value={show?.sequence}
+            layout="horizontal"
+            align="top"
+            marker={(item, index) => customizedMarker(item, index, show)}
+            content={(item) => (
+              <div
+                className=""
+                style={{
+                  minWidth: "3rem",
+                  minHeight: "4rem",
+                  // maxHeight: "8rem",
+                }}
+              >
+                <div className="pt-0 mt-0">
+                  <b>{`Proses Ke- ${item.seq}`}</b>
+                </div>
+
+                <div className="fs-12">
+                  {item?.datetime_actual
+                    ? `Actual Date: ${formatDate(
+                        item.datetime_actual
+                      )} ${formatDateTime(item?.datetime_actual)}`
+                    : "-"}
+                </div>
+
+                <div className="fs-12 mt-1">
+                  {item?.datetime_end
+                    ? `End Date: ${formatDate(
+                        item.datetime_end
+                      )} ${formatDateTime(item?.datetime_end)}`
+                    : "-"}
+                </div>
+
+                <div className="fs-12 mt-1">
+                  {item?.batch_code ? `Batch Code: ${item?.batch_code}` : "-"}
+                </div>
+
+                <div className="fs-12 mt-2">
+                  {item.proses === 0 ? (
+                    <Badge variant="success light">
+                      <i className="bx bx-check text-success mr-1"></i> Done
+                    </Badge>
+                  ) : item.proses === 1 ? (
+                    <Badge variant="warning light">
+                      <i className="bx bx-circle text-warning mr-1"></i> Panding
+                    </Badge>
+                  ) : (
+                    <Badge variant="danger light">
+                      <i className="bx bx-x text-danger mr-1"></i> No Proses
+                    </Badge>
+                  )}
+                </div>
+              </div>
+            )}
+          />
+
+          <label className="text-label fs-13 text-black mt-4">
+            <b>{"Produk Jadi"}</b>
+          </label>
+
+          <DataTable value={show?.product} responsiveLayout="scroll">
+            <Column
+              header={tr[localStorage.getItem("language")].prod_jd}
+              field={(e) => `${e.prod_id?.name} (${e.prod_id?.code})`}
+              style={{ minWidth: "15rem" }}
+              // body={loading && <Skeleton />}
+            />
+            <Column
+              header={"Qty Formula"}
+              field={(e) => formatTh(e.qty_form)}
+              style={{ minWidth: "6rem" }}
+              // body={loading && <Skeleton />}
+            />
+            <Column
+              header={"Qty Pembuatan"}
+              field={(e) => formatTh(e.qty_making)}
+              style={{ minWidth: "6rem" }}
+              // body={loading && <Skeleton />}
+            />
+            <Column
+              header={tr[localStorage.getItem("language")].satuan}
+              field={(e) => e.unit_id?.name}
+              style={{ minWidth: "7rem" }}
+              // body={loading && <Skeleton />}
+            />
+            <Column
+              header={"Cost Alokasi (%)"}
+              field={(e) => formatTh(e.aloc)}
+              style={{ minWidth: "6rem" }}
+              // body={loading && <Skeleton />}
+            />
+          </DataTable>
+
+          <label className="text-label fs-13 text-black mt-4">
+            <b>{"Produk Material"}</b>
+          </label>
+
+          <DataTable value={show?.material} responsiveLayout="scroll">
+            <Column
+              header={tr[localStorage.getItem("language")].prod_jd}
+              field={(e) => `${e.prod_id?.name} (${e.prod_id?.code})`}
+              style={{ minWidth: "15rem" }}
+              // body={loading && <Skeleton />}
+            />
+            <Column
+              header={"Qty Formula"}
+              field={(e) => formatTh(e.qty)}
+              style={{ minWidth: "6rem" }}
+              // body={loading && <Skeleton />}
+            />
+            <Column
+              header={"Qty Pemakaian"}
+              field={(e) => formatTh(e.mat_use)}
+              style={{ minWidth: "6rem" }}
+              // body={loading && <Skeleton />}
+            />
+            <Column
+              header={"Total Pemakaian"}
+              field={(e) => formatTh(e.total_use)}
+              style={{ minWidth: "6rem" }}
+              // body={loading && <Skeleton />}
+            />
+            <Column
+              header={tr[localStorage.getItem("language")].satuan}
+              field={(e) => e.unit_id?.name}
+              style={{ minWidth: "7rem" }}
+              // body={loading && <Skeleton />}
+            />
+          </DataTable>
+        </div>
+      </Dialog>
 
       <Dialog
         header={"Hapus Data"}

@@ -154,12 +154,12 @@ const DataCustomer = ({
   const [number, setNumber] = useState(0);
 
   useEffect(() => {
+    getComp();
     getSetup();
     getCity();
     getJpel();
     getSubArea();
     getCurrency();
-    getComp();
     getPajak();
     initFilters1();
     window.addEventListener("scroll", handleScroll);
@@ -197,7 +197,7 @@ const DataCustomer = ({
 
       if (response.status) {
         const { data } = response;
-        setNumber(data);
+         setNumber(data);
       }
       setLoading(false);
     } catch (error) {
@@ -456,7 +456,7 @@ const DataCustomer = ({
       ...endpoints.addCustomer,
       data: {
         ...currentItem,
-        cus_code: generateCodePreview(),
+        cus_code: currentItem?.customer?.cus_code ?? null,
         cus_name: currentItem?.customer?.cus_name ?? null,
         cus_jpel: currentItem?.jpel?.id ?? null,
         cus_sub_area: currentItem?.subArea?.id ?? null,
@@ -673,6 +673,21 @@ const DataCustomer = ({
     return valid;
   };
 
+  const generateCodePreview = () => {
+    let code = [];
+
+    if (currentItem?.customer?.cus_kode_country) {
+      code.push(checkCountry(currentItem?.customer?.cus_country).code);
+    }
+    if (currentItem?.jpel) {
+      code.push(currentItem?.jpel?.jpel_code);
+    }
+
+    code.push(number);
+
+    return code.join("/");
+  };
+
   const renderFooter = () => {
     if (active !== 2) {
       return (
@@ -793,10 +808,18 @@ const DataCustomer = ({
           label={tr[localStorage.getItem("language")].tambh}
           icon={<i className="bx bx-plus px-2"></i>}
           onClick={() => {
+            setCurrentItem({
+              ...def,
+              customer: {
+                ...def.customer,
+                cus_code: comp?.auto_code_customer
+                  ? generateCodePreview()
+                  : null,
+              },
+            });
             setShowInput(true);
             setEdit(false);
             setLoading(false);
-            setCurrentItem(def);
             getCustomer();
             onInput(true);
           }}
@@ -875,21 +898,6 @@ const DataCustomer = ({
     });
     console.log(currentItem);
     return selected;
-  };
-
-  const generateCodePreview = () => {
-    let code = [];
-
-    if (currentItem?.customer?.cus_kode_country) {
-      code.push(checkCountry(currentItem?.customer?.cus_country).code);
-    }
-    if (currentItem?.jpel) {
-      code.push(currentItem.jpel.jpel_code);
-    }
-
-    code.push(number);
-
-    return code.join("/");
   };
 
   const kota = (value) => {
@@ -1135,26 +1143,22 @@ const DataCustomer = ({
                 <div className="col-6">
                   <PrimeInput
                     label={tr[localStorage.getItem("language")].kd_pel}
-                    value={
-                      !isEdit
-                        ? generateCodePreview(currentItem?.customer?.cus_code)
-                        : currentItem?.customer?.cus_code
-                    }
-                    // onChange={(e) => {
-                    //   setCurrentItem({
-                    //     ...currentItem,
-                    //     customer: {
-                    //       ...currentItem.customer,
-                    //       cus_code: e.target.value,
-                    //     },
-                    //   });
-                    //   let newError = error;
-                    //   newError[0].code = false;
-                    //   setError(newError);
-                    // }}
+                    value={currentItem?.customer?.cus_code}
+                    onChange={(e) => {
+                      setCurrentItem({
+                        ...currentItem,
+                        customer: {
+                          ...currentItem.customer,
+                          cus_code: e.target.value,
+                        },
+                      });
+                      // let newError = error;
+                      // newError[0].code = false;
+                      // setError(newError);
+                    }}
                     placeholder={tr[localStorage.getItem("language")].masuk}
                     // error={error[0]?.code}
-                    disabled
+                    disabled={comp?.auto_code_customer}
                   />
                 </div>
                 <div className="col-6">
@@ -1211,7 +1215,7 @@ const DataCustomer = ({
                   </label>
                   <div className="p-inputgroup">
                     <Dropdown
-                      value={currentItem !== null ? currentItem.subArea : null}
+                      value={currentItem !== null ? currentItem?.subArea : null}
                       options={subArea}
                       onChange={(e) => {
                         console.log(e.value);
@@ -1235,7 +1239,7 @@ const DataCustomer = ({
                     label={tr[localStorage.getItem("language")].currency}
                     value={
                       currentItem
-                        ? checkCurrency(currentItem.customer.cus_curren)
+                        ? checkCurrency(currentItem?.customer?.cus_curren)
                         : null
                     }
                     options={currency}
@@ -1282,7 +1286,9 @@ const DataCustomer = ({
                   <InputSwitch
                     className="ml-0 mt-1"
                     checked={
-                      currentItem !== null ? currentItem.customer.cus_pkp : null
+                      currentItem !== null
+                        ? currentItem?.customer?.cus_pkp
+                        : null
                     }
                     onChange={(e) => {
                       setCurrentItem({
@@ -1467,7 +1473,7 @@ const DataCustomer = ({
                   {currentItem?.customer?.cus_country?.code === "IND-" ? (
                     <PrimeDropdown
                       label={tr[localStorage.getItem("language")].kota}
-                      value={currentItem.customer.cus_kota ?? null}
+                      value={currentItem?.customer?.cus_kota ?? null}
                       options={city}
                       onChange={(e) => {
                         console.log("joo", e.target.value.postal_code);
@@ -1521,9 +1527,10 @@ const DataCustomer = ({
                     <InputNumber
                       value={
                         currentItem !== null &&
-                        currentItem.customer.cus_kota !== null
+                        currentItem?.customer?.cus_kota !== null
                           ? (() => {
-                              const postalCode = currentItem.customer.cus_kpos;
+                              const postalCode =
+                                currentItem?.customer?.cus_kpos;
                               console.log("postalCode", postalCode);
                               return postalCode;
                             })()
@@ -1786,7 +1793,7 @@ const DataCustomer = ({
                     value={
                       currentItem !== null &&
                       currentItem?.customer?.cus_gl !== null
-                        ? gl(currentItem.customer.cus_gl)
+                        ? gl(currentItem?.customer?.cus_gl)
                         : null
                     }
                     options={accAr}
@@ -1825,8 +1832,8 @@ const DataCustomer = ({
                     label={"Kode Distribusi Uang Muka Penjualan"}
                     value={
                       currentItem !== null &&
-                      currentItem.customer.cus_uang_muka !== null
-                        ? gl(currentItem.customer.cus_uang_muka)
+                      currentItem?.customer?.cus_uang_muka !== null
+                        ? gl(currentItem?.customer?.cus_uang_muka)
                         : null
                     }
                     options={accUm}

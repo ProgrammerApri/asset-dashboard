@@ -25,11 +25,27 @@ import { Checkbox } from "primereact/checkbox";
 import { SelectButton } from "primereact/selectbutton";
 import DataSupplier from "../../Mitra/Pemasok/DataPemasok";
 import { MultiSelect } from "primereact/multiselect";
+import { Dialog } from "primereact/dialog";
+import { tr } from "src/data/tr";
+import { fil } from "date-fns/locale";
 
 const defError = {
   code: false,
   date: false,
-  pl: false,
+  plan: false,
+  seq: [
+    {
+      actual: false,
+      end: false,
+      durasi: false,
+    },
+  ],
+  prod: [
+    {
+      receive: false,
+      mutasi: false,
+    },
+  ],
 };
 
 const proses = [
@@ -46,6 +62,7 @@ const InputBatch = ({ onCancel, onSuccess }) => {
   const forml = useSelector((state) => state.forml.current);
   const [active, setActive] = useState(0);
   const [doubleClick, setDoubleClick] = useState(false);
+  const [displayConfirm, setDisplayConfirm] = useState(false);
   const dispatch = useDispatch();
   const [planning, setPlanning] = useState(null);
   const [dept, setDept] = useState(null);
@@ -309,7 +326,7 @@ const InputBatch = ({ onCancel, onSuccess }) => {
   const addBTC = async () => {
     const config = {
       ...endpoints.addBatch,
-      data: { ...btc, batch_date: currentDate(btc.batch_date) },
+      data: { ...btc, batch_date: currentDate(btc?.batch_date) },
     };
     console.log(config.data);
     let response = null;
@@ -481,7 +498,7 @@ const InputBatch = ({ onCancel, onSuccess }) => {
       now?.getSeconds(),
       now?.getMilliseconds()
     );
-    return newDate.toISOString();
+    return newDate?.toISOString();
   };
 
   const updateBTC = (e) => {
@@ -496,16 +513,123 @@ const InputBatch = ({ onCancel, onSuccess }) => {
     let errors = {
       code: !btc.bcode || btc.bcode === "",
       date: !btc.batch_date || btc.batch_date === "",
-      pl: !btc.plan_id,
+      plan: !btc?.plan_id,
+      seq: [],
+      prod: [],
     };
 
-    valid = !errors.code && !errors.date && !errors.pl;
+    btc?.sequence?.forEach((element, i) => {
+      if (i > 0) {
+        if (
+          element?.datetime_actual ||
+          element?.datetime_end ||
+          element?.durasi
+        ) {
+          errors.seq[i] = {
+            actual:
+              !element?.datetime_actual ||
+              element?.datetime_actual === "" ||
+              element?.datetime_actual === null,
+            end:
+              !element?.datetime_end ||
+              element?.datetime_end === "" ||
+              element?.datetime_end === null,
+            durasi:
+              !element?.durasi ||
+              element?.durasi === "" ||
+              element?.durasi === 0,
+          };
+        }
+      } else {
+        errors.seq[i] = {
+          actual:
+            !element?.datetime_actual ||
+            element?.datetime_actual === "" ||
+            element?.datetime_actual === null,
+          end:
+            !element?.datetime_end ||
+            element?.datetime_end === "" ||
+            element?.datetime_end === null,
+          durasi:
+            !element?.durasi || element?.durasi === "" || element?.durasi === 0,
+        };
+      }
+    });
+
+    btc?.product?.forEach((element, i) => {
+      if (i > 0) {
+        if (element?.qty_receive || element?.wc_mutation) {
+          errors.prod[i] = {
+            receive:
+              !element?.qty_receive ||
+              element?.qty_receive === "" ||
+              element?.qty_receive === "0",
+            mutasi:
+              !element?.wc_mutation ||
+              element?.wc_mutation === "" ||
+              element?.wc_mutation === "0",
+          };
+        }
+      } else {
+        errors.prod[i] = {
+          receive:
+            !element?.qty_receive ||
+            element?.qty_receive === "" ||
+            element?.qty_receive === "0",
+          mutasi:
+            !element?.wc_mutation ||
+            element?.wc_mutation === "" ||
+            element?.wc_mutation === "0",
+        };
+      }
+    });
+
+    if (btc?.sequence?.length) {
+      if (
+        !errors.seq[0]?.actual &&
+        !errors.seq[0]?.end &&
+        !errors.seq[0]?.durasi
+      ) {
+        errors.seq?.forEach((e) => {
+          for (var key in e) {
+            e[key] = false;
+          }
+        });
+      }
+    }
+
+    if (btc?.product.length) {
+      if (!errors.prod[0]?.receive && !errors.prod[0]?.mutasi) {
+        errors.prod?.forEach((e) => {
+          for (var key in e) {
+            e[key] = false;
+          }
+        });
+      }
+    }
+
+    let validSeq = false;
+    let validProduct = false;
+    errors.seq?.forEach((el) => {
+      for (var k in el) {
+        validSeq = !el[k];
+      }
+    });
+
+    errors.prod?.forEach((el) => {
+      for (var k in el) {
+        validProduct = !el[k];
+      }
+    });
+
+    valid =
+      !errors.code && !errors.date && !errors.plan && validSeq && validProduct;
 
     setError(errors);
 
     if (!valid) {
       window.scrollTo({
-        top: 80,
+        top: 180,
         left: 0,
         behavior: "smooth",
       });
@@ -514,36 +638,18 @@ const InputBatch = ({ onCancel, onSuccess }) => {
     return valid;
   };
 
-  const header = () => {
-    return (
-      <h4 className="mb-5">
-        <b>Pembelian (PO)</b>
-        {/* <b>{isEdit ? "Edit" : "Buat"} Pembelian (PO)</b> */}
-      </h4>
-    );
-  };
-
   const body = () => {
     let date_act = null;
     let date_end = null;
-    let step = null;
     let status = null;
-    let maklon = null;
-    let disabled = false;
+    let disabled = true;
 
     btc?.plan_id?.sequence?.forEach((el) => {
       date_act = el?.datetime_actual;
       date_end = el?.datetime_end;
-      step = el?.seq;
       status = el?.proses;
     });
 
-    btc?.sequence?.forEach((elem) => {
-      maklon = checkWork(elem?.work_id)?.maklon;
-    });
-
-    console.log("jdhfd");
-    console.log(maklon);
     return (
       <>
         {/* Put content body here */}
@@ -607,11 +713,44 @@ const InputBatch = ({ onCancel, onSuccess }) => {
               value={btc.plan_id && checkPlan(btc.plan_id)}
               options={planning}
               onChange={(e) => {
+                let step = 0;
+                let maklon = null;
+                let step_seq = e?.value?.sequence.map((v) => ({
+                  ...v,
+                  disabled: true,
+                }));
+
+                e?.value?.sequence?.forEach((elem) => {
+                  let disabled = true;
+                  maklon = checkWork(elem?.work_id)?.maklon;
+
+                  if (elem.proses !== null && elem.proses !== 1) {
+                    step_seq[step].disabled = true;
+                    if (step < e?.value?.sequence.length - 1) {
+                      step_seq[step + 1].disabled = false;
+                    }
+                  }
+
+                  if (elem.proses === null && step === 0) {
+                    step_seq[step].disabled = false;
+                  }
+
+                  step++;
+                });
+                console.log("jdhfd");
+                console.log(step);
+
+                step_seq?.forEach((el) => {
+                  if (!el?.disabled && !el?.work_id?.mutasi) {
+                    // setDisplayConfirm(true);
+                  }
+                });
+
                 updateBTC({
                   ...btc,
                   plan_id: e?.value?.id ?? null,
-                  sequence: e?.value
-                    ? e?.value?.sequence?.map((v) => {
+                  seqq: e?.value
+                    ? step_seq?.map((v) => {
                         return {
                           ...v,
                           seq: v?.seq,
@@ -621,8 +760,14 @@ const InputBatch = ({ onCancel, onSuccess }) => {
                           work_id: v?.work_id?.id ?? null,
                           sup_id: v?.sup_id ?? null,
                           datetime_plan: v?.date ?? null,
-                          datetime_actual: v?.datetime_actual ?? null,
-                          datetime_end: v?.datetime_end ?? null,
+                          datetime_actual:
+                            v?.datetime_actual !== null
+                              ? new Date(`${v.datetime_actual}Z`)
+                              : null,
+                          datetime_end:
+                            v?.datetime_end !== null
+                              ? new Date(`${v.datetime_end}Z`)
+                              : null,
                           durasi: v?.durasi ?? null,
                           proses: v?.proses ?? null,
                           batch: v?.batch ?? null,
@@ -637,10 +782,10 @@ const InputBatch = ({ onCancel, onSuccess }) => {
                           unit_id: v?.unit_id?.id ?? null,
                           qty_making: v.qty_making ?? 0,
                           aloc: v?.aloc ?? null,
-                          qty_receive:
-                            v?.wc_mutation == null
-                              ? v?.qty_making
-                              : v?.wc_mutation,
+                          qty_receive: null,
+                          // v?.wc_mutation == null
+                          //   ? v?.qty_making
+                          //   : v?.wc_mutation
                           qty_reject: null,
                           loc_reject: null,
                           wc_mutation: null,
@@ -663,6 +808,7 @@ const InputBatch = ({ onCancel, onSuccess }) => {
                       })
                     : null,
                 });
+
                 let newError = error;
                 newError.pl = false;
                 setError(newError);
@@ -776,7 +922,7 @@ const InputBatch = ({ onCancel, onSuccess }) => {
         {btc && btc.plan_id !== null ? (
           <>
             <CustomAccordion
-              tittle={"Sequence"}
+              tittle={<b>Sequence</b>}
               defaultActive={true}
               active={accor.sequence}
               onClick={() => {
@@ -790,139 +936,180 @@ const InputBatch = ({ onCancel, onSuccess }) => {
                 <DataTable
                   responsiveLayout="scroll"
                   value={
-                    // !isEdit
-                    //   ? btc?.seqq.map((v, i) => {
-                    //       return {
-                    //         ...v,
-                    //         index: i,
-                    //       };
-                    //     })
-                    //   :
-                    btc?.sequence.map((v, i) => {
-                      return {
-                        ...v,
-                        index: i,
-                      };
-                    })
+                    !isEdit
+                      ? btc?.seqq.map((v, i) => {
+                          return {
+                            ...v,
+                            index: i,
+                          };
+                        })
+                      : btc?.sequence?.map((b, a) => {
+                          return {
+                            ...b,
+                            index: a,
+                          };
+                        })
                   }
                   className="display w-150 datatable-wrapper header-white no-border"
                   showGridlines={false}
                   emptyMessage={() => <div></div>}
                 >
                   <Column
-                    header="Proses Ke"
-                    className="align-text-top"
+                    header={<b>Proses</b>}
+                    // className="align-text-top"
                     field={""}
                     style={{
-                      minWidth: "7rem",
+                      minWidth: "4rem",
                     }}
                     body={(e) => (
-                      <PrimeNumber
-                        value={e.seq && e.seq}
-                        onChange={(t) => {}}
-                        placeholder="0"
-                        type="number"
-                        min={0}
-                        disabled
-                      />
+                      <div>
+                        <label className="ml-3">{e.seq}</label>
+                      </div>
+                      // <PrimeNumber
+                      //   value={e.seq && e.seq}
+                      //   onChange={(t) => {}}
+                      //   placeholder="0"
+                      //   type="number"
+                      //   min={0}
+                      //   disabled
+                      // />
                     )}
                   />
 
                   <Column
-                    header="Work Center"
-                    className="align-text-top"
+                    header={<b>Work Center</b>}
+                    // className="align-text-top"
                     field={""}
                     style={{
                       minWidth: "15rem",
                     }}
                     body={(e) => (
-                      <PrimeInput
-                        value={
-                          e.wc_id
+                      <div>
+                        <label className="ml-0">
+                          {e.wc_id
                             ? `${checkWc(e.wc_id)?.work_name} (${
                                 checkWc(e.wc_id)?.work_code
                               })`
-                            : "-"
-                        }
-                        onChange={(t) => {}}
-                        placeholder="Work Center"
-                        disabled
-                      />
+                            : "-"}
+                        </label>
+                      </div>
+                      // <PrimeInput
+                      //   value={
+                      //     e.wc_id
+                      //       ? `${checkWc(e.wc_id)?.work_name} (${
+                      //           checkWc(e.wc_id)?.work_code
+                      //         })`
+                      //       : "-"
+                      //   }
+                      //   onChange={(t) => {}}
+                      //   placeholder="Work Center"
+                      //   disabled
+                      // />
                     )}
                   />
 
                   <Column
-                    header="Lokasi"
-                    className="align-text-top"
+                    header={<b>Lokasi Gudang</b>}
+                    // className="align-text-top"
                     field={""}
                     style={{
                       minWidth: "15rem",
                     }}
                     body={(e) => (
-                      <PrimeInput
-                        value={
-                          e.loc_id
+                      <div>
+                        <label className="ml-0">
+                          {e.loc_id
                             ? `${checkLoc(e.loc_id)?.name} (${
                                 checkLoc(e.loc_id)?.code
                               })`
-                            : "-"
-                        }
-                        onChange={(t) => {}}
-                        placeholder="Lokasi"
-                        disabled
-                      />
+                            : "-"}
+                        </label>
+                      </div>
+
+                      // <PrimeInput
+                      //   value={
+                      //     e.loc_id
+                      //       ? `${checkLoc(e.loc_id)?.name} (${
+                      //           checkLoc(e.loc_id)?.code
+                      //         })`
+                      //       : "-"
+                      //   }
+                      //   onChange={(t) => {}}
+                      //   placeholder="Lokasi"
+                      //   disabled
+                      // />
                     )}
                   />
 
                   <Column
-                    header="Mesin"
-                    className="align-text-top"
+                    header={<b>Mesin</b>}
+                    // className="align-text-top"
                     field={""}
                     style={{
                       minWidth: "15rem",
                     }}
                     body={(e) => (
-                      <PrimeInput
-                        value={
-                          e.mch_id
+                      <div>
+                        <label className="ml-0">
+                          {e.mch_id
                             ? `${checkMsn(e.mch_id)?.msn_name} (${
                                 checkMsn(e.mch_id)?.msn_code
                               })`
-                            : "-"
-                        }
-                        onChange={(t) => {}}
-                        placeholder="Mesin"
-                        disabled
-                      />
+                            : "-"}
+                        </label>
+                      </div>
+
+                      // <PrimeInput
+                      //   value={
+                      //     e.mch_id
+                      //       ? `${checkMsn(e.mch_id)?.msn_name} (${
+                      //           checkMsn(e.mch_id)?.msn_code
+                      //         })`
+                      //       : "-"
+                      //   }
+                      //   onChange={(t) => {}}
+                      //   placeholder="Mesin"
+                      //   disabled
+                      // />
                     )}
                   />
 
                   <Column
-                    header="Jenis Pekerjaan"
-                    className="align-text-top"
+                    header={<b>Jenis Pekerjaan</b>}
+                    // className="align-text-top"
                     field={""}
                     style={{
                       minWidth: "15rem",
                     }}
                     body={(e) => (
-                      <PrimeInput
-                        value={
-                          e.work_id
+                      <div>
+                        <label className="ml-0">
+                          {e.work_id
                             ? `${checkWork(e.work_id)?.work_name} (${
                                 checkWork(e.work_id)?.work_type
                               })`
-                            : "-"
-                        }
-                        onChange={(t) => {}}
-                        placeholder="Jenis Pekerjaan"
-                        disabled
-                      />
+                            : "-"}
+                        </label>
+                      </div>
+
+                      // <PrimeInput
+                      //   value={
+                      //     e.work_id
+                      //       ? `${checkWork(e.work_id)?.work_name} (${
+                      //           checkWork(e.work_id)?.work_type
+                      //         })`
+                      //       : "-"
+                      //   }
+                      //   onChange={(t) => {}}
+                      //   placeholder="Jenis Pekerjaan"
+                      //   disabled
+                      // />
                     )}
                   />
 
                   <Column
-                    header="Mutasi"
-                    className="align-text-top"
+                    header={<b>Mutasi</b>}
+                    // className="align-text-top"
                     field={""}
                     style={{
                       minWidth: "5em",
@@ -939,8 +1126,8 @@ const InputBatch = ({ onCancel, onSuccess }) => {
                   />
 
                   <Column
-                    header="Maklon"
-                    className="align-text-top"
+                    header={<b>Maklon</b>}
+                    // className="align-text-top"
                     field={""}
                     style={{
                       minWidth: "5em",
@@ -957,9 +1144,8 @@ const InputBatch = ({ onCancel, onSuccess }) => {
                   />
 
                   <Column
-                    // hidden={maklon === false || maklon === null}
-                    header="Supplier"
-                    className="align-text-top"
+                    header={<b>Supplier</b>}
+                    // className="align-text-top"
                     field={""}
                     style={{
                       minWidth: "15rem",
@@ -974,11 +1160,11 @@ const InputBatch = ({ onCancel, onSuccess }) => {
                           }
                           options={supplier}
                           onChange={(u) => {
-                            let temp = [...btc.sequence];
+                            let temp = [...btc.seqq];
                             temp[e.index].sup_id = u?.value?.map(
                               (a) => a?.supplier?.id ?? null
                             );
-                            updateBTC({ ...btc, sequence: temp });
+                            updateBTC({ ...btc, seqq: temp });
                           }}
                           placeholder="Pilih Supplier"
                           optionLabel="supplier.sup_name"
@@ -996,8 +1182,8 @@ const InputBatch = ({ onCancel, onSuccess }) => {
                   />
 
                   <Column
-                    header="Tanggal Plan"
-                    className="align-text-top"
+                    header={<b>Tanggal Plan</b>}
+                    // className="align-text-top"
                     field={""}
                     style={{
                       minWidth: "15rem",
@@ -1022,8 +1208,8 @@ const InputBatch = ({ onCancel, onSuccess }) => {
                   />
 
                   <Column
-                    header="Tanggal Actual"
-                    className="align-text-top"
+                    header={<b>Tanggal Actual</b>}
+                    // className="align-text-top"
                     field={""}
                     style={{
                       minWidth: "15rem",
@@ -1032,85 +1218,105 @@ const InputBatch = ({ onCancel, onSuccess }) => {
                       <div className="p-inputgroup">
                         <Calendar
                           value={
-                            !isEdit
-                              ? e.batch
-                                ? new Date(`${e.datetime_actual}Z`)
-                                : e.datetime_actual
-                              : new Date(`${e.datetime_actual}Z`)
+                            // !isEdit
+                            //   ?
+                            e.datetime_actual
+                            // : new Date(`${e.datetime_actual}Z`)
                           }
                           onChange={(a) => {
-                            let temp = btc.sequence;
-                            temp[e.index].datetime_actual = a?.value ?? null;
-                            updateBTC({ ...btc, sequence: temp });
+                            let temp = btc.seqq;
+                            let tempp = btc.sequence;
+
+                            if (!isEdit) {
+                              temp[e.index].datetime_actual = a?.value ?? null;
+                              updateBTC({ ...btc, seqq: temp });
+                            } else {
+                              tempp[e.index].datetime_actual = a?.value ?? null;
+                              updateBTC({ ...btc, sequence: tempp });
+                            }
                           }}
                           placeholder="Pilih Tanggal"
                           dateFormat="dd-mm-yy"
                           showTime
                           hourFormat="12"
                           showIcon
-                          // disabled={e.batch !== null}
-                        />
-                      </div>
-                    )}
-                  />
-                  <Column
-                    header="Tanggal Selesai"
-                    className="align-text-top"
-                    field={""}
-                    style={{
-                      minWidth: "15rem",
-                    }}
-                    body={(e) => (
-                      <div className="p-inputgroup">
-                        <Calendar
-                          value={
-                            !isEdit
-                              ? e?.batch
-                                ? new Date(`${e.datetime_end}Z`)
-                                : e.datetime_end
-                              : new Date(`${e.datetime_end}Z`)
-                          }
-                          onChange={(u) => {
-                            let temp = [...btc.sequence];
-                            temp[e.index].datetime_end = u?.value ?? null;
-                            updateBTC({ ...btc, sequence: temp });
-                          }}
-                          placeholder="Pilih Tanggal"
-                          dateFormat="dd-mm-yy"
-                          showTime
-                          hourFormat="12"
-                          showIcon
-                          // disabled={e.proses === 0}
+                          disabled={e.disabled}
                         />
                       </div>
                     )}
                   />
 
                   <Column
-                    header="Durasi (Jam)"
-                    className="align-text-top"
+                    header={<b>Tanggal Selesai</b>}
+                    // className="align-text-top"
                     field={""}
                     style={{
-                      minWidth: "10rem",
+                      minWidth: "15rem",
+                    }}
+                    body={(e) => (
+                      <div className="p-inputgroup">
+                        <Calendar
+                          value={
+                            // !isEdit
+                            //   ?
+                            e.datetime_end
+                            // : new Date(`${e.datetime_end}Z`)
+                          }
+                          onChange={(u) => {
+                            let temp = btc.seqq;
+                            let tempp = btc.sequence;
+
+                            if (!isEdit) {
+                              temp[e.index].datetime_end = u?.value ?? null;
+                              updateBTC({ ...btc, seqq: temp });
+                            } else {
+                              tempp[e.index].datetime_end = u?.value ?? null;
+                              updateBTC({ ...btc, sequence: tempp });
+                            }
+                          }}
+                          placeholder="Pilih Tanggal"
+                          dateFormat="dd-mm-yy"
+                          showTime
+                          hourFormat="12"
+                          showIcon
+                          disabled={e.disabled}
+                        />
+                      </div>
+                    )}
+                  />
+
+                  <Column
+                    header={<b>Durasi (Jam)</b>}
+                    // className="align-text-top"
+                    field={""}
+                    style={{
+                      minWidth: "8rem",
                     }}
                     body={(e) => (
                       <PrimeNumber
                         price
                         value={e.durasi && e.durasi}
                         onChange={(a) => {
-                          let temp = [...btc.sequence];
-                          temp[e.index].durasi = a?.value ?? null;
-                          updateBTC({ ...btc, sequence: temp });
+                          let temp = btc.seqq;
+                          let tempp = btc.sequence;
+
+                          if (!isEdit) {
+                            temp[e.index].durasi = a?.value ?? null;
+                            updateBTC({ ...btc, seqq: temp });
+                          } else {
+                            tempp[e.index].durasi = a?.value ?? null;
+                            updateBTC({ ...btc, sequence: tempp });
+                          }
                         }}
                         placeholder="0"
-                        // disabled={e.proses === 0}
+                        disabled={e.disabled}
                       />
                     )}
                   />
 
                   <Column
-                    header="Status Proses"
-                    className="align-text-top"
+                    header={<b>Status Proses</b>}
+                    // className="align-text-top"
                     field={""}
                     style={{
                       minWidth: "15rem",
@@ -1127,36 +1333,45 @@ const InputBatch = ({ onCancel, onSuccess }) => {
                         }
                         options={proses}
                         onChange={(t) => {
-                          let temp = [...btc.sequence];
-                          temp[e.index].proses = t?.value?.code ?? null;
+                          let temp = btc.seqq;
+                          let tempp = btc.sequence;
+
+                          if (!isEdit) {
+                            temp[e.index].proses = t?.value?.code ?? null;
+                          } else {
+                            tempp[e.index].proses = t?.value?.code ?? null;
+                          }
 
                           let val = [];
                           btc?.seqq?.forEach((el) => {
-                            if (el?.proses != null) {
+                            if (!el?.disabled) {
                               val?.push(el);
                             }
                           });
                           updateBTC({
                             ...btc,
-                            sequence: temp,
-                            // sequence: val?.map((v) => ({
-                            //   ...v,
-                            //   seq: v.seq,
-                            //   wc_id: v.wc_id ?? null,
-                            //   loc_id: v.loc_id ?? null,
-                            //   mch_id: v?.mch_id ?? null,
-                            //   work_id: v?.work_id ?? null,
-                            //   sup_id: v?.sup_id ?? null,
-                            //   datetime_plan: v?.datetime_plan,
-                            //   datetime_actual: temp[e.index].datetime_actual,
-                            //   datetime_end: temp[e.index].datetime_end,
-                            //   durasi: temp[e.index].durasi,
-                            //   proses: t?.value?.code ?? null,
-                            // })),
+                            seqq: !isEdit ? temp : null,
+                            sequence: !isEdit
+                              ? val?.map((v) => ({
+                                  ...v,
+                                  seq: v.seq,
+                                  wc_id: v.wc_id ?? null,
+                                  loc_id: v.loc_id ?? null,
+                                  mch_id: v?.mch_id ?? null,
+                                  work_id: v?.work_id ?? null,
+                                  sup_id: v?.sup_id ?? null,
+                                  datetime_plan: v?.datetime_plan,
+                                  datetime_actual:
+                                    temp[e.index].datetime_actual,
+                                  datetime_end: temp[e.index].datetime_end,
+                                  durasi: temp[e.index].durasi,
+                                  proses: t?.value?.code ?? null,
+                                }))
+                              : tempp,
                           });
                         }}
                         optionLabel="name"
-                        // disabled={e.proses === 0}
+                        disabled={e.disabled}
                       />
                       // </div>
                     )}
@@ -1211,7 +1426,7 @@ const InputBatch = ({ onCancel, onSuccess }) => {
             />
 
             <CustomAccordion
-              tittle={"Produk Jadi"}
+              tittle={<b>Produk Jadi</b>}
               defaultActive={true}
               active={accor.produk}
               onClick={() => {
@@ -1236,7 +1451,7 @@ const InputBatch = ({ onCancel, onSuccess }) => {
                   emptyMessage={() => <div></div>}
                 >
                   <Column
-                    header="Produk"
+                    header={<b>Produk</b>}
                     className="align-text-top"
                     field={""}
                     style={{
@@ -1287,7 +1502,24 @@ const InputBatch = ({ onCancel, onSuccess }) => {
                   />
 
                   <Column
-                    header="Satuan"
+                    header={<b>Qty Pembuatan</b>}
+                    className="align-text-top"
+                    field={""}
+                    style={{
+                      minWidth: "10rem",
+                    }}
+                    body={(e) => (
+                      <PrimeNumber
+                        price
+                        value={e.qty_making && e.qty_making}
+                        placeholder="0"
+                        disabled
+                      />
+                    )}
+                  />
+
+                  <Column
+                    header={<b>Satuan</b>}
                     className="align-text-top"
                     field={""}
                     style={{
@@ -1321,24 +1553,7 @@ const InputBatch = ({ onCancel, onSuccess }) => {
                   />
 
                   <Column
-                    header="Kuantitas Pembuatan"
-                    className="align-text-top"
-                    field={""}
-                    style={{
-                      minWidth: "10rem",
-                    }}
-                    body={(e) => (
-                      <PrimeNumber
-                        price
-                        value={e.qty_making && e.qty_making}
-                        placeholder="0"
-                        disabled
-                      />
-                    )}
-                  />
-
-                  <Column
-                    header="Cost Alokasi (%)"
+                    header={<b>Cost Alokasi (%)</b>}
                     className="align-text-top"
                     field={""}
                     style={{
@@ -1360,7 +1575,7 @@ const InputBatch = ({ onCancel, onSuccess }) => {
                   />
 
                   <Column
-                    header="Terima Hasil"
+                    header={<b>Terima Hasil/Mutasi</b>}
                     className="align-text-top"
                     field={""}
                     style={{
@@ -1383,7 +1598,7 @@ const InputBatch = ({ onCancel, onSuccess }) => {
                   />
 
                   <Column
-                    header="Reject"
+                    header={<b>Reject</b>}
                     className="align-text-top"
                     field={""}
                     style={{
@@ -1404,7 +1619,7 @@ const InputBatch = ({ onCancel, onSuccess }) => {
                   />
 
                   <Column
-                    header="Lokasi Reject"
+                    header={<b>Lokasi Reject</b>}
                     className="align-text-top"
                     field={""}
                     style={{
@@ -1437,7 +1652,7 @@ const InputBatch = ({ onCancel, onSuccess }) => {
                   />
 
                   <Column
-                    header="Mutasi WC"
+                    header={<b>Mutasi WC</b>}
                     className="align-text-top"
                     field={""}
                     style={{
@@ -1460,7 +1675,7 @@ const InputBatch = ({ onCancel, onSuccess }) => {
                   />
 
                   <Column
-                    header="Sisa"
+                    header={<b>Sisa</b>}
                     className="align-text-top"
                     field={""}
                     style={{
@@ -1523,7 +1738,7 @@ const InputBatch = ({ onCancel, onSuccess }) => {
             />
 
             <CustomAccordion
-              tittle={"Bahan"}
+              tittle={<b>Bahan</b>}
               defaultActive={true}
               active={accor.material}
               onClick={() => {
@@ -1548,7 +1763,7 @@ const InputBatch = ({ onCancel, onSuccess }) => {
                     emptyMessage={() => <div></div>}
                   >
                     <Column
-                      header="Bahan"
+                      header={<b>Bahan</b>}
                       className="align-text-top"
                       field={""}
                       style={{
@@ -1601,7 +1816,24 @@ const InputBatch = ({ onCancel, onSuccess }) => {
                     />
 
                     <Column
-                      header="Satuan"
+                      header={<b>Qty Formula</b>}
+                      className="align-text-top"
+                      field={""}
+                      style={{
+                        minWidth: "10rem",
+                      }}
+                      body={(e) => (
+                        <PrimeNumber
+                          price
+                          value={e.qty ? e.qty : ""}
+                          placeholder="0"
+                          disabled
+                        />
+                      )}
+                    />
+
+                    <Column
+                      header={<b>Satuan</b>}
                       className="align-text-top"
                       field={""}
                       style={{
@@ -1635,24 +1867,7 @@ const InputBatch = ({ onCancel, onSuccess }) => {
                     />
 
                     <Column
-                      header="Kuantitas Formula"
-                      className="align-text-top"
-                      field={""}
-                      style={{
-                        minWidth: "10rem",
-                      }}
-                      body={(e) => (
-                        <PrimeNumber
-                          price
-                          value={e.qty ? e.qty : ""}
-                          placeholder="0"
-                          disabled
-                        />
-                      )}
-                    />
-
-                    <Column
-                      header="Kebutuhan Material"
+                      header={<b>Kebutuhan Material</b>}
                       className="align-text-top"
                       field={""}
                       style={{
@@ -1678,7 +1893,7 @@ const InputBatch = ({ onCancel, onSuccess }) => {
                     />
 
                     <Column
-                      header="Total"
+                      header={<b>Total</b>}
                       className="align-text-top"
                       field={""}
                       style={{
@@ -1733,13 +1948,26 @@ const InputBatch = ({ onCancel, onSuccess }) => {
     );
   };
 
-  const getIndex = () => {
-    let total = 0;
-    forml?.product?.forEach((el) => {
-      total += el.index;
-    });
-
-    return total;
+  const footerConfirm = () => {
+    return (
+      <div>
+        <PButton
+          label={tr[localStorage.getItem("language")].batal}
+          onClick={onCancel}
+          className="p-button-text btn-primary"
+        />
+        <PButton
+          label="Ya"
+          icon="pi pi-check"
+          onClick={() => {
+            setUpdate(true);
+            // closePO();
+          }}
+          autoFocus
+          loading={update}
+        />
+      </div>
+    );
   };
 
   const footer = () => {
@@ -1793,6 +2021,22 @@ const InputBatch = ({ onCancel, onSuccess }) => {
           </Card>
         </Col>
       </Row>
+
+      <Dialog
+        header={"Mutasi Tidak Diaktifkan"}
+        visible={displayConfirm}
+        style={{ width: "30vw" }}
+        footer={footerConfirm("displayConfirm")}
+        onHide={onCancel}
+      >
+        <div className="ml-3 mr-3">
+          <i
+            className="pi pi-exclamation-triangle mr-3 align-middle"
+            style={{ fontSize: "2rem" }}
+          />
+          <span>Apakah yakin ingin melanjutkan mutasi ?</span>
+        </div>
+      </Dialog>
 
       <DataSupplier
         data={supplier}

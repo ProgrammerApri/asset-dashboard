@@ -12,8 +12,14 @@ import { Skeleton } from "primereact/skeleton";
 import { Toast } from "primereact/toast";
 import { Dropdown } from "primereact/dropdown";
 import { useDispatch, useSelector } from "react-redux";
-import { SET_BTC, SET_CURRENT_BTC, SET_EDIT_BTC } from "src/redux/actions";
+import {
+  SET_BTC,
+  SET_CURRENT_BTC,
+  SET_EDIT_BTC,
+  SET_FM,
+} from "src/redux/actions";
 import PrimeSingleButton from "src/jsx/components/PrimeSingleButton/PrimeSingleButton";
+import { tr } from "src/data/tr";
 
 const data = {
   id: null,
@@ -39,13 +45,16 @@ const DataBatch = ({ onAdd, onEdit, onDetail }) => {
   const [rows2, setRows2] = useState(20);
   const dispatch = useDispatch();
   const btc = useSelector((state) => state.btc.btc);
+  const form = useSelector((state) => state.forml.forml);
   const show = useSelector((state) => state.btc.current);
   const printPage = useRef(null);
+  const [expandedRows, setExpandedRows] = useState(null);
 
   const dummy = Array.from({ length: 10 });
 
   useEffect(() => {
     getBatch();
+    getForm();
     initFilters1();
   }, []);
 
@@ -67,7 +76,7 @@ const DataBatch = ({ onAdd, onEdit, onDetail }) => {
           type: SET_CURRENT_BTC,
           payload: {
             ...data,
-            bcode:kode,
+            bcode: kode,
             sequence: [
               {
                 id: 0,
@@ -122,6 +131,7 @@ const DataBatch = ({ onAdd, onEdit, onDetail }) => {
       }, 500);
     }
   };
+
   const getBatch = async (isUpdate = false) => {
     setLoading(true);
     const config = {
@@ -137,6 +147,31 @@ const DataBatch = ({ onAdd, onEdit, onDetail }) => {
         const { data } = response;
         console.log(data);
         dispatch({ type: SET_BTC, payload: data });
+      }
+    } catch (error) {}
+    if (isUpdate) {
+      setLoading(false);
+    } else {
+      setTimeout(() => {
+        setLoading(false);
+      }, 500);
+    }
+  };
+
+  const getForm = async (isUpdate = false) => {
+    setLoading(true);
+    const config = {
+      ...endpoints.formula,
+      data: btc,
+    };
+    console.log(config.data);
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log(response);
+      if (response.status) {
+        const { data } = response;
+        dispatch({ type: SET_FM, payload: data });
       }
     } catch (error) {}
     if (isUpdate) {
@@ -191,7 +226,7 @@ const DataBatch = ({ onAdd, onEdit, onDetail }) => {
     return (
       // <React.Fragment>
       <div className="d-flex">
-        <Link
+        {/* <Link
           onClick={() => {
             onDetail();
             let sequence = data.sequence;
@@ -227,7 +262,7 @@ const DataBatch = ({ onAdd, onEdit, onDetail }) => {
           className="btn btn-info shadow btn-xs sharp ml-1"
         >
           <i className="bx bx-show mt-1"></i>
-        </Link>
+        </Link> */}
 
         <Link
           onClick={() => {
@@ -244,6 +279,8 @@ const DataBatch = ({ onAdd, onEdit, onDetail }) => {
               el.mch_id = el?.mch_id?.id ?? null;
               el.work_id = el?.work_id?.id ?? null;
               el.sup_id = el?.sup_id?.id ?? null;
+              el.datetime_actual = new Date(`${el.datetime_actual}Z`) ?? null;
+              el.datetime_end = new Date(`${el.datetime_end}Z`) ?? null;
             });
 
             let product = data.product;
@@ -390,7 +427,7 @@ const DataBatch = ({ onAdd, onEdit, onDetail }) => {
           icon={<i class="bx bx-plus px-2"></i>}
           onClick={() => {
             onAdd();
-            getBatch_code()
+            getBatch_code();
             dispatch({
               type: SET_EDIT_BTC,
               payload: false,
@@ -548,10 +585,127 @@ const DataBatch = ({ onAdd, onEdit, onDetail }) => {
     return [day, month, year].join("-");
   };
 
-  const formatIdr = (value) => {
-    return `${value}`
+  const formatTh = (value) => {
+    return `${value?.toFixed(2)}`
       .replace(".", ",")
       .replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1.");
+  };
+
+  const checkForm = (value) => {
+    let selected = {};
+    form?.forEach((element) => {
+      if (value === element.id) {
+        selected = element;
+      }
+    });
+
+    return selected;
+  };
+
+  const rowExpansionTemplate = (data) => {
+    return (
+      <div className="">
+        <>
+          <label className="text-label fs-13 text-black">
+            <b>Daftar Produk Jadi</b>
+          </label>
+
+          <DataTable value={data?.product} responsiveLayout="scroll">
+            <Column
+              header="Produk"
+              field={(e) => `${e.prod_id?.name} (${e.prod_id?.code})`}
+              style={{ minWidth: "19rem" }}
+              // body={loading && <Skeleton />}
+            />
+            <Column
+              header={"Qty Pembuatan"}
+              field={(e) => formatTh(e?.qty_making) ?? 0}
+              style={{ minWidth: "9rem" }}
+              // body={loading && <Skeleton />}
+            />
+            <Column
+              header={tr[localStorage.getItem("language")].satuan}
+              field={(e) => e.unit_id?.name}
+              style={{ minWidth: "7rem" }}
+              // body={loading && <Skeleton />}
+            />
+            <Column
+              header={"Cost Alokasi (%)"}
+              field={(e) => formatTh(e.aloc)}
+              style={{ minWidth: "6rem" }}
+              // body={loading && <Skeleton />}
+            />
+            <Column
+              header={"Teima Hasil/Mutasi"}
+              field={(e) => e.qty_receive ? formatTh(e.qty_receive) : 0}
+              style={{ minWidth: "6rem" }}
+              // body={loading && <Skeleton />}
+            />
+            <Column
+              header={"Qty Reject"}
+              field={(e) => e.qty_reject ? formatTh(e.qty_reject) : 0}
+              style={{ minWidth: "6rem" }}
+              // body={loading && <Skeleton />}
+            />
+            <Column
+              header={"Lokasi Reject"}
+              field={(e) =>
+                e.loc_reject
+                  ? `${e?.loc_reject?.name} (${e?.loc_reject?.code})`
+                  : "-"
+              }
+              style={{ minWidth: "10rem" }}
+              // body={loading && <Skeleton />}
+            />
+            <Column
+              header={"Qty Mutasi"}
+              field={(e) => formatTh(e.wc_mutation)}
+              style={{ minWidth: "6rem" }}
+              // body={loading && <Skeleton />}
+            />
+          </DataTable>
+        </>
+
+        <>
+          <label className="text-label fs-13 text-black mt-4">
+            <b>Daftar Material</b>
+          </label>
+
+          <DataTable value={data?.material} responsiveLayout="scroll">
+            <Column
+              header={"Bahan"}
+              field={(e) => `${e.prod_id?.name} (${e.prod_id?.code})`}
+              style={{ minWidth: "19rem" }}
+              // body={loading && <Skeleton />}
+            />
+            <Column
+              header={"Qty Formula"}
+              field={(e) => formatTh(e.qty)}
+              style={{ minWidth: "6rem" }}
+              // body={loading && <Skeleton />}
+            />
+            <Column
+              header={"Kebutuhan Material"}
+              field={(e) => formatTh(e.mat_use)}
+              style={{ minWidth: "6rem" }}
+              // body={loading && <Skeleton />}
+            />
+            <Column
+              header={"Total Pemakaian"}
+              field={(e) => formatTh(e.total_use)}
+              style={{ minWidth: "6rem" }}
+              // body={loading && <Skeleton />}
+            />
+            <Column
+              header={tr[localStorage.getItem("language")].satuan}
+              field={(e) => e.unit_id?.name}
+              style={{ minWidth: "7rem" }}
+              // body={loading && <Skeleton />}
+            />
+          </DataTable>
+        </>
+      </div>
+    );
   };
 
   return (
@@ -570,10 +724,7 @@ const DataBatch = ({ onAdd, onEdit, onDetail }) => {
                 rowHover
                 header={renderHeader}
                 filters={filters1}
-                globalFilterFields={[
-                  "bcode",
-                  "plan_id.pcode",
-                ]}
+                globalFilterFields={["bcode", "plan_id.pcode"]}
                 emptyMessage="Tidak ada data"
                 paginator
                 paginatorTemplate={template2}
@@ -581,7 +732,11 @@ const DataBatch = ({ onAdd, onEdit, onDetail }) => {
                 rows={rows2}
                 onPage={onCustomPage2}
                 paginatorClassName="justify-content-end mt-3"
+                expandedRows={expandedRows}
+                onRowToggle={(e) => setExpandedRows(e.data)}
+                rowExpansionTemplate={rowExpansionTemplate}
               >
+                <Column expander style={{ width: "3em" }} />
                 <Column
                   header="Tanggal"
                   field={(e) => formatDate(e.batch_date)}
@@ -618,13 +773,13 @@ const DataBatch = ({ onAdd, onEdit, onDetail }) => {
                 />
                 <Column
                   header="Kode Formula"
-                  field={(e) => e.plan_id?.form_id?.fcode ?? "-"}
+                  field={(e) => checkForm(e.plan_id?.form_id)?.fcode ?? "-"}
                   style={{ minWidth: "8rem" }}
                   body={loading && <Skeleton />}
                 />
                 <Column
                   header="Nama Formula"
-                  field={(e) => e.plan_id?.form_id?.fname ?? "-"}
+                  field={(e) => checkForm(e.plan_id?.form_id)?.fname ?? "-"}
                   style={{ minWidth: "8rem" }}
                   body={loading && <Skeleton />}
                 />

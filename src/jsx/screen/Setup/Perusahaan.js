@@ -52,6 +52,9 @@ const data = {
   tiered: false,
   rp: false,
   status_number_otomatis: false,
+  auto_code_product: false,
+  auto_code_customer: false,
+  auto_code_supplier: false,
   over_po: false,
   rak_option: false,
   cutoff: null,
@@ -572,85 +575,153 @@ const Perusahaan = () => {
                 </Accordion.Toggle>
                 <Accordion.Collapse eventKey={"0"}>
                   <div className="accordion__body--text">
-                    <div className="d-flex col-12 align-items-center">
-                      <InputSwitch
-                        className="mr-3"
-                        inputId="email"
-                        checked={currentData && currentData.multi_currency}
-                        onChange={(e) => {
-                          setCurrentData({
-                            ...currentData,
-                            multi_currency: e.value,
-                          });
-                          submitUpdate(false, {
-                            ...currentData,
-                            multi_currency: e.value,
-                          });
-                        }}
-                      />
-                      <label className="mr-3 mt-1" htmlFor="email">
-                        {"Multi Currency"}
-                      </label>
-                    </div>
+                    <div className="row">
+                      <div className="d-flex col-6 align-items-center">
+                        <InputSwitch
+                          className="mr-3"
+                          inputId="email"
+                          checked={currentData && currentData.multi_currency}
+                          onChange={(e) => {
+                            setCurrentData({
+                              ...currentData,
+                              multi_currency: e.value,
+                            });
+                            submitUpdate(false, {
+                              ...currentData,
+                              multi_currency: e.value,
+                            });
+                          }}
+                        />
+                        <label className="mr-3 mt-1" htmlFor="email">
+                          {"Multi Currency"}
+                        </label>
+                      </div>
 
-                    <div className="d-flex col-12 align-items-center">
-                      <InputSwitch
-                        className="mr-3"
-                        inputId="email"
-                        checked={currentData && currentData.appr_po}
-                        onChange={(e) => {
-                          setCurrentData({ ...currentData, appr_po: e.value });
-                          submitUpdate(false, {
-                            ...currentData,
-                            appr_po: e.value,
-                          });
-                        }}
-                      />
-                      <label className="mr-3 mt-1" htmlFor="email">
-                        {"Approval PO"}
-                      </label>
-                    </div>
+                      <div className="d-flex col-6 align-items-center">
+                        <InputSwitch
+                          className="mr-3"
+                          inputId="email"
+                          checked={currentData && currentData.auto_code_product}
+                          onChange={(e) => {
+                            setCurrentData({
+                              ...currentData,
+                              auto_code_product: e.value,
+                            });
+                            submitUpdate(false, {
+                              ...currentData,
+                              auto_code_product: e.value,
+                            });
+                          }}
+                        />
+                        <label className="mr-3 mt-1" htmlFor="email">
+                          {"Auto Code Product"}
+                        </label>
+                      </div>
 
-                    <div className="d-flex col-12 align-items-center">
-                      <InputSwitch
-                        className="mr-3"
-                        inputId="email"
-                        checked={currentData && currentData.appr_payment}
-                        onChange={(e) => {
-                          setCurrentData({
-                            ...currentData,
-                            appr_payment: e.value,
-                          });
-                          submitUpdate(false, {
-                            ...currentData,
-                            appr_payment: e.value,
-                          });
-                        }}
-                      />
-                      <label className="mr-3 mt-1" htmlFor="email">
-                        {"Approval Pembayaran"}
-                      </label>
-                    </div>
+                      <div className="d-flex col-6 align-items-center">
+                        <InputSwitch
+                          className="mr-3"
+                          inputId="email"
+                          checked={currentData && currentData.appr_po}
+                          onChange={(e) => {
+                            setCurrentData({
+                              ...currentData,
+                              appr_po: e.value,
+                            });
+                            submitUpdate(false, {
+                              ...currentData,
+                              appr_po: e.value,
+                            });
+                          }}
+                        />
+                        <label className="mr-3 mt-1" htmlFor="email">
+                          {"Approval PO"}
+                        </label>
+                      </div>
 
-                    <div className="d-flex col-12 align-items-center">
-                      <InputSwitch
-                        className="mr-3"
-                        inputId="email"
-                        checked={currentData && currentData.rak_option}
-                        onChange={(e) => {
-                          setCurrentData({
-                            ...currentData,
-                            rak_option: e.value,
-                          });
-                          submitUpdate(false, {
-                            ...currentData,
-                            rak_option: e.value,
-                          });
-                        }}
-                      />
-                      <label className="mr-3 mt-1" htmlFor="email">
-                        {"Aktifkan Rak Untuk Semua Transaksi"}
-                      </label>
+                      <div className="d-flex col-6 align-items-center">
+                        <InputSwitch
+                          className="mr-3"
+                          inputId="email"
+                          checked={currentData && currentData.auto_code_customer}
+                          onChange={(e) => {
+                            setCurrentData({
+                              ...currentData,
+                              auto_code_customer: e.value,
+                            });
+                            submitUpdate(false, {
+                              ...currentData,
+                              auto_code_customer: e.value,
+                            });
+                          }}
+                        />
+                        <label className="mr-3 mt-1" htmlFor="email">
+                          {"Auto Code Customer"}
+                        </label>
+                      </div>
+
+                      <div className="d-flex col-6 align-items-center">
+                        <InputSwitch
+                          className="mr-3"
+                          inputId="email"
+                          checked={currentData && currentData.appr_payment}
+                          onChange={(e) => {
+                            setCurrentData({
+                              ...currentData,
+                              appr_payment: e.value,
+                            });
+                            submitUpdate(false, {
+                              ...currentData,
+                              appr_payment: e.value,
+                            });
+                          }}
+                        />
+                        <label className="mr-3 mt-1" htmlFor="email">
+                          {"Approval Pembayaran"}
+                        </label>
+                      </div>
+
+                      <div className="d-flex col-6 align-items-center">
+                        <InputSwitch
+                          className="mr-3"
+                          inputId="email"
+                          checked={currentData && currentData.auto_code_supplier}
+                          onChange={(e) => {
+                            setCurrentData({
+                              ...currentData,
+                              auto_code_supplier: e.value,
+                            });
+                            submitUpdate(false, {
+                              ...currentData,
+                              auto_code_supplier: e.value,
+                            });
+                          }}
+                        />
+                        <label className="mr-3 mt-1" htmlFor="email">
+                          {"Auto Code Supplier"}
+                        </label>
+                      </div>
+
+                      <div className="d-flex col-12 align-items-center">
+                        <InputSwitch
+                          className="mr-3"
+                          inputId="email"
+                          checked={currentData && currentData.rak_option}
+                          onChange={(e) => {
+                            setCurrentData({
+                              ...currentData,
+                              rak_option: e.value,
+                            });
+                            submitUpdate(false, {
+                              ...currentData,
+                              rak_option: e.value,
+                            });
+                          }}
+                        />
+                        <label className="mr-3 mt-1" htmlFor="email">
+                          {"Aktifkan Rak Untuk Semua Transaksi"}
+                        </label>
+                      </div>
                     </div>
                   </div>
                 </Accordion.Collapse>

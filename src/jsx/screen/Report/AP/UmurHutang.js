@@ -163,7 +163,7 @@ const UmurHutang = ({ month, year, id }) => {
                 value: {
                   fk: ek.trx_code,
                   tgl: formatDate(ek?.ord_date),
-                  due: formatDate(ek?.ord_due),
+                  due: ek?.ord_due ? formatDate(ek?.ord_due) : "-",
                   nota: ` ${formatIdr(ek?.trx_amnh)}`,
                   jt:
                     diff <= 0
@@ -300,7 +300,7 @@ const UmurHutang = ({ month, year, id }) => {
                   value: {
                     fk: ek.trx_code,
                     tgl: formatDate(ek?.ord_date),
-                    due: formatDate(ek?.ord_due),
+                    due: ek?.ord_due ? formatDate(ek?.ord_due) : "-",
                     nota: ` ${formatIdr(ek?.trx_amnh)}`,
                     jt: diff <= 0 ? `${formatIdr(ek.trx_amnh)}` : formatIdr(0),
                     day1:

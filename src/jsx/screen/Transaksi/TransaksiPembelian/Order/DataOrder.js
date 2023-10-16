@@ -71,6 +71,7 @@ const DataOrder = ({ onAdd, onEdit, onDetail }) => {
   const order = useSelector((state) => state.order.order);
   const show = useSelector((state) => state.order.current);
   const profile = useSelector((state) => state.profile.profile);
+  const [supplier, setSupp] = useState(null);
   const [reject, setReject] = useState(null);
   const [expandedRows, setExpandedRows] = useState(null);
   const printPage = useRef(null);
@@ -79,6 +80,7 @@ const DataOrder = ({ onAdd, onEdit, onDetail }) => {
 
   useEffect(() => {
     getOrder();
+    getSupplier();
     getCur();
     initFilters1();
   }, []);
@@ -152,6 +154,7 @@ const DataOrder = ({ onAdd, onEdit, onDetail }) => {
       // }, 500);
     }
   };
+
   const getOrder = async (isUpdate = false) => {
     setLoading(true);
     const config = {
@@ -195,6 +198,22 @@ const DataOrder = ({ onAdd, onEdit, onDetail }) => {
       if (response.status) {
         const { data } = response;
         setCurrency(data);
+      }
+    } catch (error) {}
+  };
+
+  const getSupplier = async () => {
+    const config = {
+      ...endpoints.supplier,
+      data: {},
+    };
+    let response = null;
+    try {
+      response = await request(null, config);
+      console.log(response);
+      if (response.status) {
+        const { data } = response;
+        setSupp(data);
       }
     } catch (error) {}
   };
@@ -851,6 +870,16 @@ const DataOrder = ({ onAdd, onEdit, onDetail }) => {
     )}`;
   };
 
+  const checkSupp = (value) => {
+    let selected = {};
+    supplier?.forEach((element) => {
+      if (value === element?.supplier?.id) {
+        selected = element;
+      }
+    });
+    return selected;
+  };
+
   const customizedMarker = (item, index, data) => {
     console.log(index);
     return (
@@ -977,8 +1006,10 @@ const DataOrder = ({ onAdd, onEdit, onDetail }) => {
               <Column
                 header="Supplier"
                 field={(e) =>
-                  e.sup_id
-                    ? `${e.sup_id?.supplier?.sup_name} (${e.sup_id?.supplier?.sup_code})`
+                  e?.sup_id
+                    ? `${checkSupp(e?.sup_id)?.supplier?.sup_name} (${
+                        checkSupp(e?.sup_id)?.supplier?.sup_code
+                      })`
                     : "-"
                 }
                 style={{ minWidth: "21rem" }}

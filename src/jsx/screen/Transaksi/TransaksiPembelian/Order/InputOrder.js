@@ -45,7 +45,7 @@ const defError = {
   // noDoc: false,
   // docDate: false,
   sup: false,
-  // rul: false,
+  rul: false,
   prod: [
     {
       id: false,
@@ -854,7 +854,7 @@ const InputOrder = ({ onCancel, onSuccess }) => {
       // noDoc: !order.no_doc || order.no_doc === "",
       // docDate: !order.doc_date || order.doc_date === "",
       sup: !order.sup_id,
-      // rul: !order.top,
+      rul: !order.top,
       prod: [],
       jasa: [],
     };
@@ -1010,6 +1010,7 @@ const InputOrder = ({ onCancel, onSuccess }) => {
       !errors.code &&
       !errors.date &&
       !errors.sup &&
+      !errors.rul &&
       // acc_ap &&
       // !errors.rul &&
       (validProduct === order.dprod.length || validJasa);

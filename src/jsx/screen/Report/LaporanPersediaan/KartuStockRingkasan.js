@@ -1335,7 +1335,7 @@ const KartuStockRingkasan = ({ month, year, kategory }) => {
     return (
       <div>
         {option !== null
-          ? `${option?.prod_id.name} (${option?.prod_id.code})`
+          ? `${option?.prod_id?.name} (${option?.prod_id?.code})`
           : ""}
       </div>
     );
@@ -1346,7 +1346,7 @@ const KartuStockRingkasan = ({ month, year, kategory }) => {
       return (
         <div>
           {option !== null
-            ? `${option?.prod_id.name} (${option?.prod_id.code})`
+            ? `${option?.prod_id?.name} (${option?.prod_id?.code})`
             : ""}
         </div>
       );
@@ -1359,7 +1359,7 @@ const KartuStockRingkasan = ({ month, year, kategory }) => {
     return (
       <div>
         {option !== null
-          ? `${option?.loc_id.name} (${option?.loc_id.code})`
+          ? `${option?.loc_id?.name} (${option?.loc_id?.code})`
           : ""}
       </div>
     );
@@ -1370,7 +1370,7 @@ const KartuStockRingkasan = ({ month, year, kategory }) => {
       return (
         <div>
           {option !== null
-            ? `${option?.loc_id.name} (${option?.loc_id.code})`
+            ? `${option?.loc_id?.name} (${option?.loc_id?.code})`
             : ""}
         </div>
       );

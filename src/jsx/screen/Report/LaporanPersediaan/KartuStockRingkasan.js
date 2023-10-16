@@ -288,7 +288,7 @@ const KartuStockRingkasan = ({ month, year, kategory }) => {
                       loc?.loc_id?.id === el?.loc_id?.id &&
                       filtDate.getFullYear() == date.getFullYear() &&
                       // date.getMonth() >= maxDate - 1 &&
-                      date.getMonth() <= filtDate.getMonth()
+                      date.getMonth() >= filtDate.getMonth()
                     ) {
                       qty_debit += el.trx_dbcr === "d" ? el.trx_qty : 0;
                       qty_kredit += el.trx_dbcr === "k" ? el.trx_qty : 0;
@@ -387,7 +387,7 @@ const KartuStockRingkasan = ({ month, year, kategory }) => {
                     el?.loc_id?.id === loc?.loc_id?.id &&
                     filtDate.getFullYear() === date.getFullYear() &&
                     // date.getMonth() >= maxDate &&
-                    date.getMonth() + 1 <= filtDate.getMonth()
+                    date.getMonth() >= filtDate.getMonth()
                   ) {
                     qty_debit += el.trx_dbcr === "d" ? el.trx_qty : 0;
                     qty_kredit += el.trx_dbcr === "k" ? el.trx_qty : 0;
@@ -487,7 +487,7 @@ const KartuStockRingkasan = ({ month, year, kategory }) => {
                     el?.prod_id?.group === grp?.groupPro?.id &&
                     filtDate.getFullYear() === date.getFullYear() &&
                     // date.getMonth() >= maxDate - 1 &&
-                    date.getMonth() <= filtDate.getMonth()
+                    date.getMonth() >= filtDate.getMonth()
                   ) {
                     qty_debit += el.trx_dbcr === "d" ? el.trx_qty : 0;
                     qty_kredit += el.trx_dbcr === "k" ? el.trx_qty : 0;
@@ -584,7 +584,7 @@ const KartuStockRingkasan = ({ month, year, kategory }) => {
                     el?.loc_id?.id === e?.loc_id?.id &&
                     filtDate.getFullYear() === date.getFullYear() &&
                     // date.getMonth() >= maxDate - 1 &&
-                    date.getMonth() + 1 <= filtDate.getMonth()
+                    date.getMonth() >= filtDate.getMonth()
                   ) {
                     qty_debit += el.trx_dbcr === "d" ? el.trx_qty : 0;
                     qty_kredit += el.trx_dbcr === "k" ? el.trx_qty : 0;
@@ -677,7 +677,7 @@ const KartuStockRingkasan = ({ month, year, kategory }) => {
                   el?.loc_id?.id === e?.loc_id?.id &&
                   filtDate.getFullYear() === date.getFullYear() &&
                   // date.getMonth() >= maxDate - 1 &&
-                  date.getMonth() + 1 <= filtDate.getMonth()
+                  date.getMonth() >= filtDate.getMonth()
                 ) {
                   qty_debit += el.trx_dbcr === "d" ? el.trx_qty : 0;
                   qty_kredit += el.trx_dbcr === "k" ? el.trx_qty : 0;
@@ -768,7 +768,7 @@ const KartuStockRingkasan = ({ month, year, kategory }) => {
                   el?.loc_id?.id === e?.loc_id?.id &&
                   filtDate.getFullYear() === date.getFullYear() &&
                   // date.getMonth() >= maxDate - 1 &&
-                  date.getMonth() + 1 <= filtDate.getMonth()
+                  date.getMonth() >= filtDate.getMonth()
                 ) {
                   qty_debit += el.trx_dbcr === "d" ? el.trx_qty : 0;
                   qty_kredit += el.trx_dbcr === "k" ? el.trx_qty : 0;
@@ -860,7 +860,7 @@ const KartuStockRingkasan = ({ month, year, kategory }) => {
                   el?.loc_id?.id === e?.loc_id?.id &&
                   filtDate.getFullYear() === date.getFullYear() &&
                   // date.getMonth() >= maxDate - 1 &&
-                  date.getMonth() + 1 <= filtDate.getMonth()
+                  date.getMonth() >= filtDate.getMonth()
                 ) {
                   qty_debit += el.trx_dbcr === "d" ? el.trx_qty : 0;
                   qty_kredit += el.trx_dbcr === "k" ? el.trx_qty : 0;

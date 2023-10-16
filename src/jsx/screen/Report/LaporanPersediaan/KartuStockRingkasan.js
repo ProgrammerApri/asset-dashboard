@@ -265,8 +265,8 @@ const KartuStockRingkasan = ({ month, year, kategory }) => {
 
                   invDdb?.forEach((el) => {
                     if (
-                      e.prod_id.id === el.inv_code.id &&
-                      e.loc_id.id === el.loc_code.id &&
+                      e?.prod_id?.id === el?.inv_code?.id &&
+                      e?.loc_id?.id === el?.loc_code?.id &&
                       grp?.groupPro?.id === el?.inv_code?.group
                     ) {
                       if (
@@ -284,7 +284,7 @@ const KartuStockRingkasan = ({ month, year, kategory }) => {
                   krtst?.forEach((el) => {
                     let date = new Date(`${el.trx_date}Z`);
                     if (
-                      prd.prod_id.id === el.prod_id.id &&
+                      prd?.prod_id?.id === el?.prod_id?.id &&
                       loc?.loc_id?.id === el?.loc_id?.id &&
                       filtDate.getFullYear() == date.getFullYear() &&
                       // date.getMonth() >= maxDate - 1 &&
@@ -299,11 +299,11 @@ const KartuStockRingkasan = ({ month, year, kategory }) => {
 
                   data.push({
                     type: "item",
-                    acco: `${e.prod_id.code}\n(${e.prod_id.name})`,
-                    grupP: `${checkGrup(e.prod_id.group)?.groupPro?.name}`,
-                    prod_id: e.prod_id.id,
-                    loc_id: e.loc_id.id,
-                    loc: `${e.loc_id.name}\n(${e.loc_id.code})`,
+                    acco: `${e?.prod_id?.code}\n(${e?.prod_id?.name})`,
+                    grupP: `${checkGrup(e?.prod_id?.group)?.groupPro?.name}`,
+                    prod_id: e?.prod_id?.id,
+                    loc_id: e?.loc_id?.id,
+                    loc: `${e?.loc_id?.name}\n(${e?.loc_id?.code})`,
                     awal: qty_awal,
                     debe: qty_debit,
                     kred: qty_kredit,
@@ -365,8 +365,8 @@ const KartuStockRingkasan = ({ month, year, kategory }) => {
 
                 invDdb?.forEach((el) => {
                   if (
-                    prd.prod_id.id === el.inv_code.id &&
-                    loc.loc_id.id === el.loc_code.id
+                    prd?.prod_id?.id === el?.inv_code?.id &&
+                    loc?.loc_id?.id === el?.loc_code?.id
                   ) {
                     if (
                       el?.sa &&
@@ -383,7 +383,7 @@ const KartuStockRingkasan = ({ month, year, kategory }) => {
                 krtst?.forEach((el) => {
                   let date = new Date(`${el.trx_date}Z`);
                   if (
-                    el.prod_id.id === prd.prod_id.id &&
+                    el?.prod_id?.id === prd?.prod_id?.id &&
                     el?.loc_id?.id === loc?.loc_id?.id &&
                     filtDate.getFullYear() === date.getFullYear() &&
                     // date.getMonth() >= maxDate &&
@@ -397,11 +397,11 @@ const KartuStockRingkasan = ({ month, year, kategory }) => {
                 });
                 data.push({
                   type: "item",
-                  acco: `${e.prod_id.code}\n(${e.prod_id.name})`,
-                  grupP: `${checkGrup(e.prod_id.group)?.groupPro?.name}`,
-                  prod_id: prd.prod_id.id,
-                  loc_id: loc.loc_id.id,
-                  loc: `${e.loc_id.name}\n(${e.loc_id.code})`,
+                  acco: `${e?.prod_id?.code}\n(${e?.prod_id?.name})`,
+                  grupP: `${checkGrup(e?.prod_id?.group)?.groupPro?.name}`,
+                  prod_id: prd?.prod_id?.id,
+                  loc_id: loc?.loc_id?.id,
+                  loc: `${e?.loc_id?.name}\n(${e?.loc_id?.code})`,
                   awal: qty_awal,
                   debe: qty_debit,
                   kred: qty_kredit,
@@ -462,8 +462,8 @@ const KartuStockRingkasan = ({ month, year, kategory }) => {
 
                 invDdb?.forEach((el) => {
                   if (
-                    e.prod_id.id === el.inv_code.id &&
-                    e.loc_id.id === el.loc_code.id &&
+                    e?.prod_id?.id === el?.inv_code?.id &&
+                    e?.loc_id?.id === el?.loc_code?.id &&
                     grp.groupPro.id === el.inv_code?.group
                   ) {
                     if (
@@ -482,7 +482,7 @@ const KartuStockRingkasan = ({ month, year, kategory }) => {
                 krtst?.forEach((el) => {
                   let date = new Date(`${el.trx_date}Z`);
                   if (
-                    el.prod_id.id === e.prod_id.id &&
+                    el?.prod_id?.id === e?.prod_id?.id &&
                     el?.loc_id?.id === loc?.loc_id?.id &&
                     el?.prod_id?.group === grp?.groupPro?.id &&
                     filtDate.getFullYear() === date.getFullYear() &&
@@ -497,11 +497,11 @@ const KartuStockRingkasan = ({ month, year, kategory }) => {
                 });
                 data.push({
                   type: "item",
-                  acco: `${e.prod_id.code}\n(${e.prod_id.name})`,
-                  grupP: `${checkGrup(e.prod_id.group)?.groupPro?.name}`,
-                  prod_id: e.prod_id.id,
-                  loc_id: e.loc_id.id,
-                  loc: `${e.loc_id.name}\n(${e.loc_id.code})`,
+                  acco: `${e?.prod_id?.code}\n(${e?.prod_id?.name})`,
+                  grupP: `${checkGrup(e?.prod_id?.group)?.groupPro?.name}`,
+                  prod_id: e?.prod_id?.id,
+                  loc_id: e?.loc_id?.id,
+                  loc: `${e?.loc_id?.name}\n(${e?.loc_id?.code})`,
                   awal: qty_awal,
                   debe: qty_debit,
                   kred: qty_kredit,
@@ -562,8 +562,8 @@ const KartuStockRingkasan = ({ month, year, kategory }) => {
 
                 invDdb?.forEach((el) => {
                   if (
-                    e.prod_id.id === el.inv_code.id &&
-                    e.loc_id.id === el.loc_code.id
+                    e?.prod_id?.id === el?.inv_code?.id &&
+                    e?.loc_id?.id === el?.loc_code?.id
                   ) {
                     if (
                       el?.sa &&
@@ -580,7 +580,7 @@ const KartuStockRingkasan = ({ month, year, kategory }) => {
                 krtst?.forEach((el) => {
                   let date = new Date(`${el.trx_date}Z`);
                   if (
-                    el.prod_id.id === e.prod_id.id &&
+                    el?.prod_id?.id === e?.prod_id?.id &&
                     el?.loc_id?.id === e?.loc_id?.id &&
                     filtDate.getFullYear() === date.getFullYear() &&
                     // date.getMonth() >= maxDate - 1 &&
@@ -594,11 +594,11 @@ const KartuStockRingkasan = ({ month, year, kategory }) => {
                 });
                 data.push({
                   type: "item",
-                  acco: `${e.prod_id.code}\n(${e.prod_id.name})`,
+                  acco: `${e?.prod_id?.code}\n(${e?.prod_id?.name})`,
                   grupP: `${checkGrup(e.prod_id.group)?.groupPro?.name}`,
-                  prod_id: e.prod_id.id,
-                  loc_id: e.loc_id.id,
-                  loc: `${e.loc_id.name}\n(${e.loc_id.code})`,
+                  prod_id: e?.prod_id?.id,
+                  loc_id: e?.loc_id?.id,
+                  loc: `${e?.loc_id?.name}\n(${e?.loc_id?.code})`,
                   awal: qty_awal,
                   debe: qty_debit,
                   kred: qty_kredit,
@@ -655,8 +655,8 @@ const KartuStockRingkasan = ({ month, year, kategory }) => {
 
               invDdb?.forEach((el) => {
                 if (
-                  e.prod_id.id === el.inv_code.id &&
-                  e.loc_id.id === el.loc_code.id
+                  e?.prod_id?.id === el?.inv_code?.id &&
+                  e?.loc_id?.id === el?.loc_code?.id
                 ) {
                   if (
                     el?.sa &&
@@ -673,7 +673,7 @@ const KartuStockRingkasan = ({ month, year, kategory }) => {
               krtst?.forEach((el) => {
                 let date = new Date(`${el.trx_date}Z`);
                 if (
-                  el.prod_id.id === e.prod_id.id &&
+                  el?.prod_id?.id === e?.prod_id?.id &&
                   el?.loc_id?.id === e?.loc_id?.id &&
                   filtDate.getFullYear() === date.getFullYear() &&
                   // date.getMonth() >= maxDate - 1 &&
@@ -687,11 +687,11 @@ const KartuStockRingkasan = ({ month, year, kategory }) => {
               });
               data.push({
                 type: "item",
-                acco: `${e.prod_id.code}\n(${e.prod_id.name})`,
-                grupP: `${checkGrup(e.prod_id.group)?.groupPro?.name}`,
-                prod_id: e.prod_id.id,
-                loc_id: e.loc_id.id,
-                loc: `${e.loc_id.name}\n(${e.loc_id.code})`,
+                acco: `${e?.prod_id?.code}\n(${e?.prod_id?.name})`,
+                grupP: `${checkGrup(e?.prod_id?.group)?.groupPro?.name}`,
+                prod_id: e?.prod_id?.id,
+                loc_id: e?.loc_id?.id,
+                loc: `${e?.loc_id?.name}\n(${e?.loc_id?.code})`,
                 awal: qty_awal,
                 debe: qty_debit,
                 kred: qty_kredit,
@@ -747,8 +747,8 @@ const KartuStockRingkasan = ({ month, year, kategory }) => {
 
               invDdb?.forEach((el) => {
                 if (
-                  e.prod_id.id === el.inv_code.id &&
-                  e.loc_id.id === el.loc_code.id
+                  e?.prod_id?.id === el?.inv_code?.id &&
+                  e?.loc_id?.id === el?.loc_code?.id
                 ) {
                   if (
                     el?.sa &&
@@ -764,7 +764,7 @@ const KartuStockRingkasan = ({ month, year, kategory }) => {
               krtst?.forEach((el) => {
                 let date = new Date(`${el.trx_date}Z`);
                 if (
-                  el.prod_id.id === e.prod_id.id &&
+                  el?.prod_id?.id === e?.prod_id?.id &&
                   el?.loc_id?.id === e?.loc_id?.id &&
                   filtDate.getFullYear() === date.getFullYear() &&
                   // date.getMonth() >= maxDate - 1 &&
@@ -778,11 +778,11 @@ const KartuStockRingkasan = ({ month, year, kategory }) => {
               });
               data.push({
                 type: "item",
-                acco: `${e.prod_id.code}\n(${e.prod_id.name})`,
-                grupP: `${checkGrup(e.prod_id.group)?.groupPro?.name}`,
-                prod_id: e.prod_id.id,
-                loc_id: e.loc_id.id,
-                loc: `${e.loc_id.name}\n(${e.loc_id.code})`,
+                acco: `${e?.prod_id?.code}\n(${e?.prod_id?.name})`,
+                grupP: `${checkGrup(e?.prod_id?.group)?.groupPro?.name}`,
+                prod_id: e?.prod_id?.id,
+                loc_id: e?.loc_id?.id,
+                loc: `${e?.loc_id?.name}\n(${e?.loc_id?.code})`,
                 awal: qty_awal,
                 debe: qty_debit,
                 kred: qty_kredit,
@@ -838,8 +838,8 @@ const KartuStockRingkasan = ({ month, year, kategory }) => {
 
               invDdb?.forEach((el) => {
                 if (
-                  e.prod_id.id === el.inv_code.id &&
-                  e.loc_id.id === el.loc_code.id
+                  e?.prod_id?.id === el?.inv_code?.id &&
+                  e?.loc_id.id === el?.loc_code?.id
                 ) {
                   if (
                     el?.sa &&
@@ -856,7 +856,7 @@ const KartuStockRingkasan = ({ month, year, kategory }) => {
               krtst?.forEach((el) => {
                 let date = new Date(`${el.trx_date}Z`);
                 if (
-                  el.prod_id.id === e.prod_id.id &&
+                  el?.prod_id?.id === e?.prod_id?.id &&
                   el?.loc_id?.id === e?.loc_id?.id &&
                   filtDate.getFullYear() === date.getFullYear() &&
                   // date.getMonth() >= maxDate - 1 &&
@@ -869,11 +869,11 @@ const KartuStockRingkasan = ({ month, year, kategory }) => {
                 }
               });
               data.push({
-                acco: `${e.prod_id.code}\n(${e.prod_id.name})`,
-                grupP: `${checkGrup(e.prod_id.group)?.groupPro?.name}`,
-                prod_id: e.prod_id.id,
-                loc_id: e.loc_id.id,
-                loc: `${e.loc_id.name}\n(${e.loc_id.code})`,
+                acco: `${e?.prod_id?.code}\n(${e?.prod_id?.name})`,
+                grupP: `${checkGrup(e?.prod_id?.group)?.groupPro?.name}`,
+                prod_id: e?.prod_id?.id,
+                loc_id: e?.loc_id?.id,
+                loc: `${e?.loc_id?.name}\n(${e?.loc_id?.code})`,
                 awal: qty_awal,
                 debe: qty_debit,
                 kred: qty_kredit,
@@ -929,8 +929,8 @@ const KartuStockRingkasan = ({ month, year, kategory }) => {
 
           invDdb?.forEach((el) => {
             if (
-              e.prod_id.id === el.inv_code.id &&
-              e.loc_id.id === el.loc_code.id
+              e?.prod_id?.id === el?.inv_code?.id &&
+              e?.loc_id?.id === el?.loc_code?.id
             ) {
               if (
                 el?.sa &&
@@ -948,8 +948,8 @@ const KartuStockRingkasan = ({ month, year, kategory }) => {
           krtst?.forEach((el) => {
             let date = new Date(`${el.trx_date}Z`);
             if (
-              el.prod_id.id === e.prod_id.id &&
-              el.loc_id?.id === e.loc_id?.id &&
+              el?.prod_id?.id === e?.prod_id?.id &&
+              el?.loc_id?.id === e?.loc_id?.id &&
               filtDate?.getFullYear() === date.getFullYear() &&
               // date.getMonth() >= maxDate - 1 &&
               date.getMonth() <= filtDate.getMonth()
@@ -962,11 +962,11 @@ const KartuStockRingkasan = ({ month, year, kategory }) => {
           });
           data.push({
             type: "item",
-            acco: `${e.prod_id.code}\n(${e.prod_id.name})`,
-            grupP: `${checkGrup(e.prod_id.group)?.groupPro?.name}`,
-            prod_id: e.prod_id.id,
-            loc_id: e.loc_id.id,
-            loc: `${e.loc_id.name}\n(${e.loc_id.code})`,
+            acco: `${e?.prod_id?.code}\n(${e?.prod_id?.name})`,
+            grupP: `${checkGrup(e?.prod_id?.group)?.groupPro?.name}`,
+            prod_id: e?.prod_id?.id,
+            loc_id: e?.loc_id?.id,
+            loc: `${e?.loc_id?.name}\n(${e?.loc_id?.code})`,
             awal: qty_awal,
             debe: qty_debit,
             kred: qty_kredit,

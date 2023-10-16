@@ -353,7 +353,7 @@ const ReportPiutangRingkasan = () => {
       let total_nk = 0;
       selectedAcc.forEach((sel) => {
         ar?.forEach((el) => {
-          if (sel?.account?.id === el?.customer?.cus_gl) {
+          if (sel?.account?.id === el?.cus_id?.cus_gl) {
             let amn = 0;
             let acq = 0;
             let trx_amnh = 0;
@@ -363,29 +363,29 @@ const ReportPiutangRingkasan = () => {
             let sld_efektif = 0;
             let type = null;
 
-            el.ar.forEach((ek) => {
-              let filt = new Date(`${ek?.trx_date}Z`);
+            // el?.ar?.forEach((ek) => {
+              let filt = new Date(`${el?.trx_date}Z`);
               console.log(filt);
               if (filt <= filtDate) {
                 // if (p?.cus_id?.id === ek?.cus_id?.id) {
-                if (ek.trx_dbcr === "D") {
-                  trx_amnh += ek.trx_amnh ?? 0;
+                if (el.trx_dbcr === "D") {
+                  trx_amnh += el.trx_amnh ?? 0;
                 } else {
-                  if (ek.trx_type === "SA") {
-                    acq_amnh += ek.trx_amnh;
+                  if (el.trx_type === "SA") {
+                    acq_amnh += el.trx_amnh;
                   } else {
-                    acq_amnh += ek.acq_amnh ?? 0;
+                    acq_amnh += el.acq_amnh ?? 0;
                   }
                 }
 
-                if (ek.trx_dbcr === "K" && ek.trx_type === "DP") {
-                  dp += ek.trx_amnh;
+                if (el.trx_dbcr === "K" && el.trx_type === "DP") {
+                  dp += el.trx_amnh;
                 }
 
                 saldoAr?.forEach((element) => {
                   if (
-                    ek?.trx_code === element?.code &&
-                    ek?.sa_id?.id === element?.id
+                    el?.trx_code === element?.code &&
+                    el?.sa_id?.id === element?.id
                   ) {
                     type =
                       element.type === "JL"
@@ -398,18 +398,18 @@ const ReportPiutangRingkasan = () => {
                   }
                 });
               }
-            });
+            // });
             sisa = trx_amnh > 0 ? trx_amnh - (acq_amnh + dp) : 0;
             acq = acq_amnh + dp;
 
             data.push({
-              cus: `${el.customer.cus_name} (${el.customer.cus_code})`,
+              cus: `${el?.cus_id?.cus_name} (${el?.cus_id?.cus_code})`,
               type: "item",
               value: {
-                ref: `${el.customer.cus_name} (${el.customer.cus_code})`,
-                cus_id: el.customer?.id,
-                SE: `${checkAcc(el.customer?.cus_gl)?.account?.acc_code} - ${
-                  checkAcc(el.customer?.cus_gl)?.account?.acc_name
+                ref: `${el?.cus_id?.cus_name} (${el?.cus_id?.cus_code})`,
+                cus_id: el?.cus_id?.id,
+                SE: `${checkAcc(el?.cus_id?.cus_gl)?.account?.acc_code} - ${
+                  checkAcc(el?.cus_id?.cus_gl)?.account?.acc_name
                 }`,
                 type: type,
                 NB: `Rp. ${formatIdr(trx_amnh)}`,

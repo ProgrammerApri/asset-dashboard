@@ -262,8 +262,8 @@ const InputOrder = ({ onCancel, onSuccess }) => {
 
             let jasa = [];
             elem.pjasa.forEach((element) => {
-              element.jasa_id = element.jasa_id.id;
-              element.unit_id = element.unit_id.id ?? null;
+              element.jasa_id = element.jasa_id?.id;
+              element.unit_id = element.unit_id?.id ?? null;
               jasa.push({
                 ...element,
                 r_order: element.order,
@@ -284,9 +284,9 @@ const InputOrder = ({ onCancel, onSuccess }) => {
               let prod = [];
               elem.pprod.forEach((el) => {
                 if (el.remain > 0) {
-                  el.prod_id = el.prod_id.id;
-                  el.unit_id = el.unit_id.id;
-                  el.rak_id = el.rak_id.id;
+                  el.prod_id = el.prod_id?.id;
+                  el.unit_id = el.unit_id?.id;
+                  el.rak_id = el.rak_id?.id;
                   prod.push({
                     ...el,
                     r_remain: el.remain,
@@ -303,7 +303,7 @@ const InputOrder = ({ onCancel, onSuccess }) => {
               let jasa = [];
               elem.pjasa.forEach((element) => {
                 // if (element.remain > 0) {
-                element.jasa_id = element.jasa_id.id;
+                element.jasa_id = element.jasa_id?.id;
                 element.unit_id = element.unit_id.id ?? null;
                 jasa.push({
                   ...element,
@@ -317,8 +317,12 @@ const InputOrder = ({ onCancel, onSuccess }) => {
           }
         });
         setPO(filt);
+
+        console.log("POOOOOOOOOOOOOO", filt);
       }
-    } catch (error) {}
+    } catch (error) {
+      console.log("ERROR POOOOO", error);
+    }
   };
 
   const getSupplier = async () => {

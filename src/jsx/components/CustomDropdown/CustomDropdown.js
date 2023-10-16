@@ -114,8 +114,6 @@ const CustomDropdown = ({
           if (e.includes(".")) {
             let subkey = e.split(".");
             let subValue = value;
-            console.log(subValue);
-            console.log("=========================");
             subkey?.forEach((key) => {
               subValue = subValue[`${key}`];
             });

@@ -6,7 +6,7 @@ import Filler from "./Filler";
 import SmallJoin from "./SmallJoin";
 import BranchStartJoin from "./BranchStartJoin";
 
-export default function DrawTimeline() {
+export default function DrawTimeline({data}) {
   // type :
   // 1. Normal
   // 2. branch start
@@ -23,145 +23,57 @@ export default function DrawTimeline() {
     3: "#00ff00",
   };
 
-  let data = [
-    {
-      label: "GRA-001 Created",
-      date: "2023-09-06T10:34:59.965507",
-      approved_by: "Created by: demo",
-      reason: null,
-      complete: true,
-      approved: true,
-      type: 1,
-      column: 1,
-    },
-    {
-      label: "GRA-001 Created",
-      date: "2023-09-06T10:34:59.965507",
-      approved_by: "Created by: demo",
-      reason: null,
-      complete: true,
-      approved: true,
-      type: 1,
-      column: 1,
-    },
-    {
-      label: "PO-001 Waiting for completion",
-      date: "2023-09-06T10:34:59.965507",
-      approved_by: "Auto Generated",
-      reason: null,
-      complete: true,
-      approved: true,
-      type: 1,
-      column: 1,
-    },
-    {
-      label: "PO-001 Approved",
-      date: "2023-09-06T10:34:59.965507",
-      approved_by: "Approved by: demo",
-      reason: null,
-      complete: true,
-      approved: true,
-      type: 3,
-      column: 2,
-    },
-    {
-      label: "PO-001 Approved",
-      date: "2023-09-06T10:34:59.965507",
-      approved_by: "Approved by: demo",
-      reason: null,
-      complete: true,
-      approved: true,
-      type: 1,
-      column: 2,
-    },
-    {
-      label: "PO-001 Approved",
-      date: "2023-09-06T10:34:59.965507",
-      approved_by: "Approved by: demo",
-      reason: null,
-      complete: true,
-      approved: true,
-      type: 4,
-      column: 3,
-    },
-    {
-      label: "PO-001 waiting for approval",
-      date: "2023-09-06T10:34:59.965507",
-      approved_by: "Auto Generated",
-      reason: null,
-      complete: true,
-      approved: true,
-      type: 2,
-      column: 2,
-    },
-    {
-      label: "PO-001 Created",
-      date: "2023-09-06T10:34:59.965507",
-      approved_by: "Created by: demo",
-      reason: null,
-      complete: true,
-      approved: true,
-      type: 1,
-      column: 1,
-    },
-    {
-      label: "RP-001 Created",
-      date: "2023-09-06T10:34:59.965507",
-      approved_by: "Created by: demo",
-      reason: null,
-      complete: true,
-      approved: true,
-      type: 1,
-      column: 1,
-    },
-  ];
-
   var groupBy = function (xs, key) {
-    return xs.reduce(function (rv, x) {
+    return xs?.reduce(function (rv, x) {
       (rv[x[key]] = rv[x[key]] || []).push(x);
       return rv;
     }, {});
   };
 
   const generateRow = () => {
-    let grouped = groupBy(data, "column");
-    let colKey = [];
-    let filler = {
-      label: null,
-      date: null,
-      approved_by: null,
-      reason: null,
-      complete: null,
-      approved: null,
-      type: 0,
-      column: 1,
-    };
+    if (data) {
+      let grouped = groupBy(data, "column");
+      let colKey = [];
+      let filler = {
+        id: null,
+        ref_code: null,
+        message: null,
+        note: null,
+        approved: null,
+        type: 0,
+        column: 1,
+      };
 
-    Object.keys(grouped).forEach((el) => {
-      colKey.push(Number(el));
-    });
-
-    console.log(grouped);
-    console.log(colKey);
-
-    let generatedRow = [];
-
-    colKey.forEach((el) => {
-      let row = [];
-      data.forEach((ek) => {
-        if (el == ek.column) {
-          row.push(ek);
-        } else {
-          row.push({ ...filler, column: el, type: el < ek.column ? 5 : 0 });
-        }
+      Object.keys(grouped).forEach((el) => {
+        colKey.push(Number(el));
       });
-      generatedRow.push({
-        column: el,
-        row: row,
-      });
-    });
 
-    return generatedRow;
+      console.log(grouped);
+      console.log(colKey);
+
+      let generatedRow = [];
+
+      colKey.forEach((el) => {
+        let row = [];
+        data?.forEach((ek) => {
+          if (el == ek.column) {
+            row.push(ek);
+          } else {
+            row.push({ ...filler, column: el, type: el < ek.column ? 5 : 0 });
+          }
+        });
+        generatedRow.push({
+          column: el,
+          row: row,
+        });
+      });
+
+      console.log(generatedRow);
+
+      return generatedRow;
+    }
+
+    return [];
   };
 
   const formatDateTime = (date) => {
@@ -221,7 +133,7 @@ export default function DrawTimeline() {
                 if (w.type === 0) {
                   return (
                     <>
-                      {i > 0 ? <Filler height={22} /> : null}
+                      {i > 0 && v.row[i-1].type !== 4? <Filler height={22} /> : null}
                       <Filler height={10} />
                     </>
                   );
@@ -275,14 +187,14 @@ export default function DrawTimeline() {
         })}
       </div>
 
-      {data.map((v) => {
+      {data?.map((v) => {
         return (
           <div className="row ml-3 mr-3 timeline-description">
             <div style={{ width: "4rem" }} className="pl-3"></div>
 
             <div className="col-4 py-0 pr-0 pl-4">
               <div style={{ height: 32 }} className="d-flex align-items-center">
-                <b>{v.label}</b>
+                <b>{v?.action}</b>
               </div>
             </div>
 
@@ -291,19 +203,19 @@ export default function DrawTimeline() {
                 style={{ height: 32, color: "grey" }}
                 className="d-flex align-items-center"
               >
-                {formatDateTime(v.date)}
+                {formatDateTime(v?.timestamp)}
               </div>
             </div>
 
             <div className="col-2 p-0">
               <div style={{ height: 32 }} className="d-flex align-items-center">
-                {v.approved_by}
+                {v?.message ?? "-"}
               </div>
             </div>
 
             <div className="col-2 p-0">
               <div style={{ height: 32 }} className="d-flex align-items-center">
-                {v?.reason ?? "-"}
+                {v?.note ?? "-"}
               </div>
             </div>
           </div>

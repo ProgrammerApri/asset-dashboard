@@ -441,6 +441,7 @@ const DataProduk = ({
   };
 
   const addProduk = async (image) => {
+    console.log("addProduk");
     const config = {
       ...endpoints.addProduct,
       data: {
@@ -570,6 +571,7 @@ const DataProduk = ({
         }
       }
     } else {
+      console.log("addProduk");
       if (isEdit) {
         editProduk("");
       } else {
@@ -654,6 +656,8 @@ const DataProduk = ({
 
   const onSubmit = () => {
     if (isValid()) {
+      setUpdate(true);
+      console.log("isValid");
       uploadImage();
     }
   };
@@ -714,12 +718,8 @@ const DataProduk = ({
           icon="pi pi-check"
           // onClick={() => onSubmit()}
           onClick={() => {
-            setUpdate(true);
-            setActive(0);
+            // setActive(0);
             onSubmit();
-            setTimeout(() => {
-              window.location.reload();
-            }, 500);
           }}
           autoFocus
           loading={update}

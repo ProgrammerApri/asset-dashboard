@@ -300,45 +300,9 @@ const PermintaanPembelian = ({ onAdd, onEdit }) => {
         <Link
           onClick={() => {
             setDisplayDat(data);
-            let rprod = data.rprod;
-            // rprod.forEach((el) => {
-            //   el.prod_id = el.prod_id?.id;
-            //   el.unit_id = el.unit_id?.id;
-            // });
-            let rjasa = data.rjasa;
-            // rjasa.forEach((el) => {
-            //   el.jasa_id = el.jasa_id?.id;
-            //   el.unit_id = el.unit_id?.id;
-            // });
             dispatch({
               type: SET_CURRENT_RP,
-              payload: {
-                ...data,
-                rprod:
-                  rprod.length > 0
-                    ? rprod
-                    : [
-                        {
-                          id: 0,
-                          prod_id: null,
-                          unit_id: null,
-                          request: null,
-                          konv_qty: null,
-                          unit_konv: null,
-                        },
-                      ],
-                rjasa:
-                  rjasa.length > 0
-                    ? rjasa
-                    : [
-                        {
-                          id: 0,
-                          jasa_id: null,
-                          unit_id: null,
-                          request: null,
-                        },
-                      ],
-              },
+              payload: data,
             });
           }}
           className="btn btn-info shadow btn-xs sharp ml-1"
@@ -1097,7 +1061,7 @@ const PermintaanPembelian = ({ onAdd, onEdit }) => {
           setDisplayDat(false);
         }}
       >
-        <DrawTimeline />
+        <DrawTimeline data={show?.timeline_detail} />
       </Dialog>
 
       <Dialog

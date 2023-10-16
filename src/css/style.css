@@ -48123,3 +48123,7 @@ a .sidebar-logo .logo{
   border-bottom: 1px solid var(--border-color);
   color: #455560;
 }
+
+.timeline-description:hover {
+  background: #e9ecef63 !important;
+}

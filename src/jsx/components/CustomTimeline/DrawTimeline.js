@@ -7,37 +7,308 @@ import SmallJoin from "./SmallJoin";
 import BranchStartJoin from "./BranchStartJoin";
 
 export default function DrawTimeline() {
+  // type :
+  // 1. Normal
+  // 2. branch start
+  // 3. branch end
+  // 4. branch start and branch end
+  // 0. filler
+  // 5. join
+
+  // column : integer
+
+  let columnColor = {
+    1: "#0000ff",
+    2: "#ff0000",
+    3: "#00ff00",
+  };
+
+  let data = [
+    {
+      label: "GRA-001 Created",
+      date: "2023-09-06T10:34:59.965507",
+      approved_by: "Created by: demo",
+      reason: null,
+      complete: true,
+      approved: true,
+      type: 1,
+      column: 1,
+    },
+    {
+      label: "GRA-001 Created",
+      date: "2023-09-06T10:34:59.965507",
+      approved_by: "Created by: demo",
+      reason: null,
+      complete: true,
+      approved: true,
+      type: 1,
+      column: 1,
+    },
+    {
+      label: "PO-001 Waiting for completion",
+      date: "2023-09-06T10:34:59.965507",
+      approved_by: "Auto Generated",
+      reason: null,
+      complete: true,
+      approved: true,
+      type: 1,
+      column: 1,
+    },
+    {
+      label: "PO-001 Approved",
+      date: "2023-09-06T10:34:59.965507",
+      approved_by: "Approved by: demo",
+      reason: null,
+      complete: true,
+      approved: true,
+      type: 3,
+      column: 2,
+    },
+    {
+      label: "PO-001 Approved",
+      date: "2023-09-06T10:34:59.965507",
+      approved_by: "Approved by: demo",
+      reason: null,
+      complete: true,
+      approved: true,
+      type: 1,
+      column: 2,
+    },
+    {
+      label: "PO-001 Approved",
+      date: "2023-09-06T10:34:59.965507",
+      approved_by: "Approved by: demo",
+      reason: null,
+      complete: true,
+      approved: true,
+      type: 4,
+      column: 3,
+    },
+    {
+      label: "PO-001 waiting for approval",
+      date: "2023-09-06T10:34:59.965507",
+      approved_by: "Auto Generated",
+      reason: null,
+      complete: true,
+      approved: true,
+      type: 2,
+      column: 2,
+    },
+    {
+      label: "PO-001 Created",
+      date: "2023-09-06T10:34:59.965507",
+      approved_by: "Created by: demo",
+      reason: null,
+      complete: true,
+      approved: true,
+      type: 1,
+      column: 1,
+    },
+    {
+      label: "RP-001 Created",
+      date: "2023-09-06T10:34:59.965507",
+      approved_by: "Created by: demo",
+      reason: null,
+      complete: true,
+      approved: true,
+      type: 1,
+      column: 1,
+    },
+  ];
+
+  var groupBy = function (xs, key) {
+    return xs.reduce(function (rv, x) {
+      (rv[x[key]] = rv[x[key]] || []).push(x);
+      return rv;
+    }, {});
+  };
+
+  const generateRow = () => {
+    let grouped = groupBy(data, "column");
+    let colKey = [];
+    let filler = {
+      label: null,
+      date: null,
+      approved_by: null,
+      reason: null,
+      complete: null,
+      approved: null,
+      type: 0,
+      column: 1,
+    };
+
+    Object.keys(grouped).forEach((el) => {
+      colKey.push(Number(el));
+    });
+
+    console.log(grouped);
+    console.log(colKey);
+
+    let generatedRow = [];
+
+    colKey.forEach((el) => {
+      let row = [];
+      data.forEach((ek) => {
+        if (el == ek.column) {
+          row.push(ek);
+        } else {
+          row.push({ ...filler, column: el, type: el < ek.column ? 5 : 0 });
+        }
+      });
+      generatedRow.push({
+        column: el,
+        row: row,
+      });
+    });
+
+    return generatedRow;
+  };
+
+  const formatDateTime = (date) => {
+    var d = new Date(`${date}Z`),
+      month = "" + (d.getMonth() + 1),
+      day = "" + d.getDate(),
+      year = "" + d.getFullYear(),
+      hour = "" + d.getHours(),
+      minute = "" + d.getMinutes(),
+      second = "" + d.getSeconds();
+
+    if (month.length < 2) month = "0" + month;
+    if (day.length < 2) day = "0" + day;
+    if (hour.length < 2) hour = "0" + hour;
+    if (minute.length < 2) minute = "0" + minute;
+    if (second.length < 2) second = "0" + second;
+
+    return `${[day, month, year].join("-")} || ${[hour, minute, second].join(
+      ":"
+    )}`;
+  };
+
   return (
-    <div style={{ width: "3rem" }} className="d-flex flex-row">
-      <div className="d-flex flex-column align-items-center">
-        <Point color={"#0000ff"} />
-        <Join color={"#0000ff"} />
-        <Point color={"#0000ff"} />
-        <Join color={"#0000ff"} />
-        <SmallJoin color={"#0000ff"} />
-        <Join color={"#0000ff"} />
-        <SmallJoin color={"#0000ff"} />
-        <Join color={"#0000ff"} />
-        <Point color={"#0000ff"} />
-        <Join color={"#0000ff"} />
-        <Point color={"#0000ff"} />
-      </div>
+    <div>
       <div
-        className="d-flex flex-column align-items-center"
-        style={{ marginLeft: "0.8rem" }}
+        className="row ml-3 mr-3 p-0 pb-2 pt-2"
+        style={{ backgroundColor: "var(--input-bg)" }}
       >
-        <Filler height={10} />
-        <Filler height={22} />
-        <Filler height={10} />
-        <BranchEndJoin color={"#ff0000"} />
-        <Point color={"#ff0000"} />
-        <Join color={"#ff0000"} />
-        <Point color={"#ff0000"} />
-        <BranchStartJoin color={"#ff0000"} />
-        <Filler height={10} />
-        <Filler height={22} />
-        <Filler height={10} />
+        <div style={{ width: "4rem" }} className="pl-3">
+          <b>Timeline</b>
+        </div>
+        <div className="col-4 py-0 pr-0 pl-4">
+          <b>Action</b>
+        </div>
+        <div className="col-3 py-0 pr-0 pl-3">
+          <b>Date</b>
+        </div>
+        <div className="col-2 p-0">
+          <b>Message</b>
+        </div>
+        <div className="col-2 p-0">
+          <b>Note</b>
+        </div>
       </div>
+
+      <div
+        style={{ width: "4rem", marginTop: "0.8rem" }}
+        className="d-flex flex-row mx-0 pl-1 position-absolute ml-3 mr-3"
+      >
+        {generateRow().map((v) => {
+          return (
+            <div
+              className="d-flex flex-column align-items-center"
+              style={{ marginLeft: "0.8rem" }}
+            >
+              {v.row.map((w, i) => {
+                if (w.type === 0) {
+                  return (
+                    <>
+                      {i > 0 ? <Filler height={22} /> : null}
+                      <Filler height={10} />
+                    </>
+                  );
+                }
+                if (w.type === 1) {
+                  return (
+                    <>
+                      {i > 0 ? <Join color={columnColor[v.column]} /> : null}
+                      <Point color={columnColor[v.column]} />
+                    </>
+                  );
+                }
+                if (w.type === 2) {
+                  return (
+                    <>
+                      <Join color={columnColor[v.column]} />
+                      <Point color={columnColor[v.column]} />
+                      <BranchStartJoin color={columnColor[v.column]} />
+                      <Filler height={10} />
+                    </>
+                  );
+                }
+                if (w.type === 3) {
+                  return (
+                    <>
+                      <BranchEndJoin color={columnColor[v.column]} />
+                      <Point color={columnColor[v.column]} />
+                    </>
+                  );
+                }
+                if (w.type === 4) {
+                  return (
+                    <>
+                      <BranchEndJoin color={columnColor[v.column]} />
+                      <Point color={columnColor[v.column]} />
+                      <BranchStartJoin color={columnColor[v.column]} />
+                    </>
+                  );
+                }
+                if (w.type === 5) {
+                  return (
+                    <>
+                      <Join color={columnColor[v.column]} />
+                      <SmallJoin color={columnColor[v.column]} />
+                    </>
+                  );
+                }
+              })}
+            </div>
+          );
+        })}
+      </div>
+
+      {data.map((v) => {
+        return (
+          <div className="row ml-3 mr-3 timeline-description">
+            <div style={{ width: "4rem" }} className="pl-3"></div>
+
+            <div className="col-4 py-0 pr-0 pl-4">
+              <div style={{ height: 32 }} className="d-flex align-items-center">
+                <b>{v.label}</b>
+              </div>
+            </div>
+
+            <div className="col-3 py-0 pr-0 pl-3">
+              <div
+                style={{ height: 32, color: "grey" }}
+                className="d-flex align-items-center"
+              >
+                {formatDateTime(v.date)}
+              </div>
+            </div>
+
+            <div className="col-2 p-0">
+              <div style={{ height: 32 }} className="d-flex align-items-center">
+                {v.approved_by}
+              </div>
+            </div>
+
+            <div className="col-2 p-0">
+              <div style={{ height: 32 }} className="d-flex align-items-center">
+                {v?.reason ?? "-"}
+              </div>
+            </div>
+          </div>
+        );
+      })}
     </div>
   );
 }

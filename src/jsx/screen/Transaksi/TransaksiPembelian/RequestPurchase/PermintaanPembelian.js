@@ -1089,9 +1089,9 @@ const PermintaanPembelian = ({ onAdd, onEdit }) => {
       </Dialog> */}
 
       <Dialog
-        header={"Detail Permintaan"}
+        header={"Detail Timeline"}
         visible={displayData}
-        style={{ width: "38vw" }}
+        style={{ width: "50vw" }}
         footer={renderFooter("displayData")}
         onHide={() => {
           setDisplayDat(false);

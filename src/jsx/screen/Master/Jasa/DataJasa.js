@@ -107,7 +107,7 @@ const DataJasa = ({
   };
 
   const editJasa = async () => {
-    setLoading(true);
+    setUpdate(true);
     const config = {
       ...endpoints.editJasa,
       endpoint: endpoints.editJasa.endpoint + currentItem.jasa.id,
@@ -126,7 +126,7 @@ const DataJasa = ({
       if (response.status) {
         setTimeout(() => {
           onSuccessInput();
-          setLoading(false);
+          setUpdate(false);
           onHideInput();
           onInput(false);
           toast.current.show({
@@ -151,7 +151,7 @@ const DataJasa = ({
   };
 
   const addJasa = async () => {
-    setLoading(true);
+    setUpdate(true);
     const config = {
       ...endpoints.addJasa,
       data: {
@@ -169,7 +169,7 @@ const DataJasa = ({
       if (response.status) {
         setTimeout(() => {
           onSuccessInput();
-          setLoading(false);
+          setUpdate(false);
           onHideInput();
           onInput(false);
           toast.current.show({
@@ -207,7 +207,7 @@ const DataJasa = ({
   };
 
   const delJasa = async (id) => {
-    setLoading(true);
+    setUpdate(true);
     const config = {
       ...endpoints.delJasa,
       endpoint: endpoints.delJasa.endpoint + currentItem.jasa.id,
@@ -220,8 +220,9 @@ const DataJasa = ({
       if (response.status) {
         setTimeout(() => {
           onSuccessInput();
-          setLoading(false);
+          setUpdate(false);
           onHideInput();
+          setShowDelete(false)
           onInput(false);
           toast.current.show({
             severity: "info",
@@ -235,6 +236,7 @@ const DataJasa = ({
       console.log(error);
       setTimeout(() => {
         setUpdate(false);
+        setShowDelete(false)
         toast.current.show({
           severity: "error",
           summary: tr[localStorage.getItem("language")].gagal,
@@ -293,10 +295,10 @@ const DataJasa = ({
           onClick={() => {
             if (isValid()) {
               if (isEdit) {
-                setLoading(true);
+                setUpdate(true);
                 editJasa();
               } else {
-                setLoading(true);
+                setUpdate(true);
                 addJasa();
               }
             }
@@ -570,9 +572,9 @@ const DataJasa = ({
                     ...currentItem,
                     jasa: { ...currentItem.jasa, code: e.target.value },
                   });
-                  let newError = error;
-                  newError.code = false;
-                  setError(newError);
+                  // let newError = error;
+                  // newError.code = false;
+                  setError({...error, code: false});
                 }}
                 placeholder={tr[localStorage.getItem("language")].masuk}
                 error={error?.code}
@@ -674,7 +676,7 @@ const DataJasa = ({
           <div className="ml-2 mr-3">
             <i
               className="pi pi-exclamation-triangle mr-2 align-middle"
-              style={{ fontSize: "1rem" }}
+              style={{ fontSize: "2rem" }}
             />
             <span>{tr[localStorage.getItem("language")].pesan_hapus}</span>
           </div>

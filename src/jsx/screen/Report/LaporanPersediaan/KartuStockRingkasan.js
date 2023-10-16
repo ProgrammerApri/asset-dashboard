@@ -869,11 +869,11 @@ const KartuStockRingkasan = ({ month, year, kategory }) => {
                 }
               });
               data.push({
-                acco: `${e?.prod_id?.code}\n(${e?.prod_id?.name})`,
-                grupP: `${checkGrup(e?.prod_id?.group)?.groupPro?.name}`,
+                acco: e?.prod_id ? `${e?.prod_id?.code}\n(${e?.prod_id?.name})` : "-",
+                grupP: e?.prod_id ? `${checkGrup(e?.prod_id?.group)?.groupPro?.name}` : "-",
                 prod_id: e?.prod_id?.id,
                 loc_id: e?.loc_id?.id,
-                loc: `${e?.loc_id?.name}\n(${e?.loc_id?.code})`,
+                loc: e?.loc_id ? `${e?.loc_id?.name}\n(${e?.loc_id?.code})` : "-",
                 awal: qty_awal,
                 debe: qty_debit,
                 kred: qty_kredit,
@@ -962,11 +962,11 @@ const KartuStockRingkasan = ({ month, year, kategory }) => {
           });
           data.push({
             type: "item",
-            acco: `${e?.prod_id?.code}\n(${e?.prod_id?.name})`,
-            grupP: `${checkGrup(e?.prod_id?.group)?.groupPro?.name}`,
+            acco: e?.prod_id ? `${e?.prod_id?.code}\n(${e?.prod_id?.name})` : "-",
+            grupP: e?.prod_id ? `${checkGrup(e?.prod_id?.group)?.groupPro?.name}` : "-",
             prod_id: e?.prod_id?.id,
             loc_id: e?.loc_id?.id,
-            loc: `${e?.loc_id?.name}\n(${e?.loc_id?.code})`,
+            loc: e?.loc_id ? `${e?.loc_id?.name}\n(${e?.loc_id?.code})` : "-",
             awal: qty_awal,
             debe: qty_debit,
             kred: qty_kredit,

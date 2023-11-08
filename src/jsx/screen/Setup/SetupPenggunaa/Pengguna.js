@@ -106,7 +106,7 @@ const Pengguna = ({ onAdd, onEdit }) => {
             });
             dispatch({
               type: SET_CURRENT_USER,
-              payload: def,
+              payload: data,
             });
           }}
           className={`btn btn-primary shadow btn-xs sharp ml-1`}

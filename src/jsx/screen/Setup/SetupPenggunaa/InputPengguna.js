@@ -87,45 +87,7 @@ const InputPengguna = ({ onCancel, onSuccess, del }) => {
       behavior: "smooth",
     });
     getMenu();
-    getPusatBiaya();
-    getDivisi()
   }, []);
-
-  const getPusatBiaya = async () => {
-    const config = {
-      ...endpoints.pusatBiaya,
-      data: {},
-    };
-    console.log(config.data);
-    let response = null;
-    try {
-      response = await request(null, config);
-      console.log(response);
-      if (response.status) {
-        const { data } = response;
-        console.log(data);
-        setPusatBiaya(data);
-      }
-    } catch (error) {}
-  };
-
-  const getDivisi = async () => {
-    const config = {
-      ...endpoints.divpusatBiaya,
-      data: {},
-    };
-    console.log(config.data);
-    let response = null;
-    try {
-      response = await request(null, config);
-      console.log(response);
-      if (response.status) {
-        const { data } = response;
-        console.log(data);
-        setDivisi(data);
-      }
-    } catch (error) {}
-  };
 
   const getMenu = async (isUpdate = false) => {
     setLoading(true);
@@ -343,27 +305,7 @@ const InputPengguna = ({ onCancel, onSuccess, del }) => {
     });
   };
 
-  const checkDepartement = (value) => {
-    let selected = null;
-    pusatBiaya?.forEach((element) => {
-      if (element.id === value) {
-        selected = element;
-      }
-    });
 
-    return selected;
-  };
-
-  const checkDivisi = (value) => {
-    let selected = null;
-    divisi?.forEach((element) => {
-      if (element.id === value) {
-        selected = element;
-      }
-    });
-
-    return selected;
-  };
 
   const checkModules = (value) => {
     let selected = null;
@@ -569,58 +511,6 @@ const InputPengguna = ({ onCancel, onSuccess, del }) => {
               <b>Hak Otorisasi</b>
             </span>
             <Divider className="mt-1"></Divider>
-          </div>
-
-          <div className="col-3 ">
-            <PrimeDropdown
-              label={"Divisi"}
-              value={
-                user.previlage?.div_id
-                  ? checkDivisi(user.previlage.div_id)
-                  : null
-              }
-              options={divisi}
-              optionLabel={"div_ccost_name"}
-              onChange={(e) => {
-                console.log(e);
-                updateUser({
-                  ...user,
-                  previlage: {
-                    ...user.previlage,
-                    div_id: e.value.id,
-                  },
-                });
-              }}
-              filter
-              filterBy={"div_ccost_name"}
-              placeholder="Pilih Divisi"
-            />
-          </div>
-
-          <div className="col-3 ">
-            <PrimeDropdown
-              label={"Department"}
-              value={
-                user.previlage?.dep_id
-                  ? checkDepartement(user.previlage.dep_id)
-                  : null
-              }
-              options={pusatBiaya}
-              optionLabel={"ccost_name"}
-              onChange={(e) => {
-                console.log(e.value);
-                updateUser({
-                  ...user,
-                  previlage: {
-                    ...user.previlage,
-                    dep_id: e.value.id,
-                  },
-                });
-              }}
-              filter
-              filterBy={"ccost_name"}
-              placeholder="Pilih Department"
-            />
           </div>
           <div className="d-flex flex-column px-3 py-2">
             <label className="text-label">Akses Data</label>

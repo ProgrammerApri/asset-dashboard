@@ -4,7 +4,6 @@ import { Checkbox } from "primereact/checkbox";
 import { Password } from "primereact/password";
 import { InputText } from "primereact/inputtext";
 import { Button, Image, Row } from "react-bootstrap";
-import logo from "../images/logo-large.png";
 import ilustration from "../images/header-mobile.png";
 import { ApiConfig } from "src/data/config";
 
